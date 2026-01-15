@@ -53,8 +53,6 @@ Pantalla táctil 5" 800x480 con ESP32-S3.
 
 ### Dashboard Bambu Lab
 
-![Dashboard Bambu](docs/bambu-dashboard.png)
-
 Funcionalidades:
 - Temperaturas en tiempo real (nozzle, cama)
 - Progreso de impresión con barra
