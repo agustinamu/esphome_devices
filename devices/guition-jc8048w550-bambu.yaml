@@ -109,10 +109,24 @@ sensor:
   - platform: homeassistant
     id: current_layer
     entity_id: sensor.p1s_01p00c581002790_capa_actual
+    on_value:
+      - lvgl.label.update:
+          id: lbl_layers
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f / %.0f", x, id(total_layers).state);
+            return buf;
 
   - platform: homeassistant
     id: total_layers
     entity_id: sensor.p1s_01p00c581002790_cantidad_total_de_capas
+    on_value:
+      - lvgl.label.update:
+          id: lbl_layers
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f / %.0f", id(current_layer).state, x);
+            return buf;
 
   - platform: wifi_signal
     id: wifi_signal_db
@@ -209,6 +223,23 @@ lvgl:
   touchscreens:
     - my_touch
   color_depth: 16
+  font:
+    - file: "gfonts://Roboto"
+      id: roboto_28
+      size: 28
+      glyphs: "0123456789°C/% ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-:_"
+    - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+      id: mdi_28
+      size: 28
+      glyphs: [
+        "\U000F18B8",
+        "\U000F0157",
+        "\U000F08ED",
+        "\U000F0AB9",
+        "\U000F0425",
+        "\U000F040A",
+        "\U000F0E51"
+      ]
   style_definitions:
     - id: style_card
       bg_color: 0x1E1E1E
@@ -268,64 +299,79 @@ lvgl:
             height: 280
             styles: style_card
             widgets:
-              # Nozzle
+              # Nozzle - icono + temperatura
               - label:
                   x: 10
-                  y: 15
-                  text: "Boquilla"
-                  text_color: 0x008844
-                  text_font: montserrat_18
+                  y: 10
+                  text: "\U000F18B8"
+                  text_font: mdi_28
+                  text_color: 0xFFFFFF
               - label:
-                  x: 10
-                  y: 45
+                  x: 50
+                  y: 10
                   text: "---°C"
                   text_color: 0xFFFFFF
-                  text_font: montserrat_36
+                  text_font: montserrat_28
                   id: lbl_nozzle
               - label:
-                  x: 130
-                  y: 55
-                  text: "/ ---°C"
-                  text_color: 0x006633
+                  x: 150
+                  y: 15
+                  text: "/ ---"
+                  text_color: 0xFFFFFF
                   text_font: montserrat_18
                   id: lbl_nozzle_target
 
-              # Bed
+              # Bed - icono + temperatura
               - label:
                   x: 10
-                  y: 110
-                  text: "Cama"
-                  text_color: 0x008844
-                  text_font: montserrat_18
+                  y: 70
+                  text: "\U000F0157"
+                  text_font: mdi_28
+                  text_color: 0xFFFFFF
               - label:
-                  x: 10
-                  y: 140
+                  x: 50
+                  y: 70
                   text: "---°C"
                   text_color: 0xFFFFFF
-                  text_font: montserrat_36
+                  text_font: montserrat_28
                   id: lbl_bed
               - label:
-                  x: 130
-                  y: 150
-                  text: "/ ---°C"
-                  text_color: 0x006633
+                  x: 150
+                  y: 75
+                  text: "/ ---"
+                  text_color: 0xFFFFFF
                   text_font: montserrat_18
                   id: lbl_bed_target
 
-              # Estado filamento
+              # Filamento - icono + tipo
               - label:
                   x: 10
-                  y: 205
-                  text: "Filamento"
-                  text_color: 0x008844
-                  text_font: montserrat_18
+                  y: 130
+                  text: "\U000F08ED"
+                  text_font: mdi_28
+                  text_color: 0xFFFFFF
               - label:
-                  x: 10
-                  y: 230
+                  x: 50
+                  y: 130
                   text: "PLA"
-                  text_color: 0x00AE42
+                  text_color: 0xFFFFFF
                   text_font: montserrat_28
                   id: lbl_filament
+
+              # Capas
+              - label:
+                  x: 10
+                  y: 190
+                  text: "\U000F0AB9"
+                  text_font: mdi_28
+                  text_color: 0xFFFFFF
+              - label:
+                  x: 50
+                  y: 190
+                  text: "0 / 0"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_28
+                  id: lbl_layers
 
         # === Tarjeta Progreso (centro) ===
         - obj:
