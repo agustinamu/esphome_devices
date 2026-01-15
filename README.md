@@ -10,14 +10,43 @@ Configuraciones ESPHome para dispositivos del hogar, usables como remote package
 | Guition 5" Básico | `devices/guition-jc8048w550.yaml` | Reloj, WiFi, botón de prueba |
 | Guition 5" Bambu | `devices/guition-jc8048w550-bambu.yaml` | Dashboard para impresora Bambu Lab P1S |
 
-## Uso
+## Configuraciones para ESPHome en Home Assistant
 
-En ESPHome de Home Assistant:
+### Humidificador (ESP8266)
 
 ```yaml
 esphome:
-  name: mi-dispositivo
-  friendly_name: Mi Dispositivo
+  name: humidificador
+  friendly_name: Humidificador
+
+packages:
+  - url: https://github.com/agustinamu/esphome_devices
+    ref: develop
+    files: [devices/humidificador.yaml]
+    refresh: 1d
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Humidificador Fallback"
+    password: !secret fallback_password
+```
+
+### Guition 5" - Ejemplo básico (reloj, wifi, botón)
+
+```yaml
+esphome:
+  name: guition-pantalla
+  friendly_name: Pantalla Guition
 
 packages:
   - url: https://github.com/agustinamu/esphome_devices
@@ -37,7 +66,36 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   ap:
-    ssid: "Fallback Hotspot"
+    ssid: "Guition Fallback"
+    password: !secret fallback_password
+```
+
+### Guition 5" - Dashboard Bambu Lab P1S
+
+```yaml
+esphome:
+  name: guition-bambu
+  friendly_name: Panel Bambu
+
+packages:
+  - url: https://github.com/agustinamu/esphome_devices
+    ref: develop
+    files: [devices/guition-jc8048w550-bambu.yaml]
+    refresh: 1d
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Guition Bambu Fallback"
     password: !secret fallback_password
 ```
 
