@@ -23,11 +23,11 @@ time:
   - platform: homeassistant
     id: ha_time
 
-# Sensores de Home Assistant (Bambu Lab)
+# Sensores de Home Assistant (Bambu Lab P1S)
 sensor:
   - platform: homeassistant
     id: nozzle_temp
-    entity_id: sensor.x1c_nozzle_temperature
+    entity_id: sensor.p1s_01p00c581002790_nozzle_temperature
     on_value:
       - lvgl.label.update:
           id: lbl_nozzle
@@ -38,11 +38,18 @@ sensor:
 
   - platform: homeassistant
     id: nozzle_target
-    entity_id: number.x1c_nozzle_target_temperature
+    entity_id: number.p1s_01p00c581002790_nozzle_target_temperature
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nozzle_target
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "/ %.0f°C", x);
+            return buf;
 
   - platform: homeassistant
     id: bed_temp
-    entity_id: sensor.x1c_bed_temperature
+    entity_id: sensor.p1s_01p00c581002790_bed_temperature
     on_value:
       - lvgl.label.update:
           id: lbl_bed
@@ -53,22 +60,18 @@ sensor:
 
   - platform: homeassistant
     id: bed_target
-    entity_id: number.x1c_bed_target_temperature
-
-  - platform: homeassistant
-    id: chamber_temp
-    entity_id: sensor.x1c_chamber_temperature
+    entity_id: number.p1s_01p00c581002790_bed_target_temperature
     on_value:
       - lvgl.label.update:
-          id: lbl_chamber
+          id: lbl_bed_target
           text: !lambda |-
             static char buf[16];
-            snprintf(buf, sizeof(buf), "%.0f°C", x);
+            snprintf(buf, sizeof(buf), "/ %.0f°C", x);
             return buf;
 
   - platform: homeassistant
     id: print_progress
-    entity_id: sensor.x1c_print_progress
+    entity_id: sensor.p1s_01p00c581002790_print_progress
     on_value:
       - lvgl.bar.update:
           id: progress_bar
@@ -82,17 +85,25 @@ sensor:
 
   - platform: homeassistant
     id: print_time_remaining
-    entity_id: sensor.x1c_remaining_time
+    entity_id: sensor.p1s_01p00c581002790_remaining_time
     on_value:
       - lvgl.label.update:
           id: lbl_remaining
           text: !lambda |-
-            static char buf[16];
+            static char buf[24];
             int mins = (int)x;
             int h = mins / 60;
             int m = mins % 60;
-            snprintf(buf, sizeof(buf), "%dh %02dm", h, m);
+            snprintf(buf, sizeof(buf), "Restante: %dh %02dm", h, m);
             return buf;
+
+  - platform: homeassistant
+    id: current_layer
+    entity_id: sensor.p1s_01p00c581002790_current_layer
+
+  - platform: homeassistant
+    id: total_layers
+    entity_id: sensor.p1s_01p00c581002790_total_layer_count
 
   - platform: wifi_signal
     id: wifi_signal_db
@@ -101,15 +112,19 @@ sensor:
 text_sensor:
   - platform: homeassistant
     id: printer_status
-    entity_id: sensor.x1c_print_status
+    entity_id: sensor.p1s_01p00c581002790_current_stage
     on_value:
       - lvgl.label.update:
           id: lbl_status
           text: !lambda return x.c_str();
 
   - platform: homeassistant
+    id: gcode_state
+    entity_id: sensor.p1s_01p00c581002790_gcode_state
+
+  - platform: homeassistant
     id: current_file
-    entity_id: sensor.x1c_current_task
+    entity_id: sensor.p1s_01p00c581002790_task_name
     on_value:
       - lvgl.label.update:
           id: lbl_filename
@@ -236,20 +251,20 @@ lvgl:
               # Nozzle
               - label:
                   x: 10
-                  y: 10
+                  y: 15
                   text: "Nozzle"
                   text_color: 0x888888
                   text_font: montserrat_18
               - label:
                   x: 10
-                  y: 35
+                  y: 45
                   text: "---°C"
                   text_color: 0xFFFFFF
                   text_font: montserrat_36
                   id: lbl_nozzle
               - label:
-                  x: 140
-                  y: 45
+                  x: 130
+                  y: 55
                   text: "/ ---°C"
                   text_color: 0x666666
                   text_font: montserrat_18
@@ -258,39 +273,39 @@ lvgl:
               # Bed
               - label:
                   x: 10
-                  y: 100
+                  y: 110
                   text: "Cama"
                   text_color: 0x888888
                   text_font: montserrat_18
               - label:
                   x: 10
-                  y: 125
+                  y: 140
                   text: "---°C"
                   text_color: 0xFFFFFF
                   text_font: montserrat_36
                   id: lbl_bed
               - label:
-                  x: 140
-                  y: 135
+                  x: 130
+                  y: 150
                   text: "/ ---°C"
                   text_color: 0x666666
                   text_font: montserrat_18
                   id: lbl_bed_target
 
-              # Chamber
+              # Estado filamento
               - label:
                   x: 10
-                  y: 190
-                  text: "Cámara"
+                  y: 205
+                  text: "Filamento"
                   text_color: 0x888888
                   text_font: montserrat_18
               - label:
                   x: 10
-                  y: 215
-                  text: "---°C"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_36
-                  id: lbl_chamber
+                  y: 230
+                  text: "PLA"
+                  text_color: 0x00AE42
+                  text_font: montserrat_28
+                  id: lbl_filament
 
         # === Tarjeta Progreso (centro) ===
         - obj:
@@ -385,7 +400,7 @@ lvgl:
                     - homeassistant.action:
                         action: button.press
                         data:
-                          entity_id: button.x1c_pause_printing
+                          entity_id: button.p1s_01p00c581002790_pause_printing
 
               # Botón Reanudar
               - button:
@@ -403,7 +418,7 @@ lvgl:
                     - homeassistant.action:
                         action: button.press
                         data:
-                          entity_id: button.x1c_resume_printing
+                          entity_id: button.p1s_01p00c581002790_resume_printing
 
               # Botón Cancelar
               - button:
@@ -421,7 +436,7 @@ lvgl:
                     - homeassistant.action:
                         action: button.press
                         data:
-                          entity_id: button.x1c_stop_printing
+                          entity_id: button.p1s_01p00c581002790_stop_printing
 
         # === Footer con botones adicionales ===
         - obj:
@@ -449,7 +464,7 @@ lvgl:
                     - homeassistant.action:
                         action: button.press
                         data:
-                          entity_id: button.x1c_home
+                          entity_id: button.p1s_01p00c581002790_home
 
               # Filamento
               - button:
@@ -486,12 +501,12 @@ lvgl:
                     - homeassistant.action:
                         action: number.set_value
                         data:
-                          entity_id: number.x1c_bed_target_temperature
+                          entity_id: number.p1s_01p00c581002790_bed_target_temperature
                           value: "60"
                     - homeassistant.action:
                         action: number.set_value
                         data:
-                          entity_id: number.x1c_nozzle_target_temperature
+                          entity_id: number.p1s_01p00c581002790_nozzle_target_temperature
                           value: "200"
 
               # Enfriar
@@ -512,12 +527,12 @@ lvgl:
                     - homeassistant.action:
                         action: number.set_value
                         data:
-                          entity_id: number.x1c_bed_target_temperature
+                          entity_id: number.p1s_01p00c581002790_bed_target_temperature
                           value: "0"
                     - homeassistant.action:
                         action: number.set_value
                         data:
-                          entity_id: number.x1c_nozzle_target_temperature
+                          entity_id: number.p1s_01p00c581002790_nozzle_target_temperature
                           value: "0"
 
               # Luz
@@ -538,7 +553,7 @@ lvgl:
                     - homeassistant.action:
                         action: light.toggle
                         data:
-                          entity_id: light.x1c_chamber_light
+                          entity_id: light.p1s_01p00c581002790_chamber_light
 
     # === Página Filamento ===
     - id: filament_page
@@ -566,7 +581,7 @@ lvgl:
               - homeassistant.action:
                   action: bambu_lab.load_filament
                   data:
-                    device_id: !secret bambu_device_id
+                    device_id: 01KF1V4Q1W6KB1AQ4KGPJM6FQT
 
         - button:
             align: CENTER
@@ -583,7 +598,7 @@ lvgl:
               - homeassistant.action:
                   action: bambu_lab.unload_filament
                   data:
-                    device_id: !secret bambu_device_id
+                    device_id: 01KF1V4Q1W6KB1AQ4KGPJM6FQT
 
         - button:
             align: BOTTOM_MID
