@@ -46,7 +46,7 @@ light:
 # I2C para touch GT911
 i2c:
   sda: GPIO19
-  scl: GPIO45
+  scl: GPIO20
   scan: false
 
 touchscreen:
