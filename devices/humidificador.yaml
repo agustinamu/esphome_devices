@@ -1,32 +1,18 @@
 # Humidificador - Control mediante pulsos en GPIO
-# Placa: ESP8266 ESP-01 1M
-
-substitutions:
-  device_name: "humidificador"
-  friendly_name: "Humidificador"
 
 esphome:
-  name: ${device_name}
-  friendly_name: ${friendly_name}
   on_boot:
     priority: 1000
     then:
       - lambda: |-
-          // Inicializar pines en estado alto con pull-up
           pinMode(14, OUTPUT);
           digitalWrite(14, HIGH);
           delay(10);
           pinMode(14, INPUT_PULLUP);
-
           pinMode(16, OUTPUT);
           digitalWrite(16, HIGH);
           delay(10);
           pinMode(16, INPUT_PULLUP);
-
-packages:
-  base: !include ../common/base.yaml
-  wifi: !include ../common/wifi.yaml
-  board: !include ../common/esp8266.yaml
 
 globals:
   - id: luz_bloqueo
@@ -37,7 +23,6 @@ globals:
     initial_value: 'false'
 
 script:
-  # Pulso para control de luz (D0/GPIO16)
   - id: pulse_luz
     mode: queued
     max_runs: 2
@@ -52,7 +37,6 @@ script:
       - lambda: 'id(luz_bloqueo) = false;'
       - delay: 300ms
 
-  # Pulso para control de encendido (D5/GPIO14)
   - id: pulse_power
     mode: queued
     max_runs: 2
@@ -95,7 +79,7 @@ switch:
 binary_sensor:
   - platform: gpio
     pin:
-      number: 16  # D0
+      number: 16
       mode: INPUT
     name: "Sensor Luz"
     id: sensor_luz
@@ -111,7 +95,7 @@ binary_sensor:
 
   - platform: gpio
     pin:
-      number: 14  # D5
+      number: 14
       mode: INPUT
     name: "Sensor Power"
     id: sensor_power
