@@ -17,6 +17,12 @@ psram:
 
 logger:
 
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_signal_db
+    update_interval: 10s
+
 time:
   - platform: homeassistant
     id: ha_time
@@ -172,5 +178,9 @@ interval:
           id: lbl_wifi
           text: !lambda |-
             static char buf[40];
-            snprintf(buf, sizeof(buf), "WiFi: %s (%ddBm)", WiFi.SSID().c_str(), WiFi.RSSI());
+            if (id(wifi_signal_db).has_state()) {
+              snprintf(buf, sizeof(buf), "WiFi: %.0f dBm", id(wifi_signal_db).state);
+            } else {
+              snprintf(buf, sizeof(buf), "WiFi: conectando...");
+            }
             return buf;
