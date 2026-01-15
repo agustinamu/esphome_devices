@@ -1,0 +1,5 @@
+# Secretos - nunca subir al repo
+secrets.yaml
+
+# Archivos generados por ESPHome
+.esphome/

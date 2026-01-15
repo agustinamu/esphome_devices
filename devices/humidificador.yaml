@@ -1,0 +1,126 @@
+# Humidificador - Control mediante pulsos en GPIO
+# Placa: ESP8266 ESP-01 1M
+
+substitutions:
+  device_name: "humidificador"
+  friendly_name: "Humidificador"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  on_boot:
+    priority: 1000
+    then:
+      - lambda: |-
+          // Inicializar pines en estado alto con pull-up
+          pinMode(14, OUTPUT);
+          digitalWrite(14, HIGH);
+          delay(10);
+          pinMode(14, INPUT_PULLUP);
+
+          pinMode(16, OUTPUT);
+          digitalWrite(16, HIGH);
+          delay(10);
+          pinMode(16, INPUT_PULLUP);
+
+packages:
+  base: !include ../common/base.yaml
+  wifi: !include ../common/wifi.yaml
+  board: !include ../common/esp8266.yaml
+
+globals:
+  - id: luz_bloqueo
+    type: bool
+    initial_value: 'false'
+  - id: power_bloqueo
+    type: bool
+    initial_value: 'false'
+
+script:
+  # Pulso para control de luz (D0/GPIO16)
+  - id: pulse_luz
+    mode: queued
+    max_runs: 2
+    then:
+      - lambda: 'id(luz_bloqueo) = true;'
+      - lambda: |-
+          pinMode(16, OUTPUT);
+          digitalWrite(16, LOW);
+      - delay: 500ms
+      - lambda: 'pinMode(16, INPUT);'
+      - delay: 100ms
+      - lambda: 'id(luz_bloqueo) = false;'
+      - delay: 300ms
+
+  # Pulso para control de encendido (D5/GPIO14)
+  - id: pulse_power
+    mode: queued
+    max_runs: 2
+    then:
+      - lambda: 'id(power_bloqueo) = true;'
+      - lambda: |-
+          pinMode(14, OUTPUT);
+          digitalWrite(14, LOW);
+      - delay: 500ms
+      - lambda: 'pinMode(14, INPUT);'
+      - delay: 100ms
+      - lambda: 'id(power_bloqueo) = false;'
+      - delay: 300ms
+
+switch:
+  - platform: template
+    name: "Luz"
+    id: switch_luz
+    icon: "mdi:lightbulb"
+    optimistic: true
+    turn_on_action:
+      - lambda: 'id(luz_bloqueo) = true;'
+      - script.execute: pulse_luz
+    turn_off_action:
+      - lambda: 'id(luz_bloqueo) = true;'
+      - script.execute: pulse_luz
+
+  - platform: template
+    name: "Power"
+    id: switch_power
+    icon: "mdi:power"
+    optimistic: true
+    turn_on_action:
+      - lambda: 'id(power_bloqueo) = true;'
+      - script.execute: pulse_power
+    turn_off_action:
+      - lambda: 'id(power_bloqueo) = true;'
+      - script.execute: pulse_power
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 16  # D0
+      mode: INPUT
+    name: "Sensor Luz"
+    id: sensor_luz
+    internal: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    on_state:
+      - lambda: |-
+          if (!id(luz_bloqueo)) {
+            id(switch_luz).toggle();
+          }
+
+  - platform: gpio
+    pin:
+      number: 14  # D5
+      mode: INPUT
+    name: "Sensor Power"
+    id: sensor_power
+    internal: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    on_state:
+      - lambda: |-
+          if (!id(power_bloqueo)) {
+            id(switch_power).toggle();
+          }
