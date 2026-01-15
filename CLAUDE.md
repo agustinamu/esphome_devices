@@ -1,104 +1,122 @@
-# ESPHome Devices Repository
+# ESPHome Devices - Contexto para Claude
 
 ## Descripción
-Repositorio de configuraciones ESPHome para dispositivos del hogar, diseñado para usarse con Home Assistant mediante remote packages.
+Repositorio de configuraciones ESPHome para dispositivos del hogar. Usa remote packages para cargar desde GitHub.
 
-## Estructura
+## Estructura de carpetas
 
 ```
-├── devices/                    # Configuraciones de dispositivos
-│   ├── humidificador.yaml     # Control de humidificador via GPIO pulsos
-│   ├── guition-jc8048w550.yaml         # Pantalla 5" - ejemplo básico (reloj, wifi, botón)
-│   └── guition-jc8048w550-bambu.yaml   # Pantalla 5" - dashboard Bambu Lab P1S
-├── secrets.yaml.example        # Template de secretos
-└── .gitignore
+devices/
+├── humidificador/
+│   ├── esphome.yaml    # Config para copiar en HA (secretos + package ref)
+│   └── package.yaml    # Lógica del dispositivo (se carga desde GitHub)
+├── guition-jc8048w550/
+│   ├── esphome.yaml
+│   └── package.yaml
+└── guition-jc8048w550-bambu/
+    ├── esphome.yaml
+    └── package.yaml
 ```
 
 ## Dispositivos
 
-### Humidificador (ESP8266)
-- **Placa**: ESP-01 1M
-- **Función**: Control de humidificador mediante pulsos en GPIO
+### 1. Humidificador
+- **Placa**: ESP8266 ESP-01 1M
 - **Pines**: GPIO14 (power), GPIO16 (luz)
+- **Función**: Pulsos para simular botones físicos
 
-### Guition JC8048W550 (ESP32-S3)
-- **Pantalla**: 5" IPS 800x480
-- **Touch**: GT911 capacitivo (I2C)
-- **Driver**: ST7262 RGB paralelo
-- **PSRAM**: 8MB Octal
-- **Flash**: 16MB
+### 2. Guition JC8048W550 (básico)
+- **Placa**: ESP32-S3 N16R8
+- **Display**: 5" IPS 800x480 RGB (ST7262)
+- **Touch**: GT911 I2C
+- **Función**: Ejemplo con reloj y botón
 
-#### Pines importantes:
-- **Backlight**: GPIO2
-- **I2C**: SDA=GPIO19, SCL=GPIO20
-- **Display**: DE=GPIO40, HSYNC=GPIO39, VSYNC=GPIO41, PCLK=GPIO42
+### 3. Guition JC8048W550 Bambu
+- **Igual que anterior**
+- **Función**: Dashboard para Bambu Lab P1S
+- **Entidades**: En español (HA configurado en español)
+- **Prefijo entidades**: `p1s_01p00c581002790_`
 
-## Uso desde Home Assistant
+## Pinout Guition JC8048W550
 
-Los dispositivos se usan como remote packages. Ejemplo:
+| Función | GPIO |
+|---------|------|
+| Backlight | 2 |
+| I2C SDA | 19 |
+| I2C SCL | 20 |
+| Touch INT | 18 (no conectado por defecto) |
+| Display DE | 40 |
+| Display HSYNC | 39 |
+| Display VSYNC | 41 |
+| Display PCLK | 42 |
+| Red | 45, 48, 47, 21, 14 |
+| Green | 5, 6, 7, 15, 16, 4 |
+| Blue | 8, 3, 46, 9, 10 |
+
+## Configuración display
 
 ```yaml
-esphome:
-  name: mi-dispositivo
-  friendly_name: Mi Dispositivo
-
-packages:
-  - url: https://github.com/agustinamu/esphome_devices
-    ref: develop
-    files: [devices/nombre-archivo.yaml]
-    refresh: 1d
-
-api:
-  encryption:
-    key: !secret api_key
-
-ota:
-  - platform: esphome
-    password: !secret ota_password
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "Fallback"
-    password: !secret fallback_password
+pclk_frequency: 16MHz
+hsync_front_porch: 40
+hsync_pulse_width: 48
+hsync_back_porch: 40
+vsync_front_porch: 13
+vsync_pulse_width: 3
+vsync_back_porch: 32
 ```
-
-## Integración Bambu Lab
-
-El dashboard `guition-jc8048w550-bambu.yaml` está configurado para una **P1S** con serial `01P00C581002790`.
-
-Para otra impresora, cambiar el prefijo de entity_id:
-- Actual: `p1s_01p00c581002790_`
-- Buscar y reemplazar por el prefijo de tu impresora
-
-### Entidades usadas:
-- `sensor.*_nozzle_temperature`
-- `sensor.*_bed_temperature`
-- `sensor.*_print_progress`
-- `sensor.*_remaining_time`
-- `sensor.*_current_stage`
-- `sensor.*_task_name`
-- `number.*_nozzle_target_temperature`
-- `number.*_bed_target_temperature`
-- `button.*_pause_printing`
-- `button.*_resume_printing`
-- `button.*_stop_printing`
-- `button.*_home`
-- `light.*_chamber_light`
 
 ## Notas técnicas
 
 ### Framework
-Los dispositivos ESP32-S3 con pantalla RGB usan **ESP-IDF** (no Arduino) por requisitos de rendimiento del display.
+ESP32-S3 con display RGB requiere **ESP-IDF** (no Arduino).
 
-### Compilación
-Primera compilación: ~15-25 min en RPi
-Compilaciones incrementales: ~2-5 min
+### Colores RGB565
+Evitar grises intermedios (causan dithering/parpadeo). Usar colores puros:
+- Blanco: 0xFFFFFF ✓
+- Negro: 0x000000 ✓
+- Verde Bambu: 0x00AE42 ✓
+- Grises: evitar o usar tonos de verde
 
-### LVGL
-Se usa LVGL para la interfaz gráfica. Acciones disponibles:
-- `lvgl.label.update` - actualizar texto
-- `lvgl.bar.update` - actualizar barra de progreso
-- `lvgl.page.show` - cambiar de página
-- `homeassistant.action` - llamar acciones de HA
+### Iconos MDI
+Se definen fuera del bloque `lvgl:` con el componente `font:`.
+
+### Auto-dim
+Brillo baja al 15% después de 60s sin tocar. Al tocar vuelve al 100%.
+
+## Integración Bambu Lab
+
+### Requisitos
+- Integración ha-bambulab via HACS
+- Habilitar "Permitir acciones de Home Assistant" en ESPHome
+
+### Entidades principales (español)
+- `sensor.*_temperatura_de_la_boquilla`
+- `sensor.*_temperatura_de_la_cama`
+- `sensor.*_progreso_de_la_impresion`
+- `sensor.*_tiempo_restante`
+- `sensor.*_estado_actual`
+- `sensor.*_nombre_de_la_tarea`
+- `sensor.*_capa_actual`
+- `sensor.*_cantidad_total_de_capas`
+- `number.*_temperatura_objetivo_de_la_boquilla`
+- `number.*_temperatura_objetivo_de_la_cama`
+- `button.*_pausar_la_impresion`
+- `button.*_continuar_la_impresion`
+- `button.*_detener_la_impresion`
+- `light.*_luz_de_la_carcasa`
+
+### Acciones
+Las acciones de HA se llaman con `homeassistant.action` en LVGL:
+```yaml
+on_press:
+  - homeassistant.action:
+      action: light.toggle
+      data:
+        entity_id: light.xxx
+```
+
+## Compilación
+
+- Primera vez: 15-25 min en RPi
+- Incremental: 2-5 min
+- Durante OTA la pantalla muestra artefactos (normal)

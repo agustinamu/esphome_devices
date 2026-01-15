@@ -2,126 +2,89 @@
 
 Configuraciones ESPHome para dispositivos del hogar, usables como remote packages desde Home Assistant.
 
-## Dispositivos disponibles
+## Estructura
 
-| Dispositivo | Archivo | Descripción |
-|-------------|---------|-------------|
-| Humidificador | `devices/humidificador.yaml` | Control via pulsos GPIO (ESP8266) |
-| Guition 5" Básico | `devices/guition-jc8048w550.yaml` | Reloj, WiFi, botón de prueba |
-| Guition 5" Bambu | `devices/guition-jc8048w550-bambu.yaml` | Dashboard para impresora Bambu Lab P1S |
+```
+devices/
+├── humidificador/
+│   ├── esphome.yaml      # ← Copiar a Home Assistant
+│   └── package.yaml      # ← Se carga automáticamente
+├── guition-jc8048w550/
+│   ├── esphome.yaml      # ← Copiar a Home Assistant
+│   └── package.yaml      # ← Se carga automáticamente
+└── guition-jc8048w550-bambu/
+    ├── esphome.yaml      # ← Copiar a Home Assistant
+    └── package.yaml      # ← Se carga automáticamente
+```
 
-## Configuraciones para ESPHome en Home Assistant
+## Dispositivos
 
 ### Humidificador (ESP8266)
+Control de humidificador mediante pulsos GPIO.
+- **Placa**: ESP-01 1M
+- **Funciones**: Encender/apagar, control de luz
 
-```yaml
-esphome:
-  name: humidificador
-  friendly_name: Humidificador
+### Guition JC8048W550 - Básico
+Pantalla táctil 5" con ejemplo básico.
+- **Funciones**: Reloj, estado WiFi, botón de prueba
 
-packages:
-  - url: https://github.com/agustinamu/esphome_devices
-    ref: develop
-    files: [devices/humidificador.yaml]
-    refresh: 1d
+### Guition JC8048W550 - Bambu Lab
+Dashboard para impresora Bambu Lab P1S.
+- **Funciones**: Temperaturas, progreso, control de impresión
+- **Requiere**: Integración [ha-bambulab](https://github.com/greghesp/ha-bambulab)
 
-api:
-  encryption:
-    key: !secret api_key
+## Instalación
 
-ota:
-  - platform: esphome
-    password: !secret ota_password
+1. Abre la carpeta del dispositivo que quieres instalar
+2. Copia el contenido de `esphome.yaml`
+3. Pega en un nuevo dispositivo en ESPHome de Home Assistant
+4. Ajusta los secretos en tu `secrets.yaml` de ESPHome
+5. Compila e instala
 
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "Humidificador Fallback"
-    password: !secret fallback_password
-```
+## Guition JC8048W550 - Especificaciones
 
-### Guition 5" - Ejemplo básico (reloj, wifi, botón)
+| Componente | Especificación |
+|------------|----------------|
+| CPU | ESP32-S3 dual-core 240MHz |
+| Flash | 16MB |
+| PSRAM | 8MB Octal |
+| Display | 5" IPS 800x480 RGB |
+| Touch | GT911 capacitivo I2C |
+| Backlight | GPIO2 (PWM) |
 
-```yaml
-esphome:
-  name: guition-pantalla
-  friendly_name: Pantalla Guition
+### Pinout
 
-packages:
-  - url: https://github.com/agustinamu/esphome_devices
-    ref: develop
-    files: [devices/guition-jc8048w550.yaml]
-    refresh: 1d
+| Función | GPIO |
+|---------|------|
+| Backlight | 2 |
+| I2C SDA | 19 |
+| I2C SCL | 20 |
+| Display DE | 40 |
+| Display HSYNC | 39 |
+| Display VSYNC | 41 |
+| Display PCLK | 42 |
 
-api:
-  encryption:
-    key: !secret api_key
+## Integración Bambu Lab
 
-ota:
-  - platform: esphome
-    password: !secret ota_password
+El dashboard está configurado para P1S con entidades en español.
 
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "Guition Fallback"
-    password: !secret fallback_password
-```
+Para otra impresora, busca y reemplaza el prefijo `p1s_01p00c581002790_` por el de tu impresora en `package.yaml`.
 
-### Guition 5" - Dashboard Bambu Lab P1S
+### Funcionalidades
 
-```yaml
-esphome:
-  name: guition-bambu
-  friendly_name: Panel Bambu
-
-packages:
-  - url: https://github.com/agustinamu/esphome_devices
-    ref: develop
-    files: [devices/guition-jc8048w550-bambu.yaml]
-    refresh: 1d
-
-api:
-  encryption:
-    key: !secret api_key
-
-ota:
-  - platform: esphome
-    password: !secret ota_password
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "Guition Bambu Fallback"
-    password: !secret fallback_password
-```
-
-## Guition JC8048W550
-
-Pantalla táctil 5" 800x480 con ESP32-S3.
-
-### Especificaciones
-- **CPU**: ESP32-S3 dual-core 240MHz
-- **Memoria**: 16MB Flash, 8MB PSRAM
-- **Display**: IPS 800x480, driver ST7262
-- **Touch**: Capacitivo GT911
-
-### Dashboard Bambu Lab
-
-Funcionalidades:
 - Temperaturas en tiempo real (nozzle, cama)
-- Progreso de impresión con barra
+- Progreso de impresión con barra y porcentaje
+- Capas actual / total
 - Tiempo restante
-- Controles: pausar, reanudar, cancelar
-- Accesos rápidos: home, filamento, precalentar, enfriar, luz
+- Botones: pausar, reanudar, cancelar
+- Presets: PLA, PETG, enfriar
+- Control de luz de cámara
+- Auto-dim después de 60 segundos
 
 ## Requisitos
 
 - Home Assistant con ESPHome addon
-- Para Bambu Lab: integración [ha-bambulab](https://github.com/greghesp/ha-bambulab) via HACS
+- Para Bambu Lab: integración ha-bambulab via HACS
 
 ## Licencia
 

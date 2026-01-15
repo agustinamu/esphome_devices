@@ -1,0 +1,28 @@
+# Copiar este archivo en ESPHome de Home Assistant
+# Archivo: guition-bambu.yaml
+# Dashboard para impresora Bambu Lab P1S
+
+esphome:
+  name: guition-bambu
+  friendly_name: Panel Bambu
+
+packages:
+  - url: https://github.com/agustinamu/esphome_devices
+    ref: develop
+    files: [devices/guition-jc8048w550-bambu/package.yaml]
+    refresh: 1d
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Guition Bambu Fallback"
+    password: !secret fallback_password

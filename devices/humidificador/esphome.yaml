@@ -1,0 +1,27 @@
+# Copiar este archivo en ESPHome de Home Assistant
+# Archivo: humidificador.yaml
+
+esphome:
+  name: humidificador
+  friendly_name: Humidificador
+
+packages:
+  - url: https://github.com/agustinamu/esphome_devices
+    ref: develop
+    files: [devices/humidificador/package.yaml]
+    refresh: 1d
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Humidificador Fallback"
+    password: !secret fallback_password

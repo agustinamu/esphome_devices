@@ -1,0 +1,28 @@
+# Copiar este archivo en ESPHome de Home Assistant
+# Archivo: guition-pantalla.yaml
+# Ejemplo básico: reloj, wifi, botón de prueba
+
+esphome:
+  name: guition-pantalla
+  friendly_name: Pantalla Guition
+
+packages:
+  - url: https://github.com/agustinamu/esphome_devices
+    ref: develop
+    files: [devices/guition-jc8048w550/package.yaml]
+    refresh: 1d
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Guition Fallback"
+    password: !secret fallback_password
