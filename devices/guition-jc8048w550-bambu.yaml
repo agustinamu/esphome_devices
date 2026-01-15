@@ -216,30 +216,28 @@ display:
       green: [GPIO5, GPIO6, GPIO7, GPIO15, GPIO16, GPIO4]
       blue: [GPIO8, GPIO3, GPIO46, GPIO9, GPIO10]
 
-# Colores estilo Bambu
+# Fuente MDI para iconos
+font:
+  - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+    id: mdi_28
+    size: 28
+    glyphs: [
+      "\U000F18B8",
+      "\U000F0157",
+      "\U000F08ED",
+      "\U000F0AB9",
+      "\U000F0425",
+      "\U000F040A",
+      "\U000F0E51"
+    ]
+
+# LVGL UI
 lvgl:
   displays:
     - my_display
   touchscreens:
     - my_touch
   color_depth: 16
-  font:
-    - file: "gfonts://Roboto"
-      id: roboto_28
-      size: 28
-      glyphs: "0123456789°C/% ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-:_"
-    - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
-      id: mdi_28
-      size: 28
-      glyphs: [
-        "\U000F18B8",
-        "\U000F0157",
-        "\U000F08ED",
-        "\U000F0AB9",
-        "\U000F0425",
-        "\U000F040A",
-        "\U000F0E51"
-      ]
   style_definitions:
     - id: style_card
       bg_color: 0x1E1E1E
