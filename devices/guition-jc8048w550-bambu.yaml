@@ -1,5 +1,6 @@
 # Guition JC8048W550 - Panel de control estilo Bambu Lab
 # 800x480 - ESP32-S3
+# Configurado para P1S con entidades en español
 
 esphome:
   platformio_options:
@@ -19,15 +20,23 @@ psram:
 
 logger:
 
+globals:
+  - id: last_touch_time
+    type: unsigned long
+    initial_value: '0'
+  - id: screen_dimmed
+    type: bool
+    initial_value: 'false'
+
 time:
   - platform: homeassistant
     id: ha_time
 
-# Sensores de Home Assistant (Bambu Lab P1S)
+# Sensores de Home Assistant (Bambu Lab P1S - nombres en español)
 sensor:
   - platform: homeassistant
     id: nozzle_temp
-    entity_id: sensor.p1s_01p00c581002790_nozzle_temperature
+    entity_id: sensor.p1s_01p00c581002790_temperatura_de_la_boquilla
     on_value:
       - lvgl.label.update:
           id: lbl_nozzle
@@ -38,7 +47,7 @@ sensor:
 
   - platform: homeassistant
     id: nozzle_target
-    entity_id: number.p1s_01p00c581002790_nozzle_target_temperature
+    entity_id: sensor.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
     on_value:
       - lvgl.label.update:
           id: lbl_nozzle_target
@@ -49,7 +58,7 @@ sensor:
 
   - platform: homeassistant
     id: bed_temp
-    entity_id: sensor.p1s_01p00c581002790_bed_temperature
+    entity_id: sensor.p1s_01p00c581002790_temperatura_de_la_cama
     on_value:
       - lvgl.label.update:
           id: lbl_bed
@@ -60,7 +69,7 @@ sensor:
 
   - platform: homeassistant
     id: bed_target
-    entity_id: number.p1s_01p00c581002790_bed_target_temperature
+    entity_id: sensor.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
     on_value:
       - lvgl.label.update:
           id: lbl_bed_target
@@ -71,7 +80,7 @@ sensor:
 
   - platform: homeassistant
     id: print_progress
-    entity_id: sensor.p1s_01p00c581002790_print_progress
+    entity_id: sensor.p1s_01p00c581002790_progreso_de_la_impresion
     on_value:
       - lvgl.bar.update:
           id: progress_bar
@@ -85,25 +94,25 @@ sensor:
 
   - platform: homeassistant
     id: print_time_remaining
-    entity_id: sensor.p1s_01p00c581002790_remaining_time
+    entity_id: sensor.p1s_01p00c581002790_tiempo_restante
     on_value:
       - lvgl.label.update:
           id: lbl_remaining
           text: !lambda |-
             static char buf[24];
-            int mins = (int)x;
-            int h = mins / 60;
-            int m = mins % 60;
+            float hours = x;
+            int h = (int)hours;
+            int m = (int)((hours - h) * 60);
             snprintf(buf, sizeof(buf), "Restante: %dh %02dm", h, m);
             return buf;
 
   - platform: homeassistant
     id: current_layer
-    entity_id: sensor.p1s_01p00c581002790_current_layer
+    entity_id: sensor.p1s_01p00c581002790_capa_actual
 
   - platform: homeassistant
     id: total_layers
-    entity_id: sensor.p1s_01p00c581002790_total_layer_count
+    entity_id: sensor.p1s_01p00c581002790_cantidad_total_de_capas
 
   - platform: wifi_signal
     id: wifi_signal_db
@@ -112,7 +121,7 @@ sensor:
 text_sensor:
   - platform: homeassistant
     id: printer_status
-    entity_id: sensor.p1s_01p00c581002790_current_stage
+    entity_id: sensor.p1s_01p00c581002790_estado_actual
     on_value:
       - lvgl.label.update:
           id: lbl_status
@@ -120,15 +129,19 @@ text_sensor:
 
   - platform: homeassistant
     id: gcode_state
-    entity_id: sensor.p1s_01p00c581002790_gcode_state
+    entity_id: sensor.p1s_01p00c581002790_estado_de_la_impresion
 
   - platform: homeassistant
     id: current_file
-    entity_id: sensor.p1s_01p00c581002790_task_name
+    entity_id: sensor.p1s_01p00c581002790_nombre_de_la_tarea
     on_value:
       - lvgl.label.update:
           id: lbl_filename
-          text: !lambda return x.c_str();
+          text: !lambda |-
+            if (x == "unavailable" || x.empty()) {
+              return "Sin tarea";
+            }
+            return x.c_str();
 
 # Backlight
 output:
@@ -153,6 +166,13 @@ i2c:
 touchscreen:
   - platform: gt911
     id: my_touch
+    on_touch:
+      - lambda: |-
+          id(last_touch_time) = millis();
+          if (id(screen_dimmed)) {
+            id(screen_dimmed) = false;
+            id(backlight).turn_on().set_brightness(1.0).perform();
+          }
 
 # Display
 display:
@@ -169,14 +189,14 @@ display:
     hsync_pin: GPIO39
     vsync_pin: GPIO41
     pclk_pin: GPIO42
-    pclk_frequency: 14MHz
+    pclk_frequency: 16MHz
     pclk_inverted: false
-    hsync_front_porch: 8
-    hsync_pulse_width: 4
-    hsync_back_porch: 8
-    vsync_front_porch: 8
-    vsync_pulse_width: 4
-    vsync_back_porch: 8
+    hsync_front_porch: 40
+    hsync_pulse_width: 48
+    hsync_back_porch: 40
+    vsync_front_porch: 13
+    vsync_pulse_width: 3
+    vsync_back_porch: 32
     data_pins:
       red: [GPIO45, GPIO48, GPIO47, GPIO21, GPIO14]
       green: [GPIO5, GPIO6, GPIO7, GPIO15, GPIO16, GPIO4]
@@ -227,7 +247,7 @@ lvgl:
             y: 15
             text_font: montserrat_28
             text_color: 0x00AE42
-            text: "BAMBU LAB"
+            text: "BAMBU LAB P1S"
             id: lbl_title
 
         - label:
@@ -252,7 +272,7 @@ lvgl:
               - label:
                   x: 10
                   y: 15
-                  text: "Nozzle"
+                  text: "Boquilla"
                   text_color: 0x888888
                   text_font: montserrat_18
               - label:
@@ -319,7 +339,7 @@ lvgl:
               - label:
                   align: TOP_MID
                   y: 10
-                  text: "Imprimiendo"
+                  text: "idle"
                   text_color: 0x00AE42
                   text_font: montserrat_22
                   id: lbl_status
@@ -327,7 +347,7 @@ lvgl:
               - label:
                   align: TOP_MID
                   y: 45
-                  text: "archivo.3mf"
+                  text: "Sin tarea"
                   text_color: 0xAAAAAA
                   text_font: montserrat_18
                   long_mode: DOT
@@ -338,7 +358,7 @@ lvgl:
               - label:
                   align: CENTER
                   y: -20
-                  text: "--%"
+                  text: "0%"
                   text_color: 0xFFFFFF
                   text_font: montserrat_48
                   id: lbl_progress
@@ -363,7 +383,7 @@ lvgl:
               - label:
                   align: BOTTOM_MID
                   y: -15
-                  text: "Restante: --h --m"
+                  text: "Restante: 0h 00m"
                   text_color: 0x888888
                   text_font: montserrat_18
                   id: lbl_remaining
@@ -400,7 +420,7 @@ lvgl:
                     - homeassistant.action:
                         action: button.press
                         data:
-                          entity_id: button.p1s_01p00c581002790_pause_printing
+                          entity_id: button.p1s_01p00c581002790_pausar_la_impresion
 
               # Botón Reanudar
               - button:
@@ -418,7 +438,7 @@ lvgl:
                     - homeassistant.action:
                         action: button.press
                         data:
-                          entity_id: button.p1s_01p00c581002790_resume_printing
+                          entity_id: button.p1s_01p00c581002790_continuar_la_impresion
 
               # Botón Cancelar
               - button:
@@ -436,7 +456,7 @@ lvgl:
                     - homeassistant.action:
                         action: button.press
                         data:
-                          entity_id: button.p1s_01p00c581002790_stop_printing
+                          entity_id: button.p1s_01p00c581002790_detener_la_impresion
 
         # === Footer con botones adicionales ===
         - obj:
@@ -446,72 +466,61 @@ lvgl:
             height: 70
             styles: style_card
             widgets:
-              # Home
+              # Precalentar PLA
               - button:
                   x: 10
                   y: 8
-                  width: 110
+                  width: 170
                   height: 50
                   bg_color: 0x333333
                   radius: 8
                   widgets:
                     - label:
                         align: CENTER
-                        text: "HOME"
-                        text_color: 0xFFFFFF
-                        text_font: montserrat_18
-                  on_press:
-                    - homeassistant.action:
-                        action: button.press
-                        data:
-                          entity_id: button.p1s_01p00c581002790_home
-
-              # Filamento
-              - button:
-                  x: 135
-                  y: 8
-                  width: 140
-                  height: 50
-                  bg_color: 0x333333
-                  radius: 8
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "FILAMENTO"
-                        text_color: 0xFFFFFF
-                        text_font: montserrat_18
-                  on_press:
-                    - lvgl.page.show: filament_page
-
-              # Precalentar
-              - button:
-                  x: 290
-                  y: 8
-                  width: 150
-                  height: 50
-                  bg_color: 0x333333
-                  radius: 8
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "PRECALENTAR"
+                        text: "PREHEAT PLA"
                         text_color: 0xFFFFFF
                         text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
-                          entity_id: number.p1s_01p00c581002790_bed_target_temperature
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
                           value: "60"
                     - homeassistant.action:
                         action: number.set_value
                         data:
-                          entity_id: number.p1s_01p00c581002790_nozzle_target_temperature
-                          value: "200"
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: "220"
+
+              # Precalentar PETG
+              - button:
+                  x: 195
+                  y: 8
+                  width: 170
+                  height: 50
+                  bg_color: 0x333333
+                  radius: 8
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "PREHEAT PETG"
+                        text_color: 0xFFFFFF
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: "80"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: "250"
 
               # Enfriar
               - button:
-                  x: 455
+                  x: 380
                   y: 8
                   width: 130
                   height: 50
@@ -527,19 +536,19 @@ lvgl:
                     - homeassistant.action:
                         action: number.set_value
                         data:
-                          entity_id: number.p1s_01p00c581002790_bed_target_temperature
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
                           value: "0"
                     - homeassistant.action:
                         action: number.set_value
                         data:
-                          entity_id: number.p1s_01p00c581002790_nozzle_target_temperature
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
                           value: "0"
 
               # Luz
               - button:
-                  x: 600
+                  x: 525
                   y: 8
-                  width: 90
+                  width: 100
                   height: 50
                   bg_color: 0x333333
                   radius: 8
@@ -553,70 +562,29 @@ lvgl:
                     - homeassistant.action:
                         action: light.toggle
                         data:
-                          entity_id: light.p1s_01p00c581002790_chamber_light
+                          entity_id: light.p1s_01p00c581002790_luz_de_la_carcasa
 
-    # === Página Filamento ===
-    - id: filament_page
-      bg_color: 0x121212
-      widgets:
-        - label:
-            align: TOP_MID
-            y: 20
-            text: "Control de Filamento"
-            text_color: 0x00AE42
-            text_font: montserrat_28
+              # Actualizar
+              - button:
+                  x: 640
+                  y: 8
+                  width: 110
+                  height: 50
+                  bg_color: 0x333333
+                  radius: 8
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "REFRESH"
+                        text_color: 0xFFFFFF
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.p1s_01p00c581002790_forzar_actualizacion_de_datos
 
-        - button:
-            align: CENTER
-            y: -60
-            width: 300
-            height: 70
-            styles: style_button
-            widgets:
-              - label:
-                  align: CENTER
-                  text: "CARGAR FILAMENTO"
-                  text_font: montserrat_22
-            on_press:
-              - homeassistant.action:
-                  action: bambu_lab.load_filament
-                  data:
-                    device_id: 01KF1V4Q1W6KB1AQ4KGPJM6FQT
-
-        - button:
-            align: CENTER
-            y: 30
-            width: 300
-            height: 70
-            styles: style_button_red
-            widgets:
-              - label:
-                  align: CENTER
-                  text: "DESCARGAR FILAMENTO"
-                  text_font: montserrat_22
-            on_press:
-              - homeassistant.action:
-                  action: bambu_lab.unload_filament
-                  data:
-                    device_id: 01KF1V4Q1W6KB1AQ4KGPJM6FQT
-
-        - button:
-            align: BOTTOM_MID
-            y: -30
-            width: 200
-            height: 60
-            bg_color: 0x333333
-            radius: 8
-            widgets:
-              - label:
-                  align: CENTER
-                  text: "VOLVER"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_22
-            on_press:
-              - lvgl.page.show: main_page
-
-# Actualizar reloj
+# Actualizar reloj y gestionar brillo
 interval:
   - interval: 1s
     then:
@@ -627,3 +595,9 @@ interval:
             auto time = id(ha_time).now();
             snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
             return buf;
+      # Atenuar pantalla después de 60 segundos sin tocar
+      - lambda: |-
+          if (!id(screen_dimmed) && (millis() - id(last_touch_time) > 60000)) {
+            id(screen_dimmed) = true;
+            id(backlight).turn_on().set_brightness(0.15).perform();
+          }
