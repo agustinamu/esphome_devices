@@ -17,21 +17,6 @@ psram:
 
 logger:
 
-api:
-  encryption:
-    key: !secret api_key
-
-ota:
-  - platform: esphome
-    password: !secret ota_password
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "Guition Fallback"
-    password: !secret fallback_password
-
 time:
   - platform: homeassistant
     id: ha_time
@@ -85,24 +70,24 @@ display:
     vsync_back_porch: 32
     data_pins:
       red:
-        - GPIO45  # R3
-        - GPIO48  # R4
-        - GPIO47  # R5
-        - GPIO21  # R6
-        - GPIO14  # R7
+        - GPIO45
+        - GPIO48
+        - GPIO47
+        - GPIO21
+        - GPIO14
       green:
-        - GPIO5   # G2
-        - GPIO6   # G3
-        - GPIO7   # G4
-        - GPIO15  # G5
-        - GPIO16  # G6
-        - GPIO4   # G7
+        - GPIO5
+        - GPIO6
+        - GPIO7
+        - GPIO15
+        - GPIO16
+        - GPIO4
       blue:
-        - GPIO8   # B3
-        - GPIO3   # B4
-        - GPIO46  # B5
-        - GPIO9   # B6
-        - GPIO10  # B7
+        - GPIO8
+        - GPIO3
+        - GPIO46
+        - GPIO9
+        - GPIO10
 
 # LVGL UI
 lvgl:
@@ -146,12 +131,12 @@ lvgl:
                   text: "TEST"
                   text_font: montserrat_28
             on_press:
-              - logger.log: "Botón presionado!"
-              - lvgl.widget.update:
+              - logger.log: "Boton presionado!"
+              - lvgl.label.update:
                   id: lbl_status
                   text: "Pulsado!"
             on_release:
-              - lvgl.widget.update:
+              - lvgl.label.update:
                   id: lbl_status
                   text: ""
         # Status de botón
@@ -166,14 +151,14 @@ lvgl:
 interval:
   - interval: 1s
     then:
-      - lvgl.widget.update:
+      - lvgl.label.update:
           id: lbl_time
           text: !lambda |-
             static char buf[10];
             auto time = id(ha_time).now();
             snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
             return buf;
-      - lvgl.widget.update:
+      - lvgl.label.update:
           id: lbl_date
           text: !lambda |-
             static char buf[20];
@@ -183,7 +168,7 @@ interval:
             return buf;
   - interval: 10s
     then:
-      - lvgl.widget.update:
+      - lvgl.label.update:
           id: lbl_wifi
           text: !lambda |-
             static char buf[40];
