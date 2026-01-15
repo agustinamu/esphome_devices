@@ -1,0 +1,614 @@
+# Guition JC8048W550 - Panel de control estilo Bambu Lab
+# 800x480 - ESP32-S3
+
+esphome:
+  platformio_options:
+    build_flags: "-DBOARD_HAS_PSRAM"
+    board_build.esp-idf.memory_type: qio_opi
+    board_build.flash_mode: dio
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+logger:
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+# Sensores de Home Assistant (Bambu Lab)
+sensor:
+  - platform: homeassistant
+    id: nozzle_temp
+    entity_id: sensor.x1c_nozzle_temperature
+    on_value:
+      - lvgl.label.update:
+          id: lbl_nozzle
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f°C", x);
+            return buf;
+
+  - platform: homeassistant
+    id: nozzle_target
+    entity_id: number.x1c_nozzle_target_temperature
+
+  - platform: homeassistant
+    id: bed_temp
+    entity_id: sensor.x1c_bed_temperature
+    on_value:
+      - lvgl.label.update:
+          id: lbl_bed
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f°C", x);
+            return buf;
+
+  - platform: homeassistant
+    id: bed_target
+    entity_id: number.x1c_bed_target_temperature
+
+  - platform: homeassistant
+    id: chamber_temp
+    entity_id: sensor.x1c_chamber_temperature
+    on_value:
+      - lvgl.label.update:
+          id: lbl_chamber
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f°C", x);
+            return buf;
+
+  - platform: homeassistant
+    id: print_progress
+    entity_id: sensor.x1c_print_progress
+    on_value:
+      - lvgl.bar.update:
+          id: progress_bar
+          value: !lambda return (int)x;
+      - lvgl.label.update:
+          id: lbl_progress
+          text: !lambda |-
+            static char buf[8];
+            snprintf(buf, sizeof(buf), "%.0f%%", x);
+            return buf;
+
+  - platform: homeassistant
+    id: print_time_remaining
+    entity_id: sensor.x1c_remaining_time
+    on_value:
+      - lvgl.label.update:
+          id: lbl_remaining
+          text: !lambda |-
+            static char buf[16];
+            int mins = (int)x;
+            int h = mins / 60;
+            int m = mins % 60;
+            snprintf(buf, sizeof(buf), "%dh %02dm", h, m);
+            return buf;
+
+  - platform: wifi_signal
+    id: wifi_signal_db
+    update_interval: 30s
+
+text_sensor:
+  - platform: homeassistant
+    id: printer_status
+    entity_id: sensor.x1c_print_status
+    on_value:
+      - lvgl.label.update:
+          id: lbl_status
+          text: !lambda return x.c_str();
+
+  - platform: homeassistant
+    id: current_file
+    entity_id: sensor.x1c_current_task
+    on_value:
+      - lvgl.label.update:
+          id: lbl_filename
+          text: !lambda return x.c_str();
+
+# Backlight
+output:
+  - platform: ledc
+    pin: GPIO2
+    frequency: 1220Hz
+    id: backlight_pwm
+
+light:
+  - platform: monochromatic
+    output: backlight_pwm
+    name: "Backlight"
+    id: backlight
+    restore_mode: ALWAYS_ON
+
+# I2C para touch
+i2c:
+  sda: GPIO19
+  scl: GPIO20
+  scan: false
+
+touchscreen:
+  - platform: gt911
+    id: my_touch
+
+# Display
+display:
+  - platform: rpi_dpi_rgb
+    id: my_display
+    color_order: RGB
+    invert_colors: false
+    update_interval: never
+    auto_clear_enabled: false
+    dimensions:
+      width: 800
+      height: 480
+    de_pin: GPIO40
+    hsync_pin: GPIO39
+    vsync_pin: GPIO41
+    pclk_pin: GPIO42
+    pclk_frequency: 14MHz
+    pclk_inverted: false
+    hsync_front_porch: 8
+    hsync_pulse_width: 4
+    hsync_back_porch: 8
+    vsync_front_porch: 8
+    vsync_pulse_width: 4
+    vsync_back_porch: 8
+    data_pins:
+      red: [GPIO45, GPIO48, GPIO47, GPIO21, GPIO14]
+      green: [GPIO5, GPIO6, GPIO7, GPIO15, GPIO16, GPIO4]
+      blue: [GPIO8, GPIO3, GPIO46, GPIO9, GPIO10]
+
+# Colores estilo Bambu
+lvgl:
+  displays:
+    - my_display
+  touchscreens:
+    - my_touch
+  color_depth: 16
+  style_definitions:
+    - id: style_card
+      bg_color: 0x1E1E1E
+      radius: 12
+      pad_all: 10
+      border_width: 0
+    - id: style_temp_icon
+      text_color: 0x00AE42
+      text_font: montserrat_28
+    - id: style_temp_value
+      text_color: 0xFFFFFF
+      text_font: montserrat_36
+    - id: style_temp_target
+      text_color: 0x888888
+      text_font: montserrat_18
+    - id: style_title
+      text_color: 0x00AE42
+      text_font: montserrat_22
+    - id: style_button
+      bg_color: 0x00AE42
+      text_color: 0xFFFFFF
+      radius: 8
+    - id: style_button_red
+      bg_color: 0xE53935
+      text_color: 0xFFFFFF
+      radius: 8
+
+  pages:
+    - id: main_page
+      bg_color: 0x121212
+      widgets:
+        # === Header ===
+        - label:
+            align: TOP_LEFT
+            x: 20
+            y: 15
+            text_font: montserrat_28
+            text_color: 0x00AE42
+            text: "BAMBU LAB"
+            id: lbl_title
+
+        - label:
+            align: TOP_RIGHT
+            x: -20
+            y: 15
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+            text: "--:--"
+            id: lbl_clock
+
+        # === Tarjeta Temperaturas (izquierda) ===
+        - obj:
+            align: TOP_LEFT
+            x: 20
+            y: 60
+            width: 240
+            height: 280
+            styles: style_card
+            widgets:
+              # Nozzle
+              - label:
+                  x: 10
+                  y: 10
+                  text: "Nozzle"
+                  text_color: 0x888888
+                  text_font: montserrat_18
+              - label:
+                  x: 10
+                  y: 35
+                  text: "---°C"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_36
+                  id: lbl_nozzle
+              - label:
+                  x: 140
+                  y: 45
+                  text: "/ ---°C"
+                  text_color: 0x666666
+                  text_font: montserrat_18
+                  id: lbl_nozzle_target
+
+              # Bed
+              - label:
+                  x: 10
+                  y: 100
+                  text: "Cama"
+                  text_color: 0x888888
+                  text_font: montserrat_18
+              - label:
+                  x: 10
+                  y: 125
+                  text: "---°C"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_36
+                  id: lbl_bed
+              - label:
+                  x: 140
+                  y: 135
+                  text: "/ ---°C"
+                  text_color: 0x666666
+                  text_font: montserrat_18
+                  id: lbl_bed_target
+
+              # Chamber
+              - label:
+                  x: 10
+                  y: 190
+                  text: "Cámara"
+                  text_color: 0x888888
+                  text_font: montserrat_18
+              - label:
+                  x: 10
+                  y: 215
+                  text: "---°C"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_36
+                  id: lbl_chamber
+
+        # === Tarjeta Progreso (centro) ===
+        - obj:
+            align: TOP_MID
+            x: 0
+            y: 60
+            width: 280
+            height: 280
+            styles: style_card
+            widgets:
+              - label:
+                  align: TOP_MID
+                  y: 10
+                  text: "Imprimiendo"
+                  text_color: 0x00AE42
+                  text_font: montserrat_22
+                  id: lbl_status
+
+              - label:
+                  align: TOP_MID
+                  y: 45
+                  text: "archivo.3mf"
+                  text_color: 0xAAAAAA
+                  text_font: montserrat_18
+                  long_mode: DOT
+                  width: 250
+                  id: lbl_filename
+
+              # Porcentaje grande
+              - label:
+                  align: CENTER
+                  y: -20
+                  text: "--%"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_48
+                  id: lbl_progress
+
+              # Barra de progreso
+              - bar:
+                  align: CENTER
+                  y: 40
+                  width: 240
+                  height: 16
+                  min_value: 0
+                  max_value: 100
+                  value: 0
+                  id: progress_bar
+                  bg_color: 0x333333
+                  indicator:
+                    bg_color: 0x00AE42
+                    radius: 8
+                  radius: 8
+
+              # Tiempo restante
+              - label:
+                  align: BOTTOM_MID
+                  y: -15
+                  text: "Restante: --h --m"
+                  text_color: 0x888888
+                  text_font: montserrat_18
+                  id: lbl_remaining
+
+        # === Tarjeta Controles (derecha) ===
+        - obj:
+            align: TOP_RIGHT
+            x: -20
+            y: 60
+            width: 240
+            height: 280
+            styles: style_card
+            widgets:
+              - label:
+                  align: TOP_MID
+                  y: 5
+                  text: "Control"
+                  text_color: 0x00AE42
+                  text_font: montserrat_22
+
+              # Botón Pausar
+              - button:
+                  align: TOP_MID
+                  y: 45
+                  width: 200
+                  height: 55
+                  styles: style_button
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "PAUSAR"
+                        text_font: montserrat_22
+                  on_press:
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.x1c_pause_printing
+
+              # Botón Reanudar
+              - button:
+                  align: CENTER
+                  y: -20
+                  width: 200
+                  height: 55
+                  styles: style_button
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "REANUDAR"
+                        text_font: montserrat_22
+                  on_press:
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.x1c_resume_printing
+
+              # Botón Cancelar
+              - button:
+                  align: BOTTOM_MID
+                  y: -15
+                  width: 200
+                  height: 55
+                  styles: style_button_red
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "CANCELAR"
+                        text_font: montserrat_22
+                  on_press:
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.x1c_stop_printing
+
+        # === Footer con botones adicionales ===
+        - obj:
+            align: BOTTOM_MID
+            y: -15
+            width: 760
+            height: 70
+            styles: style_card
+            widgets:
+              # Home
+              - button:
+                  x: 10
+                  y: 8
+                  width: 110
+                  height: 50
+                  bg_color: 0x333333
+                  radius: 8
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "HOME"
+                        text_color: 0xFFFFFF
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.x1c_home
+
+              # Filamento
+              - button:
+                  x: 135
+                  y: 8
+                  width: 140
+                  height: 50
+                  bg_color: 0x333333
+                  radius: 8
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "FILAMENTO"
+                        text_color: 0xFFFFFF
+                        text_font: montserrat_18
+                  on_press:
+                    - lvgl.page.show: filament_page
+
+              # Precalentar
+              - button:
+                  x: 290
+                  y: 8
+                  width: 150
+                  height: 50
+                  bg_color: 0x333333
+                  radius: 8
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "PRECALENTAR"
+                        text_color: 0xFFFFFF
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.x1c_bed_target_temperature
+                          value: "60"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.x1c_nozzle_target_temperature
+                          value: "200"
+
+              # Enfriar
+              - button:
+                  x: 455
+                  y: 8
+                  width: 130
+                  height: 50
+                  bg_color: 0x333333
+                  radius: 8
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "ENFRIAR"
+                        text_color: 0xFFFFFF
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.x1c_bed_target_temperature
+                          value: "0"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.x1c_nozzle_target_temperature
+                          value: "0"
+
+              # Luz
+              - button:
+                  x: 600
+                  y: 8
+                  width: 90
+                  height: 50
+                  bg_color: 0x333333
+                  radius: 8
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "LUZ"
+                        text_color: 0xFFFFFF
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: light.toggle
+                        data:
+                          entity_id: light.x1c_chamber_light
+
+    # === Página Filamento ===
+    - id: filament_page
+      bg_color: 0x121212
+      widgets:
+        - label:
+            align: TOP_MID
+            y: 20
+            text: "Control de Filamento"
+            text_color: 0x00AE42
+            text_font: montserrat_28
+
+        - button:
+            align: CENTER
+            y: -60
+            width: 300
+            height: 70
+            styles: style_button
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "CARGAR FILAMENTO"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.load_filament
+                  data:
+                    device_id: !secret bambu_device_id
+
+        - button:
+            align: CENTER
+            y: 30
+            width: 300
+            height: 70
+            styles: style_button_red
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "DESCARGAR FILAMENTO"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.unload_filament
+                  data:
+                    device_id: !secret bambu_device_id
+
+        - button:
+            align: BOTTOM_MID
+            y: -30
+            width: 200
+            height: 60
+            bg_color: 0x333333
+            radius: 8
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "VOLVER"
+                  text_color: 0xFFFFFF
+                  text_font: montserrat_22
+            on_press:
+              - lvgl.page.show: main_page
+
+# Actualizar reloj
+interval:
+  - interval: 1s
+    then:
+      - lvgl.label.update:
+          id: lbl_clock
+          text: !lambda |-
+            static char buf[10];
+            auto time = id(ha_time).now();
+            snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
+            return buf;
