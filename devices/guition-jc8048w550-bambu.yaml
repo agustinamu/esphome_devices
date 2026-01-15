@@ -222,7 +222,7 @@ lvgl:
       text_color: 0xFFFFFF
       text_font: montserrat_36
     - id: style_temp_target
-      text_color: 0x888888
+      text_color: 0x008844
       text_font: montserrat_18
     - id: style_title
       text_color: 0x00AE42
@@ -273,7 +273,7 @@ lvgl:
                   x: 10
                   y: 15
                   text: "Boquilla"
-                  text_color: 0x888888
+                  text_color: 0x008844
                   text_font: montserrat_18
               - label:
                   x: 10
@@ -286,7 +286,7 @@ lvgl:
                   x: 130
                   y: 55
                   text: "/ ---°C"
-                  text_color: 0x666666
+                  text_color: 0x006633
                   text_font: montserrat_18
                   id: lbl_nozzle_target
 
@@ -295,7 +295,7 @@ lvgl:
                   x: 10
                   y: 110
                   text: "Cama"
-                  text_color: 0x888888
+                  text_color: 0x008844
                   text_font: montserrat_18
               - label:
                   x: 10
@@ -308,7 +308,7 @@ lvgl:
                   x: 130
                   y: 150
                   text: "/ ---°C"
-                  text_color: 0x666666
+                  text_color: 0x006633
                   text_font: montserrat_18
                   id: lbl_bed_target
 
@@ -317,7 +317,7 @@ lvgl:
                   x: 10
                   y: 205
                   text: "Filamento"
-                  text_color: 0x888888
+                  text_color: 0x008844
                   text_font: montserrat_18
               - label:
                   x: 10
@@ -348,7 +348,7 @@ lvgl:
                   align: TOP_MID
                   y: 45
                   text: "Sin tarea"
-                  text_color: 0xAAAAAA
+                  text_color: 0xCCCCCC
                   text_font: montserrat_18
                   long_mode: DOT
                   width: 250
@@ -373,7 +373,7 @@ lvgl:
                   max_value: 100
                   value: 0
                   id: progress_bar
-                  bg_color: 0x333333
+                  bg_color: 0x222222
                   indicator:
                     bg_color: 0x00AE42
                     radius: 8
@@ -384,7 +384,7 @@ lvgl:
                   align: BOTTOM_MID
                   y: -15
                   text: "Restante: 0h 00m"
-                  text_color: 0x888888
+                  text_color: 0x008844
                   text_font: montserrat_18
                   id: lbl_remaining
 
@@ -472,7 +472,7 @@ lvgl:
                   y: 8
                   width: 170
                   height: 50
-                  bg_color: 0x333333
+                  bg_color: 0x222222
                   radius: 8
                   widgets:
                     - label:
@@ -498,7 +498,7 @@ lvgl:
                   y: 8
                   width: 170
                   height: 50
-                  bg_color: 0x333333
+                  bg_color: 0x222222
                   radius: 8
                   widgets:
                     - label:
@@ -524,7 +524,7 @@ lvgl:
                   y: 8
                   width: 130
                   height: 50
-                  bg_color: 0x333333
+                  bg_color: 0x222222
                   radius: 8
                   widgets:
                     - label:
@@ -550,7 +550,7 @@ lvgl:
                   y: 8
                   width: 100
                   height: 50
-                  bg_color: 0x333333
+                  bg_color: 0x222222
                   radius: 8
                   widgets:
                     - label:
@@ -570,7 +570,7 @@ lvgl:
                   y: 8
                   width: 110
                   height: 50
-                  bg_color: 0x333333
+                  bg_color: 0x222222
                   radius: 8
                   widgets:
                     - label:
