@@ -3,3 +3,6 @@ secrets.yaml
 
 # Archivos generados por ESPHome
 .esphome/
+
+# Demos del fabricante (no necesarios)
+JC3248W535EN/
