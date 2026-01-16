@@ -1779,7 +1779,7 @@ lvgl:
                   action: bambu_lab.send_command
                   data:
                     device_id: ${bambu_device_id}
-                    command: "M104 S240\nM109 S240\nG28 X Y\nG0 X22 Y265 F9000\nG0 Y275 F3000\nG0 Y265 F9000\nG0 Y275 F3000\nG0 Y265 F9000\nG0 Y275 F3000\nG4 P500\nM83\nG1 E-30 F300\nG1 E-80 F1500\nM82\nM104 S0"
+                    command: "M104 S240\nM109 S240\nM83\nG1 E-20 F200\nG28 X Y\nG1 X20 Y50 F20000\nG1 Y-3 F3000\nG4 P500\nG1 E-80 F1500\nM82\nG28 X Y\nM104 S0"
 
         # Cargar filamento
         - button:
@@ -1807,7 +1807,7 @@ lvgl:
                   action: bambu_lab.send_command
                   data:
                     device_id: ${bambu_device_id}
-                    command: "M104 S220\nM109 S220\nM83\nG1 E50 F300\nG1 E30 F100\nM82"
+                    command: "M104 S220\nM109 S220\nM83\nG1 E18 F200\nG1 E2 F20\nG1 E50 F300\nM82"
 
         # Fila 3: CORTAR (manual) - Requiere nozzle caliente
         - button:
@@ -1836,7 +1836,7 @@ lvgl:
                   action: bambu_lab.send_command
                   data:
                     device_id: ${bambu_device_id}
-                    command: "G28 X Y\nG0 X22 Y265 F9000\nG0 Y275 F3000\nG0 Y265 F9000\nG0 Y275 F3000\nG0 Y265 F9000\nG0 Y275 F3000\nG4 P500"
+                    command: "G28 X Y\nG1 X20 Y50 F20000\nG1 Y-3 F3000\nG4 P500\nG28 X Y"
 
         # Precalentar para filamento
         - button:
