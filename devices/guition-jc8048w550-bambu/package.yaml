@@ -514,14 +514,16 @@ lvgl:
             x: 80
             y: 270
             width: 700
-            height: 90
+            height: 190
+            scrollbar_mode: "off"
             styles: style_card
             widgets:
+              # Primera fila
               - button:
                   x: 10
                   y: 10
-                  width: 150
-                  height: 60
+                  width: 210
+                  height: 70
                   styles: style_btn
                   widgets:
                     - label:
@@ -535,10 +537,10 @@ lvgl:
                           entity_id: button.p1s_01p00c581002790_pausar_la_impresion
 
               - button:
-                  x: 175
+                  x: 235
                   y: 10
-                  width: 150
-                  height: 60
+                  width: 210
+                  height: 70
                   styles: style_btn
                   widgets:
                     - label:
@@ -552,10 +554,10 @@ lvgl:
                           entity_id: button.p1s_01p00c581002790_continuar_la_impresion
 
               - button:
-                  x: 340
+                  x: 460
                   y: 10
-                  width: 150
-                  height: 60
+                  width: 210
+                  height: 70
                   styles: style_btn_red
                   widgets:
                     - label:
@@ -568,16 +570,17 @@ lvgl:
                         data:
                           entity_id: button.p1s_01p00c581002790_detener_la_impresion
 
+              # Segunda fila
               - button:
-                  x: 505
-                  y: 10
-                  width: 80
-                  height: 60
+                  x: 10
+                  y: 95
+                  width: 210
+                  height: 70
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "\U000F0238"
+                        text: "\U000F0238  LUZ"
                         text_font: mdi_32
                   on_press:
                     - homeassistant.action:
@@ -586,121 +589,21 @@ lvgl:
                           entity_id: light.p1s_01p00c581002790_luz_de_la_carcasa
 
               - button:
-                  x: 600
-                  y: 10
-                  width: 80
-                  height: 60
+                  x: 235
+                  y: 95
+                  width: 210
+                  height: 70
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "\U000F0415"
+                        text: "\U000F0415  REFRESH"
                         text_font: mdi_32
                   on_press:
                     - homeassistant.action:
                         action: button.press
                         data:
                           entity_id: button.p1s_01p00c581002790_forzar_actualizacion_de_datos
-
-        # Footer - Presets
-        - obj:
-            x: 80
-            y: 375
-            width: 700
-            height: 90
-            styles: style_card
-            widgets:
-              - button:
-                  x: 10
-                  y: 10
-                  width: 160
-                  height: 60
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "PLA 220/60"
-                        text_font: montserrat_18
-                  on_press:
-                    - homeassistant.action:
-                        action: number.set_value
-                        data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
-                          value: "220"
-                    - homeassistant.action:
-                        action: number.set_value
-                        data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
-                          value: "60"
-
-              - button:
-                  x: 185
-                  y: 10
-                  width: 160
-                  height: 60
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "PETG 250/80"
-                        text_font: montserrat_18
-                  on_press:
-                    - homeassistant.action:
-                        action: number.set_value
-                        data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
-                          value: "250"
-                    - homeassistant.action:
-                        action: number.set_value
-                        data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
-                          value: "80"
-
-              - button:
-                  x: 360
-                  y: 10
-                  width: 160
-                  height: 60
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "ABS 260/100"
-                        text_font: montserrat_18
-                  on_press:
-                    - homeassistant.action:
-                        action: number.set_value
-                        data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
-                          value: "260"
-                    - homeassistant.action:
-                        action: number.set_value
-                        data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
-                          value: "100"
-
-              - button:
-                  x: 535
-                  y: 10
-                  width: 145
-                  height: 60
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "ENFRIAR"
-                        text_font: montserrat_18
-                  on_press:
-                    - homeassistant.action:
-                        action: number.set_value
-                        data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
-                          value: "0"
-                    - homeassistant.action:
-                        action: number.set_value
-                        data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
-                          value: "0"
 
     # ========== PÁGINA CONTROLES ==========
     - id: controls_page
@@ -1013,23 +916,25 @@ lvgl:
               # Luz
               - label:
                   x: 10
-                  y: 130
-                  text: "Luz cámara"
+                  y: 135
+                  text: "\U000F0238"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+
+              - label:
+                  x: 55
+                  y: 138
+                  text: "Light"
                   text_font: montserrat_22
                   text_color: 0xFFFFFF
 
-              - button:
+              - switch:
+                  id: sw_light
                   x: 180
-                  y: 125
-                  width: 120
-                  height: 50
-                  styles: style_btn
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "TOGGLE"
-                        text_font: montserrat_18
-                  on_press:
+                  y: 130
+                  width: 80
+                  height: 40
+                  on_click:
                     - homeassistant.action:
                         action: light.toggle
                         data:
@@ -1042,38 +947,37 @@ lvgl:
         - label:
             x: 80
             y: 15
-            text: "Motion: XYZ"
+            text: "Motion XYZ"
             text_font: montserrat_28
             text_color: 0x00AE42
 
-        # Card Tool Head (XY)
+        # Card XY Control
         - obj:
             x: 80
-            y: 60
-            width: 380
-            height: 400
+            y: 55
+            width: 420
+            height: 405
+            scrollbar_mode: "off"
             styles: style_card
             widgets:
               - label:
                   align: TOP_MID
                   y: 5
-                  text: "Tool Head"
+                  text: "Tool Head (XY)"
                   text_font: montserrat_22
                   text_color: 0x888888
 
-              # Pad XY - Círculo exterior (±10)
-              # Y+10
+              # Fila 1: Y+
               - button:
-                  align: TOP_MID
+                  x: 165
                   y: 45
-                  width: 70
-                  height: 50
-                  radius: 8
+                  width: 80
+                  height: 60
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "Y+10"
+                        text: "Y +10"
                         text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
@@ -1082,18 +986,17 @@ lvgl:
                           device_id: ${bambu_device_id}
                           command: "G91\nG0 Y10 F3000\nG90"
 
-              # X-10
+              # Fila 2: X- HOME X+
               - button:
-                  x: 30
-                  y: 130
-                  width: 70
-                  height: 50
-                  radius: 8
+                  x: 20
+                  y: 115
+                  width: 80
+                  height: 60
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "X-10"
+                        text: "X -10"
                         text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
@@ -1102,19 +1005,73 @@ lvgl:
                           device_id: ${bambu_device_id}
                           command: "G91\nG0 X-10 F3000\nG90"
 
-              # X+10
               - button:
-                  align: TOP_RIGHT
-                  x: -30
-                  y: 130
-                  width: 70
-                  height: 50
-                  radius: 8
+                  x: 110
+                  y: 115
+                  width: 80
+                  height: 60
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "X+10"
+                        text: "X -1"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 X-1 F3000\nG90"
+
+              - button:
+                  x: 200
+                  y: 115
+                  width: 80
+                  height: 60
+                  styles: style_btn
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "HOME"
+                        text_font: montserrat_18
+                  on_press:
+                    - logger.log:
+                        level: INFO
+                        format: "Motion: HOME XY pressed, device_id=${bambu_device_id}"
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G28 X Y"
+
+              - button:
+                  x: 290
+                  y: 115
+                  width: 80
+                  height: 60
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "X +1"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 X1 F3000\nG90"
+
+              - button:
+                  x: 380
+                  y: 115
+                  width: 80
+                  height: 60
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "X +10"
                         text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
@@ -1123,18 +1080,17 @@ lvgl:
                           device_id: ${bambu_device_id}
                           command: "G91\nG0 X10 F3000\nG90"
 
-              # Y-10
+              # Fila 3: Y-
               - button:
-                  align: TOP_MID
-                  y: 215
-                  width: 70
-                  height: 50
-                  radius: 8
+                  x: 165
+                  y: 185
+                  width: 80
+                  height: 60
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "Y-10"
+                        text: "Y -10"
                         text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
@@ -1143,20 +1099,18 @@ lvgl:
                           device_id: ${bambu_device_id}
                           command: "G91\nG0 Y-10 F3000\nG90"
 
-              # Pad interior (±1)
-              # Y+1
+              # Fila 4: Y +1 / -1
               - button:
-                  align: TOP_MID
-                  y: 105
-                  width: 50
-                  height: 40
-                  radius: 8
+                  x: 110
+                  y: 255
+                  width: 80
+                  height: 60
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "+1"
-                        text_font: montserrat_14
+                        text: "Y +1"
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: bambu_lab.send_command
@@ -1164,80 +1118,17 @@ lvgl:
                           device_id: ${bambu_device_id}
                           command: "G91\nG0 Y1 F3000\nG90"
 
-              # X-1
               - button:
-                  x: 110
-                  y: 150
-                  width: 50
-                  height: 40
-                  radius: 8
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "-1"
-                        text_font: montserrat_14
-                  on_press:
-                    - homeassistant.action:
-                        action: bambu_lab.send_command
-                        data:
-                          device_id: ${bambu_device_id}
-                          command: "G91\nG0 X-1 F3000\nG90"
-
-              # HOME (centro)
-              - button:
-                  align: CENTER
-                  y: -30
-                  width: 60
+                  x: 200
+                  y: 255
+                  width: 80
                   height: 60
-                  radius: 30
-                  styles: style_btn
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "\U000F0A12"
-                        text_font: mdi_32
-                  on_press:
-                    - homeassistant.action:
-                        action: bambu_lab.send_command
-                        data:
-                          device_id: ${bambu_device_id}
-                          command: "G28"
-
-              # X+1
-              - button:
-                  align: TOP_RIGHT
-                  x: -110
-                  y: 150
-                  width: 50
-                  height: 40
-                  radius: 8
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "+1"
-                        text_font: montserrat_14
-                  on_press:
-                    - homeassistant.action:
-                        action: bambu_lab.send_command
-                        data:
-                          device_id: ${bambu_device_id}
-                          command: "G91\nG0 X1 F3000\nG90"
-
-              # Y-1
-              - button:
-                  align: TOP_MID
-                  y: 170
-                  width: 50
-                  height: 40
-                  radius: 8
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "-1"
-                        text_font: montserrat_14
+                        text: "Y -1"
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: bambu_lab.send_command
@@ -1245,88 +1136,55 @@ lvgl:
                           device_id: ${bambu_device_id}
                           command: "G91\nG0 Y-1 F3000\nG90"
 
-              # Botones Home individuales
+              # Fila 5: Home All
               - button:
-                  x: 30
-                  y: 290
-                  width: 100
-                  height: 45
-                  styles: style_btn_dark
+                  x: 110
+                  y: 330
+                  width: 170
+                  height: 55
+                  styles: style_btn
                   widgets:
                     - label:
                         align: CENTER
-                        text: "Home X"
-                        text_font: montserrat_18
+                        text: "HOME ALL"
+                        text_font: montserrat_22
                   on_press:
-                    - homeassistant.action:
-                        action: bambu_lab.send_command
-                        data:
-                          device_id: ${bambu_device_id}
-                          command: "G28 X"
-
-              - button:
-                  align: TOP_MID
-                  y: 290
-                  width: 100
-                  height: 45
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "Home Y"
-                        text_font: montserrat_18
-                  on_press:
-                    - homeassistant.action:
-                        action: bambu_lab.send_command
-                        data:
-                          device_id: ${bambu_device_id}
-                          command: "G28 Y"
-
-              - button:
-                  align: TOP_RIGHT
-                  x: -30
-                  y: 290
-                  width: 100
-                  height: 45
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "Home All"
-                        text_font: montserrat_18
-                  on_press:
+                    - logger.log:
+                        level: INFO
+                        format: "Motion: HOME ALL pressed, sending G28 to device ${bambu_device_id}"
                     - homeassistant.action:
                         action: bambu_lab.send_command
                         data:
                           device_id: ${bambu_device_id}
                           command: "G28"
 
-        # Card Z (Heatbed)
+        # Card Z Control
         - obj:
-            x: 480
-            y: 60
-            width: 300
-            height: 400
+            x: 520
+            y: 55
+            width: 260
+            height: 405
+            scrollbar_mode: "off"
             styles: style_card
             widgets:
               - label:
                   align: TOP_MID
                   y: 5
-                  text: "Heatbed (Z)"
+                  text: "Bed (Z)"
                   text_font: montserrat_22
                   text_color: 0x888888
 
               - button:
                   align: TOP_MID
-                  y: 50
-                  width: 250
+                  y: 45
+                  width: 220
                   height: 70
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "\U000F004D  +10"
-                        text_font: mdi_32
+                        text: "Z +10"
+                        text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: bambu_lab.send_command
@@ -1336,15 +1194,15 @@ lvgl:
 
               - button:
                   align: TOP_MID
-                  y: 130
-                  width: 250
+                  y: 125
+                  width: 220
                   height: 70
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "\U000F004D  +1"
-                        text_font: mdi_32
+                        text: "Z +1"
+                        text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: bambu_lab.send_command
@@ -1354,15 +1212,15 @@ lvgl:
 
               - button:
                   align: TOP_MID
-                  y: 210
-                  width: 250
+                  y: 205
+                  width: 220
                   height: 70
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "\U000F0045  -1"
-                        text_font: mdi_32
+                        text: "Z -1"
+                        text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: bambu_lab.send_command
@@ -1372,15 +1230,15 @@ lvgl:
 
               - button:
                   align: TOP_MID
-                  y: 290
-                  width: 250
+                  y: 285
+                  width: 220
                   height: 70
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "\U000F0045  -10"
-                        text_font: mdi_32
+                        text: "Z -10"
+                        text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: bambu_lab.send_command
