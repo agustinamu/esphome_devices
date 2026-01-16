@@ -115,6 +115,22 @@ on_press:
         entity_id: light.xxx
 ```
 
+## Test local antes de commit
+
+Cada dispositivo tiene un `test.yaml` para validar la configuración antes de pushear:
+
+```bash
+# Instalar esphome (una vez)
+uv tool install esphome
+
+# Validar configuración
+esphome config devices/humidificador/test.yaml
+esphome config devices/guition-jc8048w550/test.yaml
+esphome config devices/guition-jc8048w550-bambu/test.yaml
+```
+
+Los `test.yaml` usan `!include` para cargar el `package.yaml` local, simulando lo que haría el remote package en HA.
+
 ## Compilación
 
 - Primera vez: 15-25 min en RPi

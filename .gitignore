@@ -4,5 +4,9 @@ secrets.yaml
 # Archivos generados por ESPHome
 .esphome/
 
+# Tests locales
+**/test.yaml
+.test_*.yaml
+
 # Demos del fabricante (no necesarios)
 JC3248W535EN/
