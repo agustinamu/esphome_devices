@@ -77,9 +77,11 @@ font:
       - "\U000F04DB"  # pause
       - "\U000F040A"  # play
       - "\U000F04D8"  # stop
-      - "\U000F0238"  # lightbulb
+      - "\U000F0238"  # lightbulb-on
       - "\U000F0E4B"  # layers
       - "\U000F02DC"  # home
       - "\U000F0574"  # thermometer
       - "\U000F0C90"  # crosshairs-gps (tool head)
       - "\U000F0141"  # chevron-left (back)
+      - "\U000F0493"  # tune-vertical (presets)
+      - "\U000F0336"  # lightbulb-off

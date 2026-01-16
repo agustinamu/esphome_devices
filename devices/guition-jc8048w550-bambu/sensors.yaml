@@ -64,3 +64,7 @@ binary_sensor:
   - platform: homeassistant
     id: printer_online
     entity_id: binary_sensor.${bambu_prefix}_en_linea
+
+  - platform: homeassistant
+    id: chamber_light
+    entity_id: light.${bambu_prefix}_luz_de_la_carcasa

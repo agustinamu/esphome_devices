@@ -87,6 +87,24 @@ interval:
             snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", id(bed_temp).state, id(bed_target).state);
             return buf;
 
+      # Light toggle feedback
+      - lvgl.label.update:
+          id: lbl_light_icon
+          text: !lambda |-
+            if (id(chamber_light).state) return "\U000F0238";
+            return "\U000F0336";
+          text_color: !lambda |-
+            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0x888888);
+      - lvgl.label.update:
+          id: lbl_light_text
+          text: !lambda |-
+            if (id(chamber_light).state) return "LIGHT ON";
+            return "LIGHT OFF";
+          text_color: !lambda |-
+            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0x888888);
+
       # === INFO PAGE ===
       - lvgl.label.update:
           id: lbl_wifi_signal

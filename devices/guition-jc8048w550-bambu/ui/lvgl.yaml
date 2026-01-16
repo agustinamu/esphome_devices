@@ -20,8 +20,8 @@ lvgl:
       text_color: 0x888888
       radius: 0
       border_width: 0
-      width: 60
-      height: 60
+      width: 80
+      height: 80
 
     - id: style_sidebar_btn_active
       bg_color: 0x1A1A1A
@@ -62,7 +62,7 @@ lvgl:
     widgets:
       - obj:
           id: sidebar
-          width: 60
+          width: 80
           height: 480
           x: 0
           y: 0
@@ -72,7 +72,7 @@ lvgl:
             - button:
                 id: btn_nav_home
                 x: 0
-                y: 20
+                y: 40
                 styles: style_sidebar_btn_active
                 widgets:
                   - label:
@@ -98,7 +98,7 @@ lvgl:
             - button:
                 id: btn_nav_controls
                 x: 0
-                y: 100
+                y: 140
                 styles: style_sidebar_btn
                 widgets:
                   - label:
@@ -124,7 +124,7 @@ lvgl:
             - button:
                 id: btn_nav_motion
                 x: 0
-                y: 180
+                y: 240
                 styles: style_sidebar_btn
                 widgets:
                   - label:
@@ -150,7 +150,7 @@ lvgl:
             - button:
                 id: btn_nav_info
                 x: 0
-                y: 260
+                y: 340
                 styles: style_sidebar_btn
                 widgets:
                   - label:
@@ -180,7 +180,7 @@ lvgl:
       widgets:
         # Header
         - label:
-            x: 80
+            x: 100
             y: 10
             text: "BAMBU P1S"
             text_font: montserrat_28
@@ -198,7 +198,7 @@ lvgl:
         # Estado actual
         - label:
             id: lbl_status
-            x: 80
+            x: 100
             y: 50
             text: "Idle"
             text_font: montserrat_28
@@ -216,9 +216,9 @@ lvgl:
 
         - bar:
             id: progress_bar
-            x: 80
+            x: 100
             y: 180
-            width: 500
+            width: 480
             height: 24
             min_value: 0
             max_value: 100
@@ -232,7 +232,7 @@ lvgl:
         # Tiempo restante
         - label:
             id: lbl_remaining
-            x: 80
+            x: 100
             y: 220
             text: "-- restante"
             text_font: montserrat_28
@@ -271,9 +271,9 @@ lvgl:
 
         # Botones: Pause, Resume, Stop
         - button:
-            x: 80
+            x: 100
             y: 280
-            width: 220
+            width: 210
             height: 90
             styles: style_btn
             widgets:
@@ -288,9 +288,9 @@ lvgl:
                     entity_id: button.${bambu_prefix}_pausar_la_impresion
 
         - button:
-            x: 320
+            x: 330
             y: 280
-            width: 220
+            width: 210
             height: 90
             styles: style_btn
             widgets:
@@ -307,7 +307,7 @@ lvgl:
         - button:
             x: 560
             y: 280
-            width: 220
+            width: 210
             height: 90
             styles: style_btn_red
             widgets:
@@ -321,27 +321,9 @@ lvgl:
                   data:
                     entity_id: button.${bambu_prefix}_detener_la_impresion
 
-        # Light toggle
-        - button:
-            x: 80
-            y: 385
-            width: 220
-            height: 80
-            styles: style_btn_dark
-            widgets:
-              - label:
-                  align: CENTER
-                  text: "\U000F0238"
-                  text_font: mdi_48
-            on_press:
-              - homeassistant.action:
-                  action: light.toggle
-                  data:
-                    entity_id: light.${bambu_prefix}_luz_de_la_carcasa
-
         # Capas
         - label:
-            x: 320
+            x: 100
             y: 400
             text: "\U000F0E4B"
             text_font: mdi_48
@@ -349,7 +331,7 @@ lvgl:
 
         - label:
             id: lbl_layers
-            x: 380
+            x: 160
             y: 405
             text: "-- / --"
             text_font: montserrat_36
@@ -360,7 +342,7 @@ lvgl:
       bg_color: 0x121212
       widgets:
         - label:
-            x: 80
+            x: 100
             y: 15
             text: "Controles"
             text_font: montserrat_28
@@ -368,12 +350,13 @@ lvgl:
 
         # Card Nozzle
         - obj:
-            x: 80
+            x: 100
             y: 60
             width: 340
             height: 220
             styles: style_card
             scrollbar_mode: "off"
+            scrollable: false
             widgets:
               - label:
                   x: 10
@@ -482,12 +465,13 @@ lvgl:
 
         # Card Bed
         - obj:
-            x: 440
+            x: 460
             y: 60
-            width: 340
+            width: 320
             height: 220
             styles: style_card
             scrollbar_mode: "off"
+            scrollable: false
             widgets:
               - label:
                   x: 10
@@ -596,7 +580,7 @@ lvgl:
 
         # PRESETS button
         - button:
-            x: 80
+            x: 100
             y: 300
             width: 340
             height: 160
@@ -618,8 +602,9 @@ lvgl:
             on_press:
               - lvgl.page.show: controls_presets_page
 
-        # LIGHT button
+        # LIGHT toggle con feedback
         - button:
+            id: btn_light
             x: 440
             y: 300
             width: 340
@@ -628,17 +613,19 @@ lvgl:
             bg_color: 0x1E1E1E
             widgets:
               - label:
+                  id: lbl_light_icon
                   align: CENTER
                   y: -20
-                  text: "\U000F0238"
+                  text: "\U000F0336"
                   text_font: mdi_48
-                  text_color: 0x00AE42
+                  text_color: 0x888888
               - label:
+                  id: lbl_light_text
                   align: CENTER
                   y: 40
-                  text: "LIGHT"
+                  text: "LIGHT OFF"
                   text_font: montserrat_28
-                  text_color: 0xFFFFFF
+                  text_color: 0x888888
             on_press:
               - homeassistant.action:
                   action: light.toggle
@@ -650,7 +637,7 @@ lvgl:
       bg_color: 0x121212
       widgets:
         - button:
-            x: 80
+            x: 100
             y: 10
             width: 80
             height: 50
@@ -666,7 +653,7 @@ lvgl:
               - lvgl.page.show: controls_page
 
         - label:
-            x: 180
+            x: 200
             y: 20
             text: "PRESETS"
             text_font: montserrat_28
@@ -674,9 +661,9 @@ lvgl:
 
         # PLA
         - button:
-            x: 80
+            x: 100
             y: 80
-            width: 340
+            width: 330
             height: 120
             radius: 12
             bg_color: 0x00AE42
@@ -830,7 +817,7 @@ lvgl:
       bg_color: 0x121212
       widgets:
         - label:
-            x: 80
+            x: 100
             y: 15
             text: "Motion"
             text_font: montserrat_28
@@ -838,16 +825,16 @@ lvgl:
 
         # TOOL HEAD
         - button:
-            x: 80
+            x: 100
             y: 70
-            width: 340
-            height: 180
+            width: 330
+            height: 380
             radius: 16
             bg_color: 0x1E1E1E
             widgets:
               - label:
                   align: CENTER
-                  y: -20
+                  y: -40
                   text: "\U000F0C90"
                   text_font: mdi_48
                   text_color: 0x00AE42
@@ -862,16 +849,16 @@ lvgl:
 
         # BED
         - button:
-            x: 440
+            x: 450
             y: 70
-            width: 340
-            height: 180
+            width: 330
+            height: 380
             radius: 16
             bg_color: 0x1E1E1E
             widgets:
               - label:
                   align: CENTER
-                  y: -20
+                  y: -40
                   text: "\U000F0157"
                   text_font: mdi_48
                   text_color: 0x00AE42
@@ -884,40 +871,13 @@ lvgl:
             on_press:
               - lvgl.page.show: motion_z_page
 
-        # HOME ALL
-        - button:
-            x: 80
-            y: 270
-            width: 700
-            height: 180
-            radius: 16
-            bg_color: 0x00AE42
-            widgets:
-              - label:
-                  align: CENTER
-                  y: -20
-                  text: "\U000F0A12"
-                  text_font: mdi_48
-                  text_color: 0xFFFFFF
-              - label:
-                  align: CENTER
-                  y: 40
-                  text: "HOME ALL"
-                  text_font: montserrat_28
-                  text_color: 0xFFFFFF
-            on_press:
-              - homeassistant.action:
-                  action: bambu_lab.send_command
-                  data:
-                    device_id: ${bambu_device_id}
-                    command: "G28"
-
     # ==================== MOTION XY ====================
     - id: motion_xy_page
       bg_color: 0x121212
       widgets:
+        # Header
         - button:
-            x: 80
+            x: 100
             y: 10
             width: 80
             height: 50
@@ -933,58 +893,18 @@ lvgl:
               - lvgl.page.show: motion_page
 
         - label:
-            x: 180
+            x: 200
             y: 20
             text: "TOOL HEAD"
             text_font: montserrat_28
             text_color: 0x00AE42
 
-        # Y+ row
+        # Layout: X en fila horizontal, Y en columna vertical derecha
+        # Fila X: X-10, X-1, HOME, X+1, X+10
         - button:
-            x: 280
-            y: 75
-            width: 110
-            height: 70
-            radius: 10
-            bg_color: 0x2A2A2A
-            widgets:
-              - label:
-                  align: CENTER
-                  text: "Y+10"
-                  text_font: montserrat_22
-                  text_color: 0x00AE42
-            on_press:
-              - homeassistant.action:
-                  action: bambu_lab.send_command
-                  data:
-                    device_id: ${bambu_device_id}
-                    command: "G91\nG0 Y10 F3000\nG90"
-
-        - button:
-            x: 400
-            y: 75
-            width: 110
-            height: 70
-            radius: 10
-            bg_color: 0x333333
-            widgets:
-              - label:
-                  align: CENTER
-                  text: "Y+1"
-                  text_font: montserrat_22
-                  text_color: 0xCCCCCC
-            on_press:
-              - homeassistant.action:
-                  action: bambu_lab.send_command
-                  data:
-                    device_id: ${bambu_device_id}
-                    command: "G91\nG0 Y1 F3000\nG90"
-
-        # X row
-        - button:
-            x: 80
-            y: 195
-            width: 110
+            x: 100
+            y: 200
+            width: 100
             height: 70
             radius: 10
             bg_color: 0x2A2A2A
@@ -1002,9 +922,9 @@ lvgl:
                     command: "G91\nG0 X-10 F3000\nG90"
 
         - button:
-            x: 200
-            y: 195
-            width: 90
+            x: 210
+            y: 200
+            width: 80
             height: 70
             radius: 10
             bg_color: 0x333333
@@ -1021,12 +941,12 @@ lvgl:
                     device_id: ${bambu_device_id}
                     command: "G91\nG0 X-1 F3000\nG90"
 
-        # HOME XY center
+        # HOME XY (centro, más pequeño)
         - button:
             x: 300
-            y: 155
-            width: 190
-            height: 150
+            y: 180
+            width: 120
+            height: 110
             radius: 12
             bg_color: 0x00AE42
             widgets:
@@ -1043,9 +963,9 @@ lvgl:
                     command: "G28 X Y"
 
         - button:
-            x: 500
-            y: 195
-            width: 90
+            x: 430
+            y: 200
+            width: 80
             height: 70
             radius: 10
             bg_color: 0x333333
@@ -1063,9 +983,9 @@ lvgl:
                     command: "G91\nG0 X1 F3000\nG90"
 
         - button:
-            x: 600
-            y: 195
-            width: 110
+            x: 520
+            y: 200
+            width: 100
             height: 70
             radius: 10
             bg_color: 0x2A2A2A
@@ -1082,12 +1002,52 @@ lvgl:
                     device_id: ${bambu_device_id}
                     command: "G91\nG0 X10 F3000\nG90"
 
-        # Y- row
+        # Columna Y (derecha): Y+10, Y+1, Y-1, Y-10
         - button:
-            x: 280
-            y: 315
-            width: 110
-            height: 70
+            x: 680
+            y: 70
+            width: 90
+            height: 90
+            radius: 10
+            bg_color: 0x2A2A2A
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "Y+10"
+                  text_font: montserrat_22
+                  text_color: 0x00AE42
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "G91\nG0 Y10 F3000\nG90"
+
+        - button:
+            x: 680
+            y: 170
+            width: 90
+            height: 90
+            radius: 10
+            bg_color: 0x333333
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "Y+1"
+                  text_font: montserrat_22
+                  text_color: 0xCCCCCC
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "G91\nG0 Y1 F3000\nG90"
+
+        - button:
+            x: 680
+            y: 270
+            width: 90
+            height: 90
             radius: 10
             bg_color: 0x333333
             widgets:
@@ -1104,10 +1064,10 @@ lvgl:
                     command: "G91\nG0 Y-1 F3000\nG90"
 
         - button:
-            x: 400
-            y: 315
-            width: 110
-            height: 70
+            x: 680
+            y: 370
+            width: 90
+            height: 90
             radius: 10
             bg_color: 0x2A2A2A
             widgets:
