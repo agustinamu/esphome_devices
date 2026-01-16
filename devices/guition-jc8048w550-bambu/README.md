@@ -146,6 +146,33 @@ Control mediante `fan.set_percentage` con valores 0-100.
 | `G91` | Movimiento relativo |
 | `G90` | Movimiento absoluto |
 
+## Issues Conocidos
+
+### Filament Page (Desactivada)
+
+La página de filamento está temporalmente desactivada por los siguientes problemas:
+
+1. **PURGE ZONE**: Las coordenadas actuales (X5 Y5 Z50) no son correctas para la zona de purga. La zona de purga/calentamiento real está en X60-X70 Y265.
+
+2. **UNLOAD**: El proceso no completa correctamente el ciclo de corte:
+   - La aproximación al cortador debe ser por el eje X primero (X20), luego Y (Y50 → Y-3)
+   - La secuencia actual no activa el corte correctamente
+
+3. **Coordenadas del cortador P1S**:
+   - Posición de aproximación: X20 Y50
+   - Posición del cortador: X20 Y-3 (Y negativo, fuera del área de impresión)
+   - El cortador requiere nozzle caliente (>180°C)
+
+### Para depurar
+
+Probar manualmente via consola de HA:
+```yaml
+action: bambu_lab.send_command
+data:
+  device_id: "tu_device_id"
+  command: "G28 X Y\nG1 X20 Y50 F20000\nG1 Y-3 F3000\nG4 P500\nG28 X Y"
+```
+
 ## Alternativas
 
 - **[OpenHASP](https://www.openhasp.com/)** - Firmware con diseñador visual

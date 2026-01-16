@@ -10,23 +10,23 @@ lvgl:
 
   style_definitions:
     - id: style_sidebar
-      bg_color: 0x1A1A1A
+      bg_color: 0x0D0D0D
       radius: 0
       border_width: 0
       pad_all: 0
 
     - id: style_sidebar_btn
-      bg_color: 0x1A1A1A
-      text_color: 0x888888
-      radius: 0
+      bg_color: 0x0D0D0D
+      text_color: 0x666666
+      radius: 8
       border_width: 0
       width: 80
-      height: 80
+      height: 90
 
     - id: style_sidebar_btn_active
       bg_color: 0x1A1A1A
       text_color: 0x00AE42
-      radius: 0
+      radius: 8
       border_width: 0
 
     - id: style_card
@@ -34,21 +34,46 @@ lvgl:
       radius: 12
       pad_all: 12
       border_width: 0
+      shadow_width: 8
+      shadow_ofs_x: 2
+      shadow_ofs_y: 2
+      shadow_color: 0x000000
+      shadow_opa: 30%
 
     - id: style_btn
       bg_color: 0x00AE42
       text_color: 0xFFFFFF
-      radius: 8
+      radius: 12
+      shadow_width: 6
+      shadow_ofs_x: 2
+      shadow_ofs_y: 2
+      shadow_color: 0x000000
+      shadow_opa: 50%
 
     - id: style_btn_dark
       bg_color: 0x2A2A2A
       text_color: 0xFFFFFF
-      radius: 8
+      radius: 12
+      shadow_width: 4
+      shadow_ofs_x: 1
+      shadow_ofs_y: 1
+      shadow_color: 0x000000
+      shadow_opa: 40%
 
     - id: style_btn_red
       bg_color: 0xE53935
       text_color: 0xFFFFFF
-      radius: 8
+      radius: 12
+      shadow_width: 6
+      shadow_ofs_x: 2
+      shadow_ofs_y: 2
+      shadow_color: 0x000000
+      shadow_opa: 50%
+
+    - id: style_btn_disabled
+      bg_color: 0x1A1A1A
+      text_color: 0x555555
+      radius: 12
 
     - id: style_motion_btn
       bg_color: 0x2A2A2A
@@ -73,105 +98,145 @@ lvgl:
             - button:
                 id: btn_nav_home
                 x: 0
-                y: 32
+                y: 15
                 styles: style_sidebar_btn_active
                 widgets:
                   - label:
                       align: CENTER
+                      y: -8
                       text: "\U000F02DC"
                       text_font: mdi_32
+                  - label:
+                      align: CENTER
+                      y: 22
+                      text: "Home"
+                      text_font: montserrat_14
                 on_press:
                   - lvgl.page.show: main_page
                   - lvgl.widget.update:
                       id: btn_nav_home
                       text_color: 0x00AE42
+                      bg_color: 0x1A1A1A
                   - lvgl.widget.update:
                       id: btn_nav_controls
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_motion
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_info
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
 
             # Controles
             - button:
                 id: btn_nav_controls
                 x: 0
-                y: 144
+                y: 130
                 styles: style_sidebar_btn
                 widgets:
                   - label:
                       align: CENTER
+                      y: -8
                       text: "\U000F0493"
                       text_font: mdi_32
+                  - label:
+                      align: CENTER
+                      y: 22
+                      text: "Ctrl"
+                      text_font: montserrat_14
                 on_press:
                   - lvgl.page.show: controls_page
                   - lvgl.widget.update:
                       id: btn_nav_home
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_controls
                       text_color: 0x00AE42
+                      bg_color: 0x1A1A1A
                   - lvgl.widget.update:
                       id: btn_nav_motion
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_info
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
 
             # Motion
             - button:
                 id: btn_nav_motion
                 x: 0
-                y: 256
+                y: 245
                 styles: style_sidebar_btn
                 widgets:
                   - label:
                       align: CENTER
+                      y: -8
                       text: "\U000F0C90"
                       text_font: mdi_32
+                  - label:
+                      align: CENTER
+                      y: 22
+                      text: "Move"
+                      text_font: montserrat_14
                 on_press:
                   - lvgl.page.show: motion_page
                   - lvgl.widget.update:
                       id: btn_nav_home
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_controls
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_motion
                       text_color: 0x00AE42
+                      bg_color: 0x1A1A1A
                   - lvgl.widget.update:
                       id: btn_nav_info
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
 
             # Info
             - button:
                 id: btn_nav_info
                 x: 0
-                y: 368
+                y: 360
                 styles: style_sidebar_btn
                 widgets:
                   - label:
                       align: CENTER
+                      y: -8
                       text: "\U000F02FC"
                       text_font: mdi_32
+                  - label:
+                      align: CENTER
+                      y: 22
+                      text: "Info"
+                      text_font: montserrat_14
                 on_press:
                   - lvgl.page.show: info_page
                   - lvgl.widget.update:
                       id: btn_nav_home
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_controls
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_motion
-                      text_color: 0x888888
+                      text_color: 0x666666
+                      bg_color: 0x0D0D0D
                   - lvgl.widget.update:
                       id: btn_nav_info
                       text_color: 0x00AE42
+                      bg_color: 0x1A1A1A
 
   # === PAGINAS ===
   pages:
@@ -1331,29 +1396,35 @@ lvgl:
             on_press:
               - lvgl.page.show: motion_z_page
 
-        # FILAMENT
-        - button:
+        # FILAMENT (Desactivado - requiere depuracion)
+        - obj:
             x: 560
             y: 70
             width: 215
             height: 380
             radius: 16
-            bg_color: 0x1E1E1E
+            bg_color: 0x1A1A1A
+            scrollbar_mode: "off"
+            scrollable: false
             widgets:
               - label:
                   align: CENTER
-                  y: -40
+                  y: -50
                   text: "\U000F08BC"
                   text_font: mdi_48
-                  text_color: 0x00AE42
+                  text_color: 0x444444
               - label:
                   align: CENTER
-                  y: 40
+                  y: 20
                   text: "FILAMENT"
                   text_font: montserrat_22
-                  text_color: 0xFFFFFF
-            on_press:
-              - lvgl.page.show: filament_page
+                  text_color: 0x444444
+              - label:
+                  align: CENTER
+                  y: 60
+                  text: "(disabled)"
+                  text_font: montserrat_18
+                  text_color: 0x333333
 
     # ==================== MOTION XY ====================
     # Layout en "+" con HOME pequeño en centro
@@ -1933,7 +2004,7 @@ lvgl:
                   y: 25
                   text: "-- dBm"
                   text_font: montserrat_22
-                  text_color: 0x888888
+                  text_color: 0xFFFFFF
 
               # IP
               - label:
@@ -1956,7 +2027,7 @@ lvgl:
                   y: 85
                   text: "---.---.---.---"
                   text_font: montserrat_22
-                  text_color: 0x888888
+                  text_color: 0xFFFFFF
 
               # Uptime
               - label:
@@ -1979,7 +2050,7 @@ lvgl:
                   y: 145
                   text: "--"
                   text_font: montserrat_22
-                  text_color: 0x888888
+                  text_color: 0xFFFFFF
 
               # Estado impresora
               - label:
@@ -2002,7 +2073,7 @@ lvgl:
                   y: 205
                   text: "--"
                   text_font: montserrat_22
-                  text_color: 0x888888
+                  text_color: 0xFFFFFF
 
               # Version
               - label:
@@ -2024,7 +2095,7 @@ lvgl:
                   y: 265
                   text: "ESPHome 2025.x"
                   text_font: montserrat_22
-                  text_color: 0x888888
+                  text_color: 0xFFFFFF
 
               # Printer Online
               - label:
@@ -2048,4 +2119,4 @@ lvgl:
                   y: 325
                   text: "---"
                   text_font: montserrat_22
-                  text_color: 0x888888
+                  text_color: 0xFFFFFF
