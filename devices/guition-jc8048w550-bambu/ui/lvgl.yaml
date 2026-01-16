@@ -1574,7 +1574,7 @@ lvgl:
       bg_color: 0x121212
       widgets:
         - button:
-            x: 80
+            x: 100
             y: 10
             width: 80
             height: 50
@@ -1590,59 +1590,108 @@ lvgl:
               - lvgl.page.show: motion_page
 
         - label:
-            x: 180
+            x: 200
             y: 20
             text: "BED (Z)"
             text_font: montserrat_28
             text_color: 0x00AE42
 
-        # Z +10
+        # Warning message
+        - label:
+            x: 100
+            y: 70
+            width: 680
+            text: "Asegurate que no hay nada debajo de la cama"
+            text_font: montserrat_18
+            text_color: 0xFFAA00
+
+        # Posiciones absolutas seguras (alejan la cama del nozzle)
         - button:
-            x: 80
-            y: 90
-            width: 300
-            height: 110
+            x: 100
+            y: 110
+            width: 215
+            height: 120
             radius: 12
             bg_color: 0x2A2A2A
             widgets:
               - label:
                   align: CENTER
-                  text: "Z +10"
-                  text_font: montserrat_36
+                  y: -15
+                  text: "Z = 250"
+                  text_font: montserrat_28
                   text_color: 0x00AE42
+              - label:
+                  align: CENTER
+                  y: 25
+                  text: "Abajo"
+                  text_font: montserrat_18
+                  text_color: 0x888888
             on_press:
               - homeassistant.action:
                   action: bambu_lab.send_command
                   data:
                     device_id: ${bambu_device_id}
-                    command: "G91\nG0 Z10 F600\nG90"
+                    command: "G90\nG0 Z250 F600"
 
-        # Z +1
         - button:
-            x: 400
-            y: 90
-            width: 300
-            height: 110
+            x: 330
+            y: 110
+            width: 215
+            height: 120
             radius: 12
             bg_color: 0x333333
             widgets:
               - label:
                   align: CENTER
-                  text: "Z +1"
-                  text_font: montserrat_36
+                  y: -15
+                  text: "Z = 150"
+                  text_font: montserrat_28
                   text_color: 0xCCCCCC
+              - label:
+                  align: CENTER
+                  y: 25
+                  text: "Medio"
+                  text_font: montserrat_18
+                  text_color: 0x888888
             on_press:
               - homeassistant.action:
                   action: bambu_lab.send_command
                   data:
                     device_id: ${bambu_device_id}
-                    command: "G91\nG0 Z1 F600\nG90"
+                    command: "G90\nG0 Z150 F600"
+
+        - button:
+            x: 560
+            y: 110
+            width: 215
+            height: 120
+            radius: 12
+            bg_color: 0x333333
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -15
+                  text: "Z = 50"
+                  text_font: montserrat_28
+                  text_color: 0xCCCCCC
+              - label:
+                  align: CENTER
+                  y: 25
+                  text: "Arriba"
+                  text_font: montserrat_18
+                  text_color: 0x888888
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "G90\nG0 Z50 F600"
 
         # HOME Z
         - button:
-            x: 80
-            y: 220
-            width: 620
+            x: 100
+            y: 260
+            width: 675
             height: 100
             radius: 12
             bg_color: 0x00AE42
@@ -1666,47 +1715,14 @@ lvgl:
                     device_id: ${bambu_device_id}
                     command: "G28 Z"
 
-        # Z -1
-        - button:
-            x: 80
-            y: 340
-            width: 300
-            height: 110
-            radius: 12
-            bg_color: 0x333333
-            widgets:
-              - label:
-                  align: CENTER
-                  text: "Z -1"
-                  text_font: montserrat_36
-                  text_color: 0xCCCCCC
-            on_press:
-              - homeassistant.action:
-                  action: bambu_lab.send_command
-                  data:
-                    device_id: ${bambu_device_id}
-                    command: "G91\nG0 Z-1 F600\nG90"
-
-        # Z -10
-        - button:
-            x: 400
-            y: 340
-            width: 300
-            height: 110
-            radius: 12
-            bg_color: 0x2A2A2A
-            widgets:
-              - label:
-                  align: CENTER
-                  text: "Z -10"
-                  text_font: montserrat_36
-                  text_color: 0x00AE42
-            on_press:
-              - homeassistant.action:
-                  action: bambu_lab.send_command
-                  data:
-                    device_id: ${bambu_device_id}
-                    command: "G91\nG0 Z-10 F600\nG90"
+        # Info
+        - label:
+            x: 100
+            y: 390
+            width: 680
+            text: "Z mayor = cama mas abajo (seguro)"
+            text_font: montserrat_18
+            text_color: 0x666666
 
     # ==================== FILAMENT ====================
     - id: filament_page
