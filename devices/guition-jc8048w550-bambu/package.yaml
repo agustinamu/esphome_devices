@@ -579,9 +579,15 @@ lvgl:
                   styles: style_btn_dark
                   widgets:
                     - label:
-                        align: CENTER
-                        text: "\U000F0238  LUZ"
+                        align: LEFT_MID
+                        x: 20
+                        text: "\U000F0238"
                         text_font: mdi_32
+                    - label:
+                        align: RIGHT_MID
+                        x: -30
+                        text: "LUZ"
+                        text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: light.toggle
@@ -596,9 +602,15 @@ lvgl:
                   styles: style_btn_dark
                   widgets:
                     - label:
-                        align: CENTER
-                        text: "\U000F0415  REFRESH"
+                        align: LEFT_MID
+                        x: 20
+                        text: "\U000F0415"
                         text_font: mdi_32
+                    - label:
+                        align: RIGHT_MID
+                        x: -20
+                        text: "REFRESH"
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: button.press
