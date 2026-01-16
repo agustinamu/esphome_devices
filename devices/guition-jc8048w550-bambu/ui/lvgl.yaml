@@ -374,7 +374,7 @@ lvgl:
             widgets:
               - label:
                   align: CENTER
-                  text: "\U000F04DB"
+                  text: "\U000F03E4"
                   text_font: mdi_48
             on_press:
               - homeassistant.action:
@@ -408,7 +408,7 @@ lvgl:
             widgets:
               - label:
                   align: CENTER
-                  text: "\U000F04D8"
+                  text: "\U000F04DB"
                   text_font: mdi_48
             on_press:
               - homeassistant.action:

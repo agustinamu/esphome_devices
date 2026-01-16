@@ -44,9 +44,9 @@ font:
       - "\U000F18B8"  # printer-3d-nozzle
       - "\U000F0157"  # bed (radiator)
       - "\U000F0238"  # lightbulb
-      - "\U000F04DB"  # pause
+      - "\U000F03E4"  # pause
       - "\U000F040A"  # play
-      - "\U000F04D8"  # stop
+      - "\U000F04DB"  # stop
       - "\U000F05A9"  # wifi
       - "\U000F0574"  # thermometer
       - "\U000F0E4B"  # layers
@@ -81,9 +81,9 @@ font:
       - "\U000F0A12"  # home-automation
       - "\U000F18B8"  # printer-3d-nozzle
       - "\U000F0157"  # bed (radiator)
-      - "\U000F04DB"  # pause
+      - "\U000F03E4"  # pause
       - "\U000F040A"  # play
-      - "\U000F04D8"  # stop
+      - "\U000F04DB"  # stop
       - "\U000F0238"  # lightbulb-on
       - "\U000F0E4B"  # layers
       - "\U000F02DC"  # home
