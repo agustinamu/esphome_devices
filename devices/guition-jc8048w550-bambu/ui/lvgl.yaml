@@ -489,38 +489,38 @@ lvgl:
         - obj:
             x: 100
             y: 60
-            width: 340
-            height: 220
+            width: 320
+            height: 200
             styles: style_card
             scrollbar_mode: "off"
             scrollable: false
             widgets:
               - label:
                   x: 10
-                  y: 10
+                  y: 5
                   text: "\U000F18B8"
                   text_font: mdi_48
                   text_color: 0x00AE42
 
               - label:
                   id: lbl_nozzle_ctrl
-                  x: 70
-                  y: 20
+                  x: 65
+                  y: 15
                   text: "---°C / ---°C"
-                  text_font: montserrat_36
+                  text_font: montserrat_28
                   text_color: 0xFFFFFF
 
               - button:
                   x: 10
-                  y: 90
-                  width: 75
-                  height: 55
+                  y: 70
+                  width: 68
+                  height: 50
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
                         text: "-10"
-                        text_font: montserrat_22
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
@@ -529,52 +529,52 @@ lvgl:
                           value: !lambda "return std::max(0.0f, id(nozzle_target).state - 10);"
 
               - button:
-                  x: 90
-                  y: 90
-                  width: 70
-                  height: 55
+                  x: 83
+                  y: 70
+                  width: 68
+                  height: 50
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "-1"
-                        text_font: montserrat_22
+                        text: "-5"
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                          value: !lambda "return std::max(0.0f, id(nozzle_target).state - 1);"
+                          value: !lambda "return std::max(0.0f, id(nozzle_target).state - 5);"
 
               - button:
-                  x: 165
-                  y: 90
-                  width: 70
-                  height: 55
+                  x: 156
+                  y: 70
+                  width: 68
+                  height: 50
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "+1"
-                        text_font: montserrat_22
+                        text: "+5"
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                          value: !lambda "return id(nozzle_target).state + 1;"
+                          value: !lambda "return id(nozzle_target).state + 5;"
 
               - button:
-                  x: 240
-                  y: 90
-                  width: 75
-                  height: 55
+                  x: 229
+                  y: 70
+                  width: 68
+                  height: 50
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
                         text: "+10"
-                        text_font: montserrat_22
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
@@ -584,15 +584,15 @@ lvgl:
 
               - button:
                   x: 10
-                  y: 155
-                  width: 305
+                  y: 130
+                  width: 287
                   height: 50
                   styles: style_btn_red
                   widgets:
                     - label:
                         align: CENTER
                         text: "ENFRIAR"
-                        text_font: montserrat_22
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
@@ -602,40 +602,40 @@ lvgl:
 
         # Card Bed
         - obj:
-            x: 460
+            x: 440
             y: 60
             width: 320
-            height: 220
+            height: 200
             styles: style_card
             scrollbar_mode: "off"
             scrollable: false
             widgets:
               - label:
                   x: 10
-                  y: 10
+                  y: 5
                   text: "\U000F0157"
                   text_font: mdi_48
                   text_color: 0x00AE42
 
               - label:
                   id: lbl_bed_ctrl
-                  x: 70
-                  y: 20
+                  x: 65
+                  y: 15
                   text: "---°C / ---°C"
-                  text_font: montserrat_36
+                  text_font: montserrat_28
                   text_color: 0xFFFFFF
 
               - button:
                   x: 10
-                  y: 90
-                  width: 75
-                  height: 55
+                  y: 70
+                  width: 68
+                  height: 50
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
                         text: "-10"
-                        text_font: montserrat_22
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
@@ -644,52 +644,52 @@ lvgl:
                           value: !lambda "return std::max(0.0f, id(bed_target).state - 10);"
 
               - button:
-                  x: 90
-                  y: 90
-                  width: 70
-                  height: 55
+                  x: 83
+                  y: 70
+                  width: 68
+                  height: 50
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "-1"
-                        text_font: montserrat_22
+                        text: "-5"
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                          value: !lambda "return std::max(0.0f, id(bed_target).state - 1);"
+                          value: !lambda "return std::max(0.0f, id(bed_target).state - 5);"
 
               - button:
-                  x: 165
-                  y: 90
-                  width: 70
-                  height: 55
+                  x: 156
+                  y: 70
+                  width: 68
+                  height: 50
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "+1"
-                        text_font: montserrat_22
+                        text: "+5"
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                          value: !lambda "return id(bed_target).state + 1;"
+                          value: !lambda "return id(bed_target).state + 5;"
 
               - button:
-                  x: 240
-                  y: 90
-                  width: 75
-                  height: 55
+                  x: 229
+                  y: 70
+                  width: 68
+                  height: 50
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
                         text: "+10"
-                        text_font: montserrat_22
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
@@ -699,15 +699,15 @@ lvgl:
 
               - button:
                   x: 10
-                  y: 155
-                  width: 305
+                  y: 130
+                  width: 287
                   height: 50
                   styles: style_btn_red
                   widgets:
                     - label:
                         align: CENTER
                         text: "ENFRIAR"
-                        text_font: montserrat_22
+                        text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
