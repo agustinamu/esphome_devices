@@ -179,13 +179,21 @@ lvgl:
     - id: main_page
       bg_color: 0x121212
       widgets:
-        # Header
+        # === HEADER ===
         - label:
             x: 100
             y: 10
             text: "BAMBU P1S"
             text_font: montserrat_28
             text_color: 0x00AE42
+
+        - label:
+            id: lbl_status
+            x: 300
+            y: 10
+            text: "Idle"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
 
         - label:
             id: lbl_clock
@@ -196,108 +204,127 @@ lvgl:
             text_font: montserrat_28
             text_color: 0xFFFFFF
 
-        # Estado actual
+        # === CENTRO: Temperaturas y Ventiladores ===
+        # Nozzle
         - label:
-            id: lbl_status
-            x: 100
-            y: 50
-            text: "Idle"
-            text_font: montserrat_28
-            text_color: 0x00AE42
-
-        # Progreso GIGANTE
-        - label:
-            id: lbl_progress
-            align: TOP_MID
-            x: 30
-            y: 100
-            text: "0%"
-            text_font: montserrat_48
-            text_color: 0xFFFFFF
-
-        - bar:
-            id: progress_bar
-            x: 100
-            y: 180
-            width: 480
-            height: 24
-            min_value: 0
-            max_value: 100
-            value: 0
-            bg_color: 0x333333
-            radius: 12
-            indicator:
-              bg_color: 0x00AE42
-              radius: 12
-
-        # Tiempo restante
-        - label:
-            id: lbl_remaining
-            x: 100
-            y: 220
-            text: "-- restante"
-            text_font: montserrat_28
-            text_color: 0x888888
-
-        # Temperaturas lado derecho
-        - label:
-            x: 600
-            y: 100
+            x: 120
+            y: 70
             text: "\U000F18B8"
             text_font: mdi_48
             text_color: 0x00AE42
 
         - label:
             id: lbl_nozzle
-            x: 660
-            y: 105
+            x: 180
+            y: 75
             text: "---"
-            text_font: montserrat_36
+            text_font: montserrat_48
             text_color: 0xFFFFFF
 
         - label:
-            x: 600
-            y: 170
+            x: 280
+            y: 90
+            text: "°C"
+            text_font: montserrat_22
+            text_color: 0x888888
+
+        # Bed
+        - label:
+            x: 360
+            y: 70
             text: "\U000F0157"
             text_font: mdi_48
             text_color: 0x00AE42
 
         - label:
             id: lbl_bed
-            x: 660
-            y: 175
+            x: 420
+            y: 75
             text: "---"
-            text_font: montserrat_36
+            text_font: montserrat_48
             text_color: 0xFFFFFF
 
-        # Ventiladores (compacto)
         - label:
-            x: 600
-            y: 240
+            x: 520
+            y: 90
+            text: "°C"
+            text_font: montserrat_22
+            text_color: 0x888888
+
+        # Ventiladores (3 en fila)
+        # Cooling Fan
+        - label:
+            x: 140
+            y: 145
             text: "\U000F0210"
             text_font: mdi_32
             text_color: 0x00AE42
 
         - label:
             id: lbl_cooling_fan
-            x: 640
-            y: 242
+            x: 180
+            y: 148
             text: "--"
             text_font: montserrat_22
             text_color: 0xFFFFFF
 
         - label:
-            id: lbl_aux_fan
-            x: 710
-            y: 242
-            text: "--"
-            text_font: montserrat_22
+            x: 225
+            y: 148
+            text: "Cool"
+            text_font: montserrat_18
+            text_color: 0x666666
+
+        # Aux Fan
+        - label:
+            x: 320
+            y: 145
+            text: "\U000F0210"
+            text_font: mdi_32
             text_color: 0x888888
 
-        # Botones: Pause, Resume, Stop
+        - label:
+            id: lbl_aux_fan
+            x: 360
+            y: 148
+            text: "--"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+
+        - label:
+            x: 405
+            y: 148
+            text: "Aux"
+            text_font: montserrat_18
+            text_color: 0x666666
+
+        # Chamber Fan
+        - label:
+            x: 500
+            y: 145
+            text: "\U000F0210"
+            text_font: mdi_32
+            text_color: 0x888888
+
+        - label:
+            id: lbl_chamber_fan
+            x: 540
+            y: 148
+            text: "--"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+
+        - label:
+            x: 585
+            y: 148
+            text: "Cham"
+            text_font: montserrat_18
+            text_color: 0x666666
+
+        # === BOTONES: Pause, Resume, Stop ===
         - button:
             x: 100
-            y: 280
+            y: 200
             width: 210
             height: 90
             styles: style_btn
@@ -314,7 +341,7 @@ lvgl:
 
         - button:
             x: 330
-            y: 280
+            y: 200
             width: 210
             height: 90
             styles: style_btn
@@ -331,7 +358,7 @@ lvgl:
 
         - button:
             x: 560
-            y: 280
+            y: 200
             width: 210
             height: 90
             styles: style_btn_red
@@ -346,20 +373,62 @@ lvgl:
                   data:
                     entity_id: button.${bambu_prefix}_detener_la_impresion
 
-        # Capas
+        # === BOTTOM: Capas | Progreso | Tiempo ===
+        # Barra de progreso
+        - bar:
+            id: progress_bar
+            x: 100
+            y: 320
+            width: 670
+            height: 16
+            min_value: 0
+            max_value: 100
+            value: 0
+            bg_color: 0x333333
+            radius: 8
+            indicator:
+              bg_color: 0x00AE42
+              radius: 8
+
+        # Capas (izquierda)
         - label:
             x: 100
-            y: 400
+            y: 360
             text: "\U000F0E4B"
-            text_font: mdi_48
+            text_font: mdi_32
             text_color: 0x00AE42
 
         - label:
             id: lbl_layers
-            x: 160
-            y: 405
+            x: 140
+            y: 362
             text: "-- / --"
-            text_font: montserrat_36
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        # Progreso (centro)
+        - label:
+            id: lbl_progress
+            x: 370
+            y: 355
+            text: "0%"
+            text_font: montserrat_48
+            text_color: 0xFFFFFF
+
+        # Tiempo restante (derecha)
+        - label:
+            x: 530
+            y: 360
+            text: "\U000F0150"
+            text_font: mdi_32
+            text_color: 0x00AE42
+
+        - label:
+            id: lbl_remaining
+            x: 570
+            y: 362
+            text: "--:--"
+            text_font: montserrat_28
             text_color: 0xFFFFFF
 
     # ==================== CONTROLS ====================

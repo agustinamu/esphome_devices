@@ -43,12 +43,12 @@ interval:
       - lvgl.label.update:
           id: lbl_remaining
           text: !lambda |-
-            static char buf[32];
+            static char buf[16];
             float hours = id(print_time_remaining).state;
-            if (isnan(hours)) return "-- restante";
+            if (isnan(hours)) return "--:--";
             int h = (int)hours;
             int m = (int)((hours - h) * 60);
-            snprintf(buf, sizeof(buf), "%dh %02dm restante", h, m);
+            snprintf(buf, sizeof(buf), "%d:%02d", h, m);
             return buf;
 
       - lvgl.label.update:
@@ -87,6 +87,15 @@ interval:
           text: !lambda |-
             static char buf[8];
             float pct = id(aux_fan_speed).state;
+            if (isnan(pct)) return "--";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_chamber_fan
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(chamber_fan_speed).state;
             if (isnan(pct)) return "--";
             snprintf(buf, sizeof(buf), "%.0f%%", pct);
             return buf;
