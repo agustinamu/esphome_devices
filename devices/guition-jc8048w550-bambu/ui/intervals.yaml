@@ -72,6 +72,25 @@ interval:
             snprintf(buf, sizeof(buf), "%.0f / %.0f", id(current_layer).state, id(total_layers).state);
             return buf;
 
+      # Fans (Home page - compact)
+      - lvgl.label.update:
+          id: lbl_cooling_fan
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(cooling_fan_speed).state;
+            if (isnan(pct)) return "--";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_aux_fan
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(aux_fan_speed).state;
+            if (isnan(pct)) return "--";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+
       # === CONTROLS PAGE ===
       - lvgl.label.update:
           id: lbl_nozzle_ctrl
@@ -99,11 +118,39 @@ interval:
       - lvgl.label.update:
           id: lbl_light_text
           text: !lambda |-
-            if (id(chamber_light).state) return "LIGHT ON";
-            return "LIGHT OFF";
+            if (id(chamber_light).state) return "ON";
+            return "OFF";
           text_color: !lambda |-
             if (id(chamber_light).state) return lv_color_hex(0x00AE42);
             return lv_color_hex(0x888888);
+
+      # === FANS PAGE ===
+      - lvgl.label.update:
+          id: lbl_cooling_pct
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(cooling_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_aux_pct
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(aux_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_chamber_pct
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(chamber_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
 
       # === INFO PAGE ===
       - lvgl.label.update:

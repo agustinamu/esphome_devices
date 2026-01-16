@@ -35,6 +35,22 @@ sensor:
     id: total_layers
     entity_id: sensor.${bambu_prefix}_cantidad_total_de_capas
 
+  # Ventiladores (porcentaje de velocidad)
+  - platform: homeassistant
+    id: aux_fan_speed
+    entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+    attribute: percentage
+
+  - platform: homeassistant
+    id: cooling_fan_speed
+    entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+    attribute: percentage
+
+  - platform: homeassistant
+    id: chamber_fan_speed
+    entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+    attribute: percentage
+
   - platform: wifi_signal
     id: wifi_signal_db
     update_interval: 30s

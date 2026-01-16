@@ -66,6 +66,10 @@ font:
       - "\U000F0F0C"  # target (purge zone)
       - "\U000F0B30"  # transfer-up (load)
       - "\U000F0B2F"  # transfer-down (unload)
+      - "\U000F0210"  # fan
+      - "\U000F1B5D"  # fan-speed-1
+      - "\U000F1B5E"  # fan-speed-2
+      - "\U000F1B5F"  # fan-speed-3
 
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_48
