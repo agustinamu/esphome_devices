@@ -73,6 +73,15 @@ font:
       - "\U000F0041"  # arrow-left
       - "\U000F0040"  # arrow-right
       - "\U000F0A12"  # home-automation
+      - "\U000F18B8"  # printer-3d-nozzle
+      - "\U000F0157"  # bed (radiator)
+      - "\U000F04DB"  # pause
+      - "\U000F040A"  # play
+      - "\U000F04D8"  # stop
+      - "\U000F0238"  # lightbulb
+      - "\U000F0E4B"  # layers
+      - "\U000F02DC"  # home
+      - "\U000F0574"  # thermometer
 
 # === LVGL UI ===
 lvgl:
