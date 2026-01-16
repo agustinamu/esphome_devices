@@ -1,0 +1,65 @@
+# Sensores de Home Assistant (Bambu Lab P1S)
+# Entidades en espanol segun configuracion de HA
+
+sensor:
+  - platform: homeassistant
+    id: nozzle_temp
+    entity_id: sensor.p1s_01p00c581002790_temperatura_de_la_boquilla
+
+  - platform: homeassistant
+    id: nozzle_target
+    entity_id: sensor.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+
+  - platform: homeassistant
+    id: bed_temp
+    entity_id: sensor.p1s_01p00c581002790_temperatura_de_la_cama
+
+  - platform: homeassistant
+    id: bed_target
+    entity_id: sensor.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+
+  - platform: homeassistant
+    id: print_progress
+    entity_id: sensor.p1s_01p00c581002790_progreso_de_la_impresion
+
+  - platform: homeassistant
+    id: print_time_remaining
+    entity_id: sensor.p1s_01p00c581002790_tiempo_restante
+
+  - platform: homeassistant
+    id: current_layer
+    entity_id: sensor.p1s_01p00c581002790_capa_actual
+
+  - platform: homeassistant
+    id: total_layers
+    entity_id: sensor.p1s_01p00c581002790_cantidad_total_de_capas
+
+  - platform: wifi_signal
+    id: wifi_signal_db
+    update_interval: 30s
+
+  - platform: uptime
+    id: uptime_sensor
+    update_interval: 60s
+
+text_sensor:
+  - platform: homeassistant
+    id: printer_status
+    entity_id: sensor.p1s_01p00c581002790_estado_actual
+
+  - platform: homeassistant
+    id: current_file
+    entity_id: sensor.p1s_01p00c581002790_nombre_de_la_tarea
+
+  - platform: homeassistant
+    id: hms_errors
+    entity_id: sensor.p1s_01p00c581002790_errores_hms
+
+  - platform: wifi_info
+    ip_address:
+      id: wifi_ip
+
+binary_sensor:
+  - platform: homeassistant
+    id: printer_online
+    entity_id: binary_sensor.p1s_01p00c581002790_en_linea
