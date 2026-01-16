@@ -104,7 +104,7 @@ lvgl:
       border_width: 0
 
     - id: style_card
-      bg_color: 0x000000
+      bg_color: 0x1E1E1E
       radius: 12
       pad_all: 12
       border_width: 0
@@ -250,7 +250,7 @@ lvgl:
   pages:
     # ========== PAGINA HOME ==========
     - id: main_page
-      bg_color: 0x000000
+      bg_color: 0x121212
       widgets:
         # Header
         - label:
@@ -508,7 +508,7 @@ lvgl:
 
     # ========== PAGINA CONTROLES ==========
     - id: controls_page
-      bg_color: 0x000000
+      bg_color: 0x121212
       widgets:
         - label:
             x: 80
@@ -843,7 +843,7 @@ lvgl:
 
     # ========== PAGINA MOTION ==========
     - id: motion_page
-      bg_color: 0x000000
+      bg_color: 0x121212
       widgets:
         - label:
             x: 80
@@ -1324,7 +1324,7 @@ lvgl:
 
     # ========== PAGINA INFO ==========
     - id: info_page
-      bg_color: 0x000000
+      bg_color: 0x121212
       widgets:
         - label:
             x: 80
