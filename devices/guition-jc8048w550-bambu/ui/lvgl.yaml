@@ -297,7 +297,7 @@ lvgl:
         # Ventiladores (3 en fila)
         # Cooling Fan
         - label:
-            x: 140
+            x: 120
             y: 145
             text: "\U000F0210"
             text_font: mdi_32
@@ -305,14 +305,14 @@ lvgl:
 
         - label:
             id: lbl_cooling_fan
-            x: 180
+            x: 158
             y: 148
             text: "--"
             text_font: montserrat_22
             text_color: 0xFFFFFF
 
         - label:
-            x: 225
+            x: 215
             y: 148
             text: "Cool"
             text_font: montserrat_18
@@ -320,7 +320,7 @@ lvgl:
 
         # Aux Fan
         - label:
-            x: 320
+            x: 310
             y: 145
             text: "\U000F0210"
             text_font: mdi_32
@@ -328,7 +328,7 @@ lvgl:
 
         - label:
             id: lbl_aux_fan
-            x: 360
+            x: 348
             y: 148
             text: "--"
             text_font: montserrat_22
@@ -343,7 +343,7 @@ lvgl:
 
         # Chamber Fan
         - label:
-            x: 500
+            x: 490
             y: 145
             text: "\U000F0210"
             text_font: mdi_32
@@ -351,7 +351,7 @@ lvgl:
 
         - label:
             id: lbl_chamber_fan
-            x: 540
+            x: 528
             y: 148
             text: "--"
             text_font: montserrat_22
