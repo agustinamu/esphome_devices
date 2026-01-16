@@ -41,5 +41,5 @@ guition-jc8048w550-bambu/
 ## Alternativas
 
 - **[OpenHASP](https://www.openhasp.com/)** - Firmware con diseñador visual
-  - [Guition en OpenHASP](https://www.openhasp.com/latest/hardware/sunton/esp32-8048s050c/)
+  - [Guition en OpenHASP](https://www.openhasp.com/0.7.0/hardware/guition/jc8048w550/)
   - Más fácil para diseños simples, menos flexible para lógica compleja

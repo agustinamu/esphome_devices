@@ -19,4 +19,4 @@ Si prefieres una solución más visual/drag-and-drop para displays táctiles:
 
 - **[OpenHASP](https://www.openhasp.com/)** - Firmware alternativo para displays táctiles con diseñador visual
   - [Dispositivos soportados](https://www.openhasp.com/latest/hardware/)
-  - [Guition en OpenHASP](https://www.openhasp.com/latest/hardware/sunton/esp32-8048s050c/)
+  - [Guition en OpenHASP](https://www.openhasp.com/0.7.0/hardware/guition/jc8048w550/)
