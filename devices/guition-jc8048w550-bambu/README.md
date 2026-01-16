@@ -107,7 +107,10 @@ G1 E-1.0 F300       ; Retracción anti-ooze
 - El cortador requiere el nozzle caliente (>180°C) para funcionar
 - Las coordenadas Y negativas están fuera del área de impresión
 - Zona de residuos/calentamiento: X60-X70 Y265
-- Estas secuencias fueron obtenidas de [BambuStudio source](https://github.com/bambulab/BambuStudio/issues/271) y [community gcode](https://gist.github.com/codeincontext/4efc5820e7fd4167b231dffcc4d9ccd6)
+- Fuentes:
+  - [BambuStudio Issues](https://github.com/bambulab/BambuStudio/issues/271)
+  - [Community gcode gist](https://gist.github.com/codeincontext/4efc5820e7fd4167b231dffcc4d9ccd6)
+  - [BBL P1S organized start/end gcode](https://forum.bambulab.com/t/bbl-p1s-organized-start-and-end-gcode/38795/7)
 
 ## Entidades de Ventiladores
 
