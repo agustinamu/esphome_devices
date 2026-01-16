@@ -1,5 +1,10 @@
 # Humidificador - Control mediante pulsos en GPIO
 
+esp8266:
+  board: esp01_1m
+
+logger:
+
 esphome:
   on_boot:
     priority: 1000
