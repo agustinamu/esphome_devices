@@ -6,6 +6,7 @@ font:
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_32
     size: 32
+    bpp: 4
     glyphs:
       - "\U000F02DC"  # home
       - "\U000F0493"  # tune-vertical
@@ -34,6 +35,7 @@ font:
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_48
     size: 48
+    bpp: 4
     glyphs:
       - "\U000F004D"  # arrow-up
       - "\U000F0045"  # arrow-down
