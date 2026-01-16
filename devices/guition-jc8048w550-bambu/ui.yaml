@@ -249,14 +249,15 @@ lvgl:
   # === Paginas ===
   pages:
     # ========== PAGINA HOME ==========
+    # Diseno minimalista - textos grandes, facil de leer
     - id: main_page
       bg_color: 0x121212
       widgets:
-        # Header
+        # Header simple
         - label:
             x: 80
-            y: 15
-            text: "BAMBU LAB P1S"
+            y: 10
+            text: "BAMBU P1S"
             text_font: montserrat_28
             text_color: 0x00AE42
 
@@ -264,247 +265,170 @@ lvgl:
             id: lbl_clock
             align: TOP_RIGHT
             x: -20
-            y: 15
+            y: 10
             text: "--:--"
-            text_font: montserrat_22
+            text_font: montserrat_28
             text_color: 0xFFFFFF
 
-        # Card Estado y Progreso
-        - obj:
+        # Estado actual
+        - label:
+            id: lbl_status
             x: 80
-            y: 55
-            width: 420
-            height: 200
-            styles: style_card
-            widgets:
-              - label:
-                  id: lbl_status
-                  x: 10
-                  y: 5
-                  text: "Idle"
-                  text_font: montserrat_28
-                  text_color: 0x00AE42
+            y: 50
+            text: "Idle"
+            text_font: montserrat_28
+            text_color: 0x00AE42
 
-              - label:
-                  id: lbl_filename
-                  x: 10
-                  y: 40
-                  text: "Sin tarea"
-                  text_font: montserrat_18
-                  text_color: 0xCCCCCC
-                  long_mode: DOT
-                  width: 380
+        # Progreso GIGANTE - centro de atencion
+        - label:
+            id: lbl_progress
+            align: TOP_MID
+            x: 30
+            y: 100
+            text: "0%"
+            text_font: montserrat_48
+            text_color: 0xFFFFFF
 
-              - label:
-                  id: lbl_progress
-                  align: CENTER
-                  y: -10
-                  text: "0%"
-                  text_font: montserrat_48
-                  text_color: 0xFFFFFF
-
-              - bar:
-                  id: progress_bar
-                  align: CENTER
-                  y: 40
-                  width: 380
-                  height: 16
-                  min_value: 0
-                  max_value: 100
-                  value: 0
-                  bg_color: 0x333333
-                  radius: 8
-                  indicator:
-                    bg_color: 0x00AE42
-                    radius: 8
-
-              - label:
-                  id: lbl_remaining
-                  align: BOTTOM_MID
-                  y: -10
-                  text: "Restante: --"
-                  text_font: montserrat_18
-                  text_color: 0x888888
-
-        # Card Temperaturas
-        - obj:
-            x: 520
-            y: 55
-            width: 260
-            height: 200
-            styles: style_card
-            widgets:
-              # Nozzle
-              - label:
-                  x: 10
-                  y: 10
-                  text: "\U000F18B8"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
-
-              - label:
-                  id: lbl_nozzle
-                  x: 55
-                  y: 15
-                  text: "---"
-                  text_font: montserrat_28
-                  text_color: 0xFFFFFF
-
-              - label:
-                  id: lbl_nozzle_target
-                  x: 130
-                  y: 20
-                  text: "/ ---"
-                  text_font: montserrat_18
-                  text_color: 0x888888
-
-              # Bed
-              - label:
-                  x: 10
-                  y: 70
-                  text: "\U000F0157"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
-
-              - label:
-                  id: lbl_bed
-                  x: 55
-                  y: 75
-                  text: "---"
-                  text_font: montserrat_28
-                  text_color: 0xFFFFFF
-
-              - label:
-                  id: lbl_bed_target
-                  x: 130
-                  y: 80
-                  text: "/ ---"
-                  text_font: montserrat_18
-                  text_color: 0x888888
-
-              # Capas
-              - label:
-                  x: 10
-                  y: 130
-                  text: "\U000F0E4B"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
-
-              - label:
-                  id: lbl_layers
-                  x: 55
-                  y: 135
-                  text: "-- / --"
-                  text_font: montserrat_28
-                  text_color: 0xFFFFFF
-
-        # Botones de control
-        - obj:
+        - bar:
+            id: progress_bar
             x: 80
-            y: 270
-            width: 700
-            height: 190
-            scrollbar_mode: "off"
-            styles: style_card
+            y: 180
+            width: 500
+            height: 24
+            min_value: 0
+            max_value: 100
+            value: 0
+            bg_color: 0x333333
+            radius: 12
+            indicator:
+              bg_color: 0x00AE42
+              radius: 12
+
+        # Tiempo restante grande
+        - label:
+            id: lbl_remaining
+            x: 80
+            y: 220
+            text: "-- restante"
+            text_font: montserrat_28
+            text_color: 0x888888
+
+        # Temperaturas - lado derecho, grandes
+        - label:
+            x: 600
+            y: 100
+            text: "\U000F18B8"
+            text_font: mdi_48
+            text_color: 0x00AE42
+
+        - label:
+            id: lbl_nozzle
+            x: 660
+            y: 105
+            text: "---"
+            text_font: montserrat_36
+            text_color: 0xFFFFFF
+
+        - label:
+            x: 600
+            y: 170
+            text: "\U000F0157"
+            text_font: mdi_48
+            text_color: 0x00AE42
+
+        - label:
+            id: lbl_bed
+            x: 660
+            y: 175
+            text: "---"
+            text_font: montserrat_36
+            text_color: 0xFFFFFF
+
+        # Botones grandes - solo los esenciales
+        - button:
+            x: 80
+            y: 280
+            width: 220
+            height: 90
+            styles: style_btn
             widgets:
-              # Primera fila
-              - button:
-                  x: 10
-                  y: 10
-                  width: 210
-                  height: 70
-                  styles: style_btn
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "PAUSAR"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: button.press
-                        data:
-                          entity_id: button.p1s_01p00c581002790_pausar_la_impresion
+              - label:
+                  align: CENTER
+                  text: "\U000F04DB"
+                  text_font: mdi_48
+            on_press:
+              - homeassistant.action:
+                  action: button.press
+                  data:
+                    entity_id: button.p1s_01p00c581002790_pausar_la_impresion
 
-              - button:
-                  x: 235
-                  y: 10
-                  width: 210
-                  height: 70
-                  styles: style_btn
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "REANUDAR"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: button.press
-                        data:
-                          entity_id: button.p1s_01p00c581002790_continuar_la_impresion
+        - button:
+            x: 320
+            y: 280
+            width: 220
+            height: 90
+            styles: style_btn
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "\U000F040A"
+                  text_font: mdi_48
+            on_press:
+              - homeassistant.action:
+                  action: button.press
+                  data:
+                    entity_id: button.p1s_01p00c581002790_continuar_la_impresion
 
-              - button:
-                  x: 460
-                  y: 10
-                  width: 210
-                  height: 70
-                  styles: style_btn_red
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "CANCELAR"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: button.press
-                        data:
-                          entity_id: button.p1s_01p00c581002790_detener_la_impresion
+        - button:
+            x: 560
+            y: 280
+            width: 220
+            height: 90
+            styles: style_btn_red
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "\U000F04D8"
+                  text_font: mdi_48
+            on_press:
+              - homeassistant.action:
+                  action: button.press
+                  data:
+                    entity_id: button.p1s_01p00c581002790_detener_la_impresion
 
-              # Segunda fila
-              - button:
-                  x: 10
-                  y: 95
-                  width: 210
-                  height: 70
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: LEFT_MID
-                        x: 20
-                        text: "\U000F0238"
-                        text_font: mdi_32
-                    - label:
-                        align: RIGHT_MID
-                        x: -30
-                        text: "LUZ"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: light.toggle
-                        data:
-                          entity_id: light.p1s_01p00c581002790_luz_de_la_carcasa
+        # Segunda fila - Luz toggle grande
+        - button:
+            x: 80
+            y: 385
+            width: 220
+            height: 80
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "\U000F0238"
+                  text_font: mdi_48
+            on_press:
+              - homeassistant.action:
+                  action: light.toggle
+                  data:
+                    entity_id: light.p1s_01p00c581002790_luz_de_la_carcasa
 
-              - button:
-                  x: 235
-                  y: 95
-                  width: 210
-                  height: 70
-                  styles: style_btn_dark
-                  widgets:
-                    - label:
-                        align: LEFT_MID
-                        x: 20
-                        text: "\U000F0415"
-                        text_font: mdi_32
-                    - label:
-                        align: RIGHT_MID
-                        x: -20
-                        text: "REFRESH"
-                        text_font: montserrat_18
-                  on_press:
-                    - homeassistant.action:
-                        action: button.press
-                        data:
-                          entity_id: button.p1s_01p00c581002790_forzar_actualizacion_de_datos
+        # Capas info
+        - label:
+            x: 320
+            y: 400
+            text: "\U000F0E4B"
+            text_font: mdi_48
+            text_color: 0x00AE42
+
+        - label:
+            id: lbl_layers
+            x: 380
+            y: 405
+            text: "-- / --"
+            text_font: montserrat_36
+            text_color: 0xFFFFFF
 
     # ========== PAGINA CONTROLES ==========
     - id: controls_page
@@ -1513,13 +1437,6 @@ interval:
             return id(printer_status).state.c_str();
 
       - lvgl.label.update:
-          id: lbl_filename
-          text: !lambda |-
-            if (id(current_file).state.empty() || id(current_file).state == "unavailable")
-              return "Sin tarea";
-            return id(current_file).state.c_str();
-
-      - lvgl.label.update:
           id: lbl_progress
           text: !lambda |-
             static char buf[8];
@@ -1535,38 +1452,24 @@ interval:
           text: !lambda |-
             static char buf[32];
             float hours = id(print_time_remaining).state;
-            if (isnan(hours)) return "Restante: --";
+            if (isnan(hours)) return "-- restante";
             int h = (int)hours;
             int m = (int)((hours - h) * 60);
-            snprintf(buf, sizeof(buf), "Restante: %dh %02dm", h, m);
+            snprintf(buf, sizeof(buf), "%dh %02dm restante", h, m);
             return buf;
 
       - lvgl.label.update:
           id: lbl_nozzle
           text: !lambda |-
             static char buf[16];
-            snprintf(buf, sizeof(buf), "%.0f°C", id(nozzle_temp).state);
-            return buf;
-
-      - lvgl.label.update:
-          id: lbl_nozzle_target
-          text: !lambda |-
-            static char buf[16];
-            snprintf(buf, sizeof(buf), "/ %.0f°C", id(nozzle_target).state);
+            snprintf(buf, sizeof(buf), "%.0f", id(nozzle_temp).state);
             return buf;
 
       - lvgl.label.update:
           id: lbl_bed
           text: !lambda |-
             static char buf[16];
-            snprintf(buf, sizeof(buf), "%.0f°C", id(bed_temp).state);
-            return buf;
-
-      - lvgl.label.update:
-          id: lbl_bed_target
-          text: !lambda |-
-            static char buf[16];
-            snprintf(buf, sizeof(buf), "/ %.0f°C", id(bed_target).state);
+            snprintf(buf, sizeof(buf), "%.0f", id(bed_temp).state);
             return buf;
 
       - lvgl.label.update:
