@@ -1,27 +1,10 @@
-# Hardware base: ESP32-S3, Display, Touch
-# No modificar - configuracion de hardware
+# Hardware Bambu: Base + Auto-dim
+# Extiende el paquete base con funcionalidad de auto-dim
 
-esphome:
-  platformio_options:
-    build_flags:
-      - "-DBOARD_HAS_PSRAM"
-      - "-DLV_USE_FONT_SUBPX=1"
-      - "-DLV_FONT_SUBPX_BGR=0"
-    board_build.esp-idf.memory_type: qio_opi
-    board_build.flash_mode: dio
+packages:
+  base: !include ../common/guition-jc8048w550-base.yaml
 
-esp32:
-  board: esp32-s3-devkitc-1
-  variant: esp32s3
-  framework:
-    type: esp-idf
-
-psram:
-  mode: octal
-  speed: 80MHz
-
-logger:
-
+# Globals para auto-dim
 globals:
   - id: last_touch_time
     type: unsigned long
@@ -30,30 +13,7 @@ globals:
     type: bool
     initial_value: 'false'
 
-time:
-  - platform: homeassistant
-    id: ha_time
-
-# Backlight
-output:
-  - platform: ledc
-    pin: GPIO2
-    frequency: 1220Hz
-    id: backlight_pwm
-
-light:
-  - platform: monochromatic
-    output: backlight_pwm
-    name: "Backlight"
-    id: backlight
-    restore_mode: ALWAYS_ON
-
-# I2C para touch
-i2c:
-  sda: GPIO19
-  scl: GPIO20
-  scan: false
-
+# Touch con callback para restaurar brillo
 touchscreen:
   - platform: gt911
     id: my_touch
@@ -64,31 +24,3 @@ touchscreen:
             id(screen_dimmed) = false;
             id(backlight).turn_on().set_brightness(1.0).perform();
           }
-
-# Display RGB 800x480
-display:
-  - platform: rpi_dpi_rgb
-    id: my_display
-    color_order: RGB
-    invert_colors: false
-    update_interval: never
-    auto_clear_enabled: false
-    dimensions:
-      width: 800
-      height: 480
-    de_pin: GPIO40
-    hsync_pin: GPIO39
-    vsync_pin: GPIO41
-    pclk_pin: GPIO42
-    pclk_frequency: 16MHz
-    pclk_inverted: false
-    hsync_front_porch: 40
-    hsync_pulse_width: 48
-    hsync_back_porch: 40
-    vsync_front_porch: 13
-    vsync_pulse_width: 3
-    vsync_back_porch: 32
-    data_pins:
-      red: [GPIO45, GPIO48, GPIO47, GPIO21, GPIO14]
-      green: [GPIO5, GPIO6, GPIO7, GPIO15, GPIO16, GPIO4]
-      blue: [GPIO8, GPIO3, GPIO46, GPIO9, GPIO1]

@@ -1,0 +1,85 @@
+# Fuentes para UI Bambu
+# Montserrat + Material Design Icons
+
+font:
+  - file: "gfonts://Montserrat"
+    id: montserrat_14
+    size: 14
+    bpp: 4
+
+  - file: "gfonts://Montserrat"
+    id: montserrat_18
+    size: 18
+    bpp: 4
+
+  - file: "gfonts://Montserrat"
+    id: montserrat_22
+    size: 22
+    bpp: 4
+
+  - file: "gfonts://Montserrat"
+    id: montserrat_28
+    size: 28
+    bpp: 4
+
+  - file: "gfonts://Montserrat"
+    id: montserrat_36
+    size: 36
+    bpp: 4
+
+  - file: "gfonts://Montserrat"
+    id: montserrat_48
+    size: 48
+    bpp: 4
+
+  - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+    id: mdi_32
+    size: 32
+    bpp: 4
+    glyphs:
+      - "\U000F02DC"  # home
+      - "\U000F0493"  # tune-vertical
+      - "\U000F0C90"  # crosshairs-gps (motion)
+      - "\U000F02FC"  # information
+      - "\U000F18B8"  # printer-3d-nozzle
+      - "\U000F0157"  # bed (radiator)
+      - "\U000F0238"  # lightbulb
+      - "\U000F04DB"  # pause
+      - "\U000F040A"  # play
+      - "\U000F04D8"  # stop
+      - "\U000F05A9"  # wifi
+      - "\U000F0574"  # thermometer
+      - "\U000F0E4B"  # layers
+      - "\U000F0150"  # clock
+      - "\U000F0415"  # refresh
+      - "\U000F004D"  # arrow-up
+      - "\U000F0045"  # arrow-down
+      - "\U000F0041"  # arrow-left
+      - "\U000F0040"  # arrow-right
+      - "\U000F0A12"  # home-automation (for homing)
+      - "\U000F0026"  # alert (warning triangle)
+      - "\U000F0028"  # alert-circle
+      - "\U000F05E0"  # checkbox-marked-circle (check ok)
+      - "\U000F0141"  # chevron-left (back)
+
+  - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+    id: mdi_48
+    size: 48
+    bpp: 4
+    glyphs:
+      - "\U000F004D"  # arrow-up
+      - "\U000F0045"  # arrow-down
+      - "\U000F0041"  # arrow-left
+      - "\U000F0040"  # arrow-right
+      - "\U000F0A12"  # home-automation
+      - "\U000F18B8"  # printer-3d-nozzle
+      - "\U000F0157"  # bed (radiator)
+      - "\U000F04DB"  # pause
+      - "\U000F040A"  # play
+      - "\U000F04D8"  # stop
+      - "\U000F0238"  # lightbulb
+      - "\U000F0E4B"  # layers
+      - "\U000F02DC"  # home
+      - "\U000F0574"  # thermometer
+      - "\U000F0C90"  # crosshairs-gps (tool head)
+      - "\U000F0141"  # chevron-left (back)

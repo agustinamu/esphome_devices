@@ -1,0 +1,133 @@
+# Actualizaciones periodicas de datos
+# Usa substitution: bambu_prefix
+
+interval:
+  - interval: 1s
+    then:
+      # Reloj
+      - lvgl.label.update:
+          id: lbl_clock
+          text: !lambda |-
+            static char buf[10];
+            auto time = id(ha_time).now();
+            snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
+            return buf;
+
+      # Auto-dim despues de 60s
+      - lambda: |-
+          if (!id(screen_dimmed) && (millis() - id(last_touch_time) > 60000)) {
+            id(screen_dimmed) = true;
+            id(backlight).turn_on().set_brightness(0.15).perform();
+          }
+
+  - interval: 2s
+    then:
+      # === HOME PAGE ===
+      - lvgl.label.update:
+          id: lbl_status
+          text: !lambda |-
+            if (id(printer_status).state.empty()) return "---";
+            return id(printer_status).state.c_str();
+
+      - lvgl.label.update:
+          id: lbl_progress
+          text: !lambda |-
+            static char buf[8];
+            snprintf(buf, sizeof(buf), "%.0f%%", id(print_progress).state);
+            return buf;
+
+      - lvgl.bar.update:
+          id: progress_bar
+          value: !lambda return (int)id(print_progress).state;
+
+      - lvgl.label.update:
+          id: lbl_remaining
+          text: !lambda |-
+            static char buf[32];
+            float hours = id(print_time_remaining).state;
+            if (isnan(hours)) return "-- restante";
+            int h = (int)hours;
+            int m = (int)((hours - h) * 60);
+            snprintf(buf, sizeof(buf), "%dh %02dm restante", h, m);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_nozzle
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f", id(nozzle_temp).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_bed
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f", id(bed_temp).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_layers
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f / %.0f", id(current_layer).state, id(total_layers).state);
+            return buf;
+
+      # === CONTROLS PAGE ===
+      - lvgl.label.update:
+          id: lbl_nozzle_ctrl
+          text: !lambda |-
+            static char buf[24];
+            snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", id(nozzle_temp).state, id(nozzle_target).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_bed_ctrl
+          text: !lambda |-
+            static char buf[24];
+            snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", id(bed_temp).state, id(bed_target).state);
+            return buf;
+
+      # === INFO PAGE ===
+      - lvgl.label.update:
+          id: lbl_wifi_signal
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f dBm", id(wifi_signal_db).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_ip
+          text: !lambda return id(wifi_ip).state.c_str();
+
+      - lvgl.label.update:
+          id: lbl_uptime
+          text: !lambda |-
+            static char buf[32];
+            float seconds = id(uptime_sensor).state;
+            int days = (int)(seconds / 86400);
+            int hours = (int)((seconds - days * 86400) / 3600);
+            int mins = (int)((seconds - days * 86400 - hours * 3600) / 60);
+            if (days > 0) {
+              snprintf(buf, sizeof(buf), "%dd %dh %dm", days, hours, mins);
+            } else {
+              snprintf(buf, sizeof(buf), "%dh %dm", hours, mins);
+            }
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_printer_status
+          text: !lambda |-
+            if (id(printer_status).state.empty()) return "---";
+            return id(printer_status).state.c_str();
+
+      # Online status dinamico
+      - lvgl.label.update:
+          id: lbl_online_status
+          text: !lambda |-
+            if (id(printer_online).state) return "Online";
+            return "Offline";
+      - lvgl.label.update:
+          id: lbl_online_icon
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0xFF4444);

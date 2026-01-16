@@ -1,38 +1,39 @@
 # Sensores de Home Assistant (Bambu Lab P1S)
 # Entidades en espanol segun configuracion de HA
+# Usa substitution: bambu_prefix
 
 sensor:
   - platform: homeassistant
     id: nozzle_temp
-    entity_id: sensor.p1s_01p00c581002790_temperatura_de_la_boquilla
+    entity_id: sensor.${bambu_prefix}_temperatura_de_la_boquilla
 
   - platform: homeassistant
     id: nozzle_target
-    entity_id: sensor.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+    entity_id: sensor.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
 
   - platform: homeassistant
     id: bed_temp
-    entity_id: sensor.p1s_01p00c581002790_temperatura_de_la_cama
+    entity_id: sensor.${bambu_prefix}_temperatura_de_la_cama
 
   - platform: homeassistant
     id: bed_target
-    entity_id: sensor.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+    entity_id: sensor.${bambu_prefix}_temperatura_objetivo_de_la_cama
 
   - platform: homeassistant
     id: print_progress
-    entity_id: sensor.p1s_01p00c581002790_progreso_de_la_impresion
+    entity_id: sensor.${bambu_prefix}_progreso_de_la_impresion
 
   - platform: homeassistant
     id: print_time_remaining
-    entity_id: sensor.p1s_01p00c581002790_tiempo_restante
+    entity_id: sensor.${bambu_prefix}_tiempo_restante
 
   - platform: homeassistant
     id: current_layer
-    entity_id: sensor.p1s_01p00c581002790_capa_actual
+    entity_id: sensor.${bambu_prefix}_capa_actual
 
   - platform: homeassistant
     id: total_layers
-    entity_id: sensor.p1s_01p00c581002790_cantidad_total_de_capas
+    entity_id: sensor.${bambu_prefix}_cantidad_total_de_capas
 
   - platform: wifi_signal
     id: wifi_signal_db
@@ -45,15 +46,15 @@ sensor:
 text_sensor:
   - platform: homeassistant
     id: printer_status
-    entity_id: sensor.p1s_01p00c581002790_estado_actual
+    entity_id: sensor.${bambu_prefix}_estado_actual
 
   - platform: homeassistant
     id: current_file
-    entity_id: sensor.p1s_01p00c581002790_nombre_de_la_tarea
+    entity_id: sensor.${bambu_prefix}_nombre_de_la_tarea
 
   - platform: homeassistant
     id: hms_errors
-    entity_id: sensor.p1s_01p00c581002790_errores_hms
+    entity_id: sensor.${bambu_prefix}_errores_hms
 
   - platform: wifi_info
     ip_address:
@@ -62,4 +63,4 @@ text_sensor:
 binary_sensor:
   - platform: homeassistant
     id: printer_online
-    entity_id: binary_sensor.p1s_01p00c581002790_en_linea
+    entity_id: binary_sensor.${bambu_prefix}_en_linea

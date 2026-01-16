@@ -7,15 +7,27 @@ Repositorio de configuraciones ESPHome para dispositivos del hogar. Usa remote p
 
 ```
 devices/
+├── common/
+│   └── guition-jc8048w550-base.yaml  # Hardware compartido
 ├── humidificador/
-│   ├── esphome.yaml    # Config para copiar en HA (secretos + package ref)
-│   └── package.yaml    # Lógica del dispositivo (se carga desde GitHub)
+│   ├── esphome.yaml
+│   ├── package.yaml
+│   └── test.yaml
 ├── guition-jc8048w550/
 │   ├── esphome.yaml
-│   └── package.yaml
+│   ├── package.yaml    # Usa !include ../common/base
+│   └── test.yaml
 └── guition-jc8048w550-bambu/
-    ├── esphome.yaml
-    └── package.yaml
+    ├── esphome.yaml    # Substitutions: bambu_device_id, bambu_prefix
+    ├── package.yaml    # Orquestador
+    ├── core.yaml       # Base + auto-dim
+    ├── sensors.yaml    # Usa ${bambu_prefix}
+    ├── ui.yaml         # Orquestador UI
+    ├── test.yaml
+    └── ui/
+        ├── fonts.yaml
+        ├── lvgl.yaml
+        └── intervals.yaml
 ```
 
 ## Dispositivos
@@ -32,10 +44,11 @@ devices/
 - **Función**: Ejemplo con reloj y botón
 
 ### 3. Guition JC8048W550 Bambu
-- **Igual que anterior**
+- **Igual hardware que anterior**
 - **Función**: Dashboard para Bambu Lab P1S
-- **Entidades**: En español (HA configurado en español)
-- **Prefijo entidades**: `p1s_01p00c581002790_`
+- **Substitutions requeridas**:
+  - `bambu_device_id`: ID del dispositivo Bambu
+  - `bambu_prefix`: Prefijo de entidades (ej: `p1s_01p00c581002790`)
 
 ## Pinout Guition JC8048W550
 
@@ -44,14 +57,14 @@ devices/
 | Backlight | 2 |
 | I2C SDA | 19 |
 | I2C SCL | 20 |
-| Touch INT | 18 (no conectado por defecto) |
+| Touch INT | 18 (no conectado) |
 | Display DE | 40 |
 | Display HSYNC | 39 |
 | Display VSYNC | 41 |
 | Display PCLK | 42 |
 | Red | 45, 48, 47, 21, 14 |
 | Green | 5, 6, 7, 15, 16, 4 |
-| Blue | 8, 3, 46, 9, 10 |
+| Blue | 8, 3, 46, 9, 1 |
 
 ## Configuración display
 
@@ -72,9 +85,9 @@ ESP32-S3 con display RGB requiere **ESP-IDF** (no Arduino).
 
 ### Colores RGB565
 Evitar grises intermedios (causan dithering/parpadeo). Usar colores puros:
-- Blanco: 0xFFFFFF ✓
-- Negro: 0x000000 ✓
-- Verde Bambu: 0x00AE42 ✓
+- Blanco: 0xFFFFFF
+- Negro: 0x000000
+- Verde Bambu: 0x00AE42
 - Grises: evitar o usar tonos de verde
 
 ### Iconos MDI
@@ -90,34 +103,25 @@ Brillo baja al 15% después de 60s sin tocar. Al tocar vuelve al 100%.
 - Habilitar "Permitir acciones de Home Assistant" en ESPHome
 
 ### Entidades principales (español)
-- `sensor.*_temperatura_de_la_boquilla`
-- `sensor.*_temperatura_de_la_cama`
-- `sensor.*_progreso_de_la_impresion`
-- `sensor.*_tiempo_restante`
-- `sensor.*_estado_actual`
-- `sensor.*_nombre_de_la_tarea`
-- `sensor.*_capa_actual`
-- `sensor.*_cantidad_total_de_capas`
-- `number.*_temperatura_objetivo_de_la_boquilla`
-- `number.*_temperatura_objetivo_de_la_cama`
-- `button.*_pausar_la_impresion`
-- `button.*_continuar_la_impresion`
-- `button.*_detener_la_impresion`
-- `light.*_luz_de_la_carcasa`
+Usan el prefijo `${bambu_prefix}`:
+- `sensor.${bambu_prefix}_temperatura_de_la_boquilla`
+- `sensor.${bambu_prefix}_temperatura_de_la_cama`
+- `sensor.${bambu_prefix}_progreso_de_la_impresion`
+- `sensor.${bambu_prefix}_tiempo_restante`
+- `sensor.${bambu_prefix}_estado_actual`
+- `button.${bambu_prefix}_pausar_la_impresion`
+- `light.${bambu_prefix}_luz_de_la_carcasa`
 
 ### Acciones
-Las acciones de HA se llaman con `homeassistant.action` en LVGL:
 ```yaml
 on_press:
   - homeassistant.action:
       action: light.toggle
       data:
-        entity_id: light.xxx
+        entity_id: light.${bambu_prefix}_luz_de_la_carcasa
 ```
 
 ## Test local antes de commit
-
-Cada dispositivo tiene un `test.yaml` para validar la configuración antes de pushear:
 
 ```bash
 # Instalar esphome (una vez)
@@ -128,8 +132,6 @@ esphome config devices/humidificador/test.yaml
 esphome config devices/guition-jc8048w550/test.yaml
 esphome config devices/guition-jc8048w550-bambu/test.yaml
 ```
-
-Los `test.yaml` usan `!include` para cargar el `package.yaml` local, simulando lo que haría el remote package en HA.
 
 ## Compilación
 

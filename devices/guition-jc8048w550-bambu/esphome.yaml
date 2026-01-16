@@ -2,9 +2,12 @@
 # Archivo: guition-bambu.yaml
 # Dashboard para impresora Bambu Lab P1S
 
-# Configurar tu device_id de Bambu Lab (Configuración > Dispositivos > Bambu > URL)
+# Configurar tus IDs de Bambu Lab:
+# - bambu_device_id: Configuración > Dispositivos > Bambu > URL
+# - bambu_prefix: Prefijo de entidades (ej: p1s_01p00c581002790)
 substitutions:
   bambu_device_id: "YOUR_DEVICE_ID_HERE"
+  bambu_prefix: "p1s_01p00c581002790"
 
 esphome:
   name: guition-bambu
