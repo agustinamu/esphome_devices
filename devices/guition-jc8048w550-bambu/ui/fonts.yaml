@@ -61,6 +61,11 @@ font:
       - "\U000F0028"  # alert-circle
       - "\U000F05E0"  # checkbox-marked-circle (check ok)
       - "\U000F0141"  # chevron-left (back)
+      - "\U000F08BC"  # reload (filament)
+      - "\U000F019F"  # content-cut
+      - "\U000F0F0C"  # target (purge zone)
+      - "\U000F0B30"  # transfer-up (load)
+      - "\U000F0B2F"  # transfer-down (unload)
 
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_48
@@ -85,3 +90,8 @@ font:
       - "\U000F0141"  # chevron-left (back)
       - "\U000F0493"  # tune-vertical (presets)
       - "\U000F0336"  # lightbulb-off
+      - "\U000F08BC"  # reload (filament)
+      - "\U000F019F"  # content-cut
+      - "\U000F0F0C"  # target (purge zone)
+      - "\U000F0B30"  # transfer-up (load)
+      - "\U000F0B2F"  # transfer-down (unload)

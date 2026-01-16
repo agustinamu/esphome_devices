@@ -828,7 +828,7 @@ lvgl:
         - button:
             x: 100
             y: 70
-            width: 330
+            width: 215
             height: 380
             radius: 16
             bg_color: 0x1E1E1E
@@ -842,7 +842,13 @@ lvgl:
               - label:
                   align: CENTER
                   y: 40
-                  text: "TOOL HEAD"
+                  text: "TOOL"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+              - label:
+                  align: CENTER
+                  y: 75
+                  text: "HEAD"
                   text_font: montserrat_28
                   text_color: 0xFFFFFF
             on_press:
@@ -850,9 +856,9 @@ lvgl:
 
         # BED
         - button:
-            x: 450
+            x: 330
             y: 70
-            width: 330
+            width: 215
             height: 380
             radius: 16
             bg_color: 0x1E1E1E
@@ -871,6 +877,30 @@ lvgl:
                   text_color: 0xFFFFFF
             on_press:
               - lvgl.page.show: motion_z_page
+
+        # FILAMENT
+        - button:
+            x: 560
+            y: 70
+            width: 215
+            height: 380
+            radius: 16
+            bg_color: 0x1E1E1E
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -40
+                  text: "\U000F08BC"
+                  text_font: mdi_48
+                  text_color: 0x00AE42
+              - label:
+                  align: CENTER
+                  y: 40
+                  text: "FILAMENT"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+            on_press:
+              - lvgl.page.show: filament_page
 
     # ==================== MOTION XY ====================
     # Layout en "+" con HOME pequeño en centro
@@ -1224,6 +1254,234 @@ lvgl:
                   data:
                     device_id: ${bambu_device_id}
                     command: "G91\nG0 Z-10 F600\nG90"
+
+    # ==================== FILAMENT ====================
+    - id: filament_page
+      bg_color: 0x121212
+      widgets:
+        # Header
+        - button:
+            x: 100
+            y: 10
+            width: 80
+            height: 50
+            radius: 8
+            bg_color: 0x2A2A2A
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "\U000F0141"
+                  text_font: mdi_32
+                  text_color: 0xFFFFFF
+            on_press:
+              - lvgl.page.show: motion_page
+
+        - label:
+            x: 200
+            y: 20
+            text: "FILAMENT"
+            text_font: montserrat_28
+            text_color: 0x00AE42
+
+        # Fila 1: PURGE ZONE y EXTRUIR
+        # Ir a zona de purga
+        - button:
+            x: 100
+            y: 75
+            width: 230
+            height: 130
+            radius: 12
+            bg_color: 0x1E1E1E
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -20
+                  text: "\U000F0F0C"
+                  text_font: mdi_48
+                  text_color: 0x00AE42
+              - label:
+                  align: CENTER
+                  y: 35
+                  text: "PURGE ZONE"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "G28 X Y\nG0 X20 Y-3 F6000"
+
+        # Extruir (empujar filamento)
+        - button:
+            x: 345
+            y: 75
+            width: 215
+            height: 130
+            radius: 12
+            bg_color: 0x1E1E1E
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -20
+                  text: "\U000F004D"
+                  text_font: mdi_48
+                  text_color: 0x00AE42
+              - label:
+                  align: CENTER
+                  y: 35
+                  text: "EXTRUIR 10"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "M83\nG1 E10 F200\nM82"
+
+        # Retraer (sacar filamento)
+        - button:
+            x: 575
+            y: 75
+            width: 215
+            height: 130
+            radius: 12
+            bg_color: 0x1E1E1E
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -20
+                  text: "\U000F0045"
+                  text_font: mdi_48
+                  text_color: 0xFF6B6B
+              - label:
+                  align: CENTER
+                  y: 35
+                  text: "RETRAER 10"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "M83\nG1 E-10 F200\nM82"
+
+        # Fila 2: UNLOAD y LOAD
+        # Descargar filamento (ciclo completo)
+        - button:
+            x: 100
+            y: 220
+            width: 340
+            height: 130
+            radius: 12
+            bg_color: 0xCC3333
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -20
+                  text: "\U000F0B2F"
+                  text_font: mdi_48
+                  text_color: 0xFFFFFF
+              - label:
+                  align: CENTER
+                  y: 35
+                  text: "UNLOAD"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "M104 S240\nM109 S240\nG28 X Y\nG0 X20 Y50 F6000\nG0 Y-3 F600\nM83\nG1 E-30 F300\nG1 E-50 F800\nM82\nM104 S0"
+
+        # Cargar filamento
+        - button:
+            x: 455
+            y: 220
+            width: 335
+            height: 130
+            radius: 12
+            bg_color: 0x00AE42
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -20
+                  text: "\U000F0B30"
+                  text_font: mdi_48
+                  text_color: 0xFFFFFF
+              - label:
+                  align: CENTER
+                  y: 35
+                  text: "LOAD"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "M104 S220\nM109 S220\nM83\nG1 E50 F300\nG1 E30 F100\nM82"
+
+        # Fila 3: CORTAR (manual)
+        - button:
+            x: 100
+            y: 365
+            width: 340
+            height: 100
+            radius: 12
+            bg_color: 0x2A2A2A
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -10
+                  text: "\U000F019F"
+                  text_font: mdi_48
+                  text_color: 0xFFAA00
+              - label:
+                  align: CENTER
+                  x: 50
+                  y: -5
+                  text: "CORTAR"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+            on_press:
+              - homeassistant.action:
+                  action: bambu_lab.send_command
+                  data:
+                    device_id: ${bambu_device_id}
+                    command: "G28 X Y\nG0 X20 Y50 F6000\nG0 Y-3 F600"
+
+        # Precalentar para filamento
+        - button:
+            x: 455
+            y: 365
+            width: 335
+            height: 100
+            radius: 12
+            bg_color: 0x2A2A2A
+            widgets:
+              - label:
+                  align: CENTER
+                  y: -10
+                  text: "\U000F0574"
+                  text_font: mdi_48
+                  text_color: 0xFF6B6B
+              - label:
+                  align: CENTER
+                  x: 50
+                  y: -5
+                  text: "PREHEAT"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+                    value: "220"
 
     # ==================== INFO ====================
     - id: info_page
