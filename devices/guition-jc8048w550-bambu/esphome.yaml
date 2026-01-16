@@ -2,6 +2,10 @@
 # Archivo: guition-bambu.yaml
 # Dashboard para impresora Bambu Lab P1S
 
+# Configurar tu device_id de Bambu Lab (Configuración > Dispositivos > Bambu > URL)
+substitutions:
+  bambu_device_id: "YOUR_DEVICE_ID_HERE"
+
 esphome:
   name: guition-bambu
   friendly_name: Panel Bambu

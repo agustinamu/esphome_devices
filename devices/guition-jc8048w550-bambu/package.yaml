@@ -1,6 +1,6 @@
-# Guition JC8048W550 - Panel de control estilo Bambu Lab
-# 800x480 - ESP32-S3
-# Configurado para P1S con entidades en español
+# Guition JC8048W550 - Panel de control Bambu Lab P1S
+# 800x480 - ESP32-S3 - Multi-página con menú lateral
+# Requiere substitution: bambu_device_id
 
 esphome:
   platformio_options:
@@ -32,130 +32,62 @@ time:
   - platform: homeassistant
     id: ha_time
 
-# Sensores de Home Assistant (Bambu Lab P1S - nombres en español)
+# === Sensores de Home Assistant (Bambu Lab P1S) ===
 sensor:
   - platform: homeassistant
     id: nozzle_temp
     entity_id: sensor.p1s_01p00c581002790_temperatura_de_la_boquilla
-    on_value:
-      - lvgl.label.update:
-          id: lbl_nozzle
-          text: !lambda |-
-            static char buf[16];
-            snprintf(buf, sizeof(buf), "%.0f°C", x);
-            return buf;
 
   - platform: homeassistant
     id: nozzle_target
     entity_id: sensor.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
-    on_value:
-      - lvgl.label.update:
-          id: lbl_nozzle_target
-          text: !lambda |-
-            static char buf[16];
-            snprintf(buf, sizeof(buf), "/ %.0f°C", x);
-            return buf;
 
   - platform: homeassistant
     id: bed_temp
     entity_id: sensor.p1s_01p00c581002790_temperatura_de_la_cama
-    on_value:
-      - lvgl.label.update:
-          id: lbl_bed
-          text: !lambda |-
-            static char buf[16];
-            snprintf(buf, sizeof(buf), "%.0f°C", x);
-            return buf;
 
   - platform: homeassistant
     id: bed_target
     entity_id: sensor.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
-    on_value:
-      - lvgl.label.update:
-          id: lbl_bed_target
-          text: !lambda |-
-            static char buf[16];
-            snprintf(buf, sizeof(buf), "/ %.0f°C", x);
-            return buf;
 
   - platform: homeassistant
     id: print_progress
     entity_id: sensor.p1s_01p00c581002790_progreso_de_la_impresion
-    on_value:
-      - lvgl.bar.update:
-          id: progress_bar
-          value: !lambda return (int)x;
-      - lvgl.label.update:
-          id: lbl_progress
-          text: !lambda |-
-            static char buf[8];
-            snprintf(buf, sizeof(buf), "%.0f%%", x);
-            return buf;
 
   - platform: homeassistant
     id: print_time_remaining
     entity_id: sensor.p1s_01p00c581002790_tiempo_restante
-    on_value:
-      - lvgl.label.update:
-          id: lbl_remaining
-          text: !lambda |-
-            static char buf[24];
-            float hours = x;
-            int h = (int)hours;
-            int m = (int)((hours - h) * 60);
-            snprintf(buf, sizeof(buf), "Restante: %dh %02dm", h, m);
-            return buf;
 
   - platform: homeassistant
     id: current_layer
     entity_id: sensor.p1s_01p00c581002790_capa_actual
-    on_value:
-      - lvgl.label.update:
-          id: lbl_layers
-          text: !lambda |-
-            static char buf[16];
-            snprintf(buf, sizeof(buf), "%.0f / %.0f", x, id(total_layers).state);
-            return buf;
 
   - platform: homeassistant
     id: total_layers
     entity_id: sensor.p1s_01p00c581002790_cantidad_total_de_capas
-    on_value:
-      - lvgl.label.update:
-          id: lbl_layers
-          text: !lambda |-
-            static char buf[16];
-            snprintf(buf, sizeof(buf), "%.0f / %.0f", id(current_layer).state, x);
-            return buf;
 
   - platform: wifi_signal
     id: wifi_signal_db
     update_interval: 30s
 
+  - platform: uptime
+    id: uptime_sensor
+    update_interval: 60s
+
 text_sensor:
   - platform: homeassistant
     id: printer_status
     entity_id: sensor.p1s_01p00c581002790_estado_actual
-    on_value:
-      - lvgl.label.update:
-          id: lbl_status
-          text: !lambda return x.c_str();
-
-  - platform: homeassistant
-    id: gcode_state
-    entity_id: sensor.p1s_01p00c581002790_estado_de_la_impresion
 
   - platform: homeassistant
     id: current_file
     entity_id: sensor.p1s_01p00c581002790_nombre_de_la_tarea
-    on_value:
-      - lvgl.label.update:
-          id: lbl_filename
-          text: !lambda |-
-            if (x == "unavailable" || x.empty()) {
-              return "Sin tarea";
-            }
-            return x.c_str();
+
+  - platform: wifi_info
+    ip_address:
+      id: wifi_ip
+
+# === Hardware ===
 
 # Backlight
 output:
@@ -216,245 +148,381 @@ display:
       green: [GPIO5, GPIO6, GPIO7, GPIO15, GPIO16, GPIO4]
       blue: [GPIO8, GPIO3, GPIO46, GPIO9, GPIO10]
 
-# Fuente MDI para iconos
+# === Fuentes ===
 font:
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
-    id: mdi_28
-    size: 28
-    glyphs: [
-      "\U000F18B8",
-      "\U000F0157",
-      "\U000F08ED",
-      "\U000F0AB9",
-      "\U000F0425",
-      "\U000F040A",
-      "\U000F0E51"
-    ]
+    id: mdi_32
+    size: 32
+    glyphs:
+      - "\U000F02DC"  # home
+      - "\U000F0493"  # tune-vertical
+      - "\U000F0C90"  # crosshairs-gps (motion)
+      - "\U000F02FC"  # information
+      - "\U000F18B8"  # printer-3d-nozzle
+      - "\U000F0157"  # bed (radiator)
+      - "\U000F0238"  # lightbulb
+      - "\U000F04DB"  # pause
+      - "\U000F040A"  # play
+      - "\U000F04D8"  # stop
+      - "\U000F05A9"  # wifi
+      - "\U000F0574"  # thermometer
+      - "\U000F0E4B"  # layers
+      - "\U000F0150"  # clock
+      - "\U000F0415"  # refresh
+      - "\U000F004D"  # arrow-up
+      - "\U000F0045"  # arrow-down
+      - "\U000F0041"  # arrow-left
+      - "\U000F0040"  # arrow-right
+      - "\U000F0A12"  # home-automation (for homing)
 
-# LVGL UI
+  - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+    id: mdi_48
+    size: 48
+    glyphs:
+      - "\U000F004D"  # arrow-up
+      - "\U000F0045"  # arrow-down
+      - "\U000F0041"  # arrow-left
+      - "\U000F0040"  # arrow-right
+      - "\U000F0A12"  # home-automation
+
+# === LVGL UI ===
 lvgl:
   displays:
     - my_display
   touchscreens:
     - my_touch
   color_depth: 16
+
   style_definitions:
+    - id: style_sidebar
+      bg_color: 0x1A1A1A
+      radius: 0
+      border_width: 0
+      pad_all: 0
+
+    - id: style_sidebar_btn
+      bg_color: 0x1A1A1A
+      text_color: 0x888888
+      radius: 0
+      border_width: 0
+      width: 60
+      height: 60
+
+    - id: style_sidebar_btn_active
+      bg_color: 0x1A1A1A
+      text_color: 0x00AE42
+      radius: 0
+      border_width: 0
+
     - id: style_card
       bg_color: 0x1E1E1E
       radius: 12
-      pad_all: 10
+      pad_all: 12
       border_width: 0
-    - id: style_temp_icon
-      text_color: 0x00AE42
-      text_font: montserrat_28
-    - id: style_temp_value
-      text_color: 0xFFFFFF
-      text_font: montserrat_36
-    - id: style_temp_target
-      text_color: 0x008844
-      text_font: montserrat_18
-    - id: style_title
-      text_color: 0x00AE42
-      text_font: montserrat_22
-    - id: style_button
+
+    - id: style_btn
       bg_color: 0x00AE42
       text_color: 0xFFFFFF
       radius: 8
-    - id: style_button_red
+
+    - id: style_btn_dark
+      bg_color: 0x2A2A2A
+      text_color: 0xFFFFFF
+      radius: 8
+
+    - id: style_btn_red
       bg_color: 0xE53935
       text_color: 0xFFFFFF
       radius: 8
 
+    - id: style_motion_btn
+      bg_color: 0x2A2A2A
+      text_color: 0xFFFFFF
+      radius: 30
+      width: 60
+      height: 60
+
+  # === Menú lateral (siempre visible) ===
+  top_layer:
+    widgets:
+      - obj:
+          id: sidebar
+          width: 60
+          height: 480
+          x: 0
+          y: 0
+          styles: style_sidebar
+          widgets:
+            # Home
+            - button:
+                id: btn_nav_home
+                x: 0
+                y: 20
+                styles: style_sidebar_btn_active
+                widgets:
+                  - label:
+                      align: CENTER
+                      text: "\U000F02DC"
+                      text_font: mdi_32
+                on_press:
+                  - lvgl.page.show: main_page
+                  - lvgl.widget.update:
+                      id: btn_nav_home
+                      text_color: 0x00AE42
+                  - lvgl.widget.update:
+                      id: btn_nav_controls
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_motion
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_info
+                      text_color: 0x888888
+
+            # Controles
+            - button:
+                id: btn_nav_controls
+                x: 0
+                y: 100
+                styles: style_sidebar_btn
+                widgets:
+                  - label:
+                      align: CENTER
+                      text: "\U000F0493"
+                      text_font: mdi_32
+                on_press:
+                  - lvgl.page.show: controls_page
+                  - lvgl.widget.update:
+                      id: btn_nav_home
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_controls
+                      text_color: 0x00AE42
+                  - lvgl.widget.update:
+                      id: btn_nav_motion
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_info
+                      text_color: 0x888888
+
+            # Motion
+            - button:
+                id: btn_nav_motion
+                x: 0
+                y: 180
+                styles: style_sidebar_btn
+                widgets:
+                  - label:
+                      align: CENTER
+                      text: "\U000F0C90"
+                      text_font: mdi_32
+                on_press:
+                  - lvgl.page.show: motion_page
+                  - lvgl.widget.update:
+                      id: btn_nav_home
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_controls
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_motion
+                      text_color: 0x00AE42
+                  - lvgl.widget.update:
+                      id: btn_nav_info
+                      text_color: 0x888888
+
+            # Info
+            - button:
+                id: btn_nav_info
+                x: 0
+                y: 260
+                styles: style_sidebar_btn
+                widgets:
+                  - label:
+                      align: CENTER
+                      text: "\U000F02FC"
+                      text_font: mdi_32
+                on_press:
+                  - lvgl.page.show: info_page
+                  - lvgl.widget.update:
+                      id: btn_nav_home
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_controls
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_motion
+                      text_color: 0x888888
+                  - lvgl.widget.update:
+                      id: btn_nav_info
+                      text_color: 0x00AE42
+
+  # === Páginas ===
   pages:
+    # ========== PÁGINA HOME ==========
     - id: main_page
       bg_color: 0x121212
       widgets:
-        # === Header ===
+        # Header
         - label:
-            align: TOP_LEFT
-            x: 20
+            x: 80
             y: 15
+            text: "BAMBU LAB P1S"
             text_font: montserrat_28
             text_color: 0x00AE42
-            text: "BAMBU LAB P1S"
-            id: lbl_title
 
         - label:
+            id: lbl_clock
             align: TOP_RIGHT
             x: -20
             y: 15
+            text: "--:--"
             text_font: montserrat_22
             text_color: 0xFFFFFF
-            text: "--:--"
-            id: lbl_clock
 
-        # === Tarjeta Temperaturas (izquierda) ===
+        # Card Estado y Progreso
         - obj:
-            align: TOP_LEFT
-            x: 20
-            y: 60
-            width: 240
-            height: 280
-            styles: style_card
-            widgets:
-              # Nozzle - icono + temperatura
-              - label:
-                  x: 10
-                  y: 10
-                  text: "\U000F18B8"
-                  text_font: mdi_28
-                  text_color: 0xFFFFFF
-              - label:
-                  x: 50
-                  y: 10
-                  text: "---°C"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_28
-                  id: lbl_nozzle
-              - label:
-                  x: 150
-                  y: 15
-                  text: "/ ---"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_18
-                  id: lbl_nozzle_target
-
-              # Bed - icono + temperatura
-              - label:
-                  x: 10
-                  y: 70
-                  text: "\U000F0157"
-                  text_font: mdi_28
-                  text_color: 0xFFFFFF
-              - label:
-                  x: 50
-                  y: 70
-                  text: "---°C"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_28
-                  id: lbl_bed
-              - label:
-                  x: 150
-                  y: 75
-                  text: "/ ---"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_18
-                  id: lbl_bed_target
-
-              # Filamento - icono + tipo
-              - label:
-                  x: 10
-                  y: 130
-                  text: "\U000F08ED"
-                  text_font: mdi_28
-                  text_color: 0xFFFFFF
-              - label:
-                  x: 50
-                  y: 130
-                  text: "PLA"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_28
-                  id: lbl_filament
-
-              # Capas
-              - label:
-                  x: 10
-                  y: 190
-                  text: "\U000F0AB9"
-                  text_font: mdi_28
-                  text_color: 0xFFFFFF
-              - label:
-                  x: 50
-                  y: 190
-                  text: "0 / 0"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_28
-                  id: lbl_layers
-
-        # === Tarjeta Progreso (centro) ===
-        - obj:
-            align: TOP_MID
-            x: 0
-            y: 60
-            width: 280
-            height: 280
+            x: 80
+            y: 55
+            width: 420
+            height: 200
             styles: style_card
             widgets:
               - label:
-                  align: TOP_MID
-                  y: 10
-                  text: "idle"
-                  text_color: 0x00AE42
-                  text_font: montserrat_22
                   id: lbl_status
+                  x: 10
+                  y: 5
+                  text: "Idle"
+                  text_font: montserrat_28
+                  text_color: 0x00AE42
 
               - label:
-                  align: TOP_MID
-                  y: 45
-                  text: "Sin tarea"
-                  text_color: 0xCCCCCC
-                  text_font: montserrat_18
-                  long_mode: DOT
-                  width: 250
                   id: lbl_filename
+                  x: 10
+                  y: 40
+                  text: "Sin tarea"
+                  text_font: montserrat_18
+                  text_color: 0xCCCCCC
+                  long_mode: DOT
+                  width: 380
 
-              # Porcentaje grande
               - label:
-                  align: CENTER
-                  y: -20
-                  text: "0%"
-                  text_color: 0xFFFFFF
-                  text_font: montserrat_48
                   id: lbl_progress
+                  align: CENTER
+                  y: -10
+                  text: "0%"
+                  text_font: montserrat_48
+                  text_color: 0xFFFFFF
 
-              # Barra de progreso
               - bar:
+                  id: progress_bar
                   align: CENTER
                   y: 40
-                  width: 240
+                  width: 380
                   height: 16
                   min_value: 0
                   max_value: 100
                   value: 0
-                  id: progress_bar
-                  bg_color: 0x222222
+                  bg_color: 0x333333
+                  radius: 8
                   indicator:
                     bg_color: 0x00AE42
                     radius: 8
-                  radius: 8
 
-              # Tiempo restante
               - label:
-                  align: BOTTOM_MID
-                  y: -15
-                  text: "Restante: 0h 00m"
-                  text_color: 0x008844
-                  text_font: montserrat_18
                   id: lbl_remaining
+                  align: BOTTOM_MID
+                  y: -10
+                  text: "Restante: --"
+                  text_font: montserrat_18
+                  text_color: 0x888888
 
-        # === Tarjeta Controles (derecha) ===
+        # Card Temperaturas
         - obj:
-            align: TOP_RIGHT
-            x: -20
-            y: 60
-            width: 240
-            height: 280
+            x: 520
+            y: 55
+            width: 260
+            height: 200
             styles: style_card
             widgets:
+              # Nozzle
               - label:
-                  align: TOP_MID
-                  y: 5
-                  text: "Control"
+                  x: 10
+                  y: 10
+                  text: "\U000F18B8"
+                  text_font: mdi_32
                   text_color: 0x00AE42
-                  text_font: montserrat_22
 
-              # Botón Pausar
+              - label:
+                  id: lbl_nozzle
+                  x: 55
+                  y: 15
+                  text: "---"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+
+              - label:
+                  id: lbl_nozzle_target
+                  x: 130
+                  y: 20
+                  text: "/ ---"
+                  text_font: montserrat_18
+                  text_color: 0x888888
+
+              # Bed
+              - label:
+                  x: 10
+                  y: 70
+                  text: "\U000F0157"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+
+              - label:
+                  id: lbl_bed
+                  x: 55
+                  y: 75
+                  text: "---"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+
+              - label:
+                  id: lbl_bed_target
+                  x: 130
+                  y: 80
+                  text: "/ ---"
+                  text_font: montserrat_18
+                  text_color: 0x888888
+
+              # Capas
+              - label:
+                  x: 10
+                  y: 130
+                  text: "\U000F0E4B"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+
+              - label:
+                  id: lbl_layers
+                  x: 55
+                  y: 135
+                  text: "-- / --"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+
+        # Botones de control
+        - obj:
+            x: 80
+            y: 270
+            width: 700
+            height: 90
+            styles: style_card
+            widgets:
               - button:
-                  align: TOP_MID
-                  y: 45
-                  width: 200
-                  height: 55
-                  styles: style_button
+                  x: 10
+                  y: 10
+                  width: 150
+                  height: 60
+                  styles: style_btn
                   widgets:
                     - label:
                         align: CENTER
@@ -466,13 +534,12 @@ lvgl:
                         data:
                           entity_id: button.p1s_01p00c581002790_pausar_la_impresion
 
-              # Botón Reanudar
               - button:
-                  align: CENTER
-                  y: -20
-                  width: 200
-                  height: 55
-                  styles: style_button
+                  x: 175
+                  y: 10
+                  width: 150
+                  height: 60
+                  styles: style_btn
                   widgets:
                     - label:
                         align: CENTER
@@ -484,13 +551,12 @@ lvgl:
                         data:
                           entity_id: button.p1s_01p00c581002790_continuar_la_impresion
 
-              # Botón Cancelar
               - button:
-                  align: BOTTOM_MID
-                  y: -15
-                  width: 200
-                  height: 55
-                  styles: style_button_red
+                  x: 340
+                  y: 10
+                  width: 150
+                  height: 60
+                  styles: style_btn_red
                   widgets:
                     - label:
                         align: CENTER
@@ -502,105 +568,466 @@ lvgl:
                         data:
                           entity_id: button.p1s_01p00c581002790_detener_la_impresion
 
-        # === Footer con botones adicionales ===
-        - obj:
-            align: BOTTOM_MID
-            y: -15
-            width: 760
-            height: 70
-            styles: style_card
-            widgets:
-              # Precalentar PLA
               - button:
-                  x: 10
-                  y: 8
-                  width: 170
-                  height: 50
-                  bg_color: 0x222222
-                  radius: 8
+                  x: 505
+                  y: 10
+                  width: 80
+                  height: 60
+                  styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "PREHEAT PLA"
-                        text_color: 0xFFFFFF
-                        text_font: montserrat_18
+                        text: "\U000F0238"
+                        text_font: mdi_32
                   on_press:
                     - homeassistant.action:
-                        action: number.set_value
+                        action: light.toggle
                         data:
-                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
-                          value: "60"
+                          entity_id: light.p1s_01p00c581002790_luz_de_la_carcasa
+
+              - button:
+                  x: 600
+                  y: 10
+                  width: 80
+                  height: 60
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "\U000F0415"
+                        text_font: mdi_32
+                  on_press:
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.p1s_01p00c581002790_forzar_actualizacion_de_datos
+
+        # Footer - Presets
+        - obj:
+            x: 80
+            y: 375
+            width: 700
+            height: 90
+            styles: style_card
+            widgets:
+              - button:
+                  x: 10
+                  y: 10
+                  width: 160
+                  height: 60
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "PLA 220/60"
+                        text_font: montserrat_18
+                  on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
                           value: "220"
-
-              # Precalentar PETG
-              - button:
-                  x: 195
-                  y: 8
-                  width: 170
-                  height: 50
-                  bg_color: 0x222222
-                  radius: 8
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "PREHEAT PETG"
-                        text_color: 0xFFFFFF
-                        text_font: montserrat_18
-                  on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
-                          value: "80"
+                          value: "60"
+
+              - button:
+                  x: 185
+                  y: 10
+                  width: 160
+                  height: 60
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "PETG 250/80"
+                        text_font: montserrat_18
+                  on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
                           value: "250"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: "80"
 
-              # Enfriar
               - button:
-                  x: 380
-                  y: 8
-                  width: 130
-                  height: 50
-                  bg_color: 0x222222
-                  radius: 8
+                  x: 360
+                  y: 10
+                  width: 160
+                  height: 60
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "ABS 260/100"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: "260"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: "100"
+
+              - button:
+                  x: 535
+                  y: 10
+                  width: 145
+                  height: 60
+                  styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
                         text: "ENFRIAR"
-                        text_color: 0xFFFFFF
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: "0"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: "0"
+
+    # ========== PÁGINA CONTROLES ==========
+    - id: controls_page
+      bg_color: 0x121212
+      widgets:
+        - label:
+            x: 80
+            y: 15
+            text: "Controles"
+            text_font: montserrat_28
+            text_color: 0x00AE42
+
+        # Card Nozzle
+        - obj:
+            x: 80
+            y: 60
+            width: 340
+            height: 180
+            styles: style_card
+            widgets:
+              - label:
+                  x: 10
+                  y: 10
+                  text: "Nozzle"
+                  text_font: montserrat_22
+                  text_color: 0x00AE42
+
+              - label:
+                  id: lbl_nozzle_ctrl
+                  align: CENTER
+                  y: -10
+                  text: "---°C / ---°C"
+                  text_font: montserrat_36
+                  text_color: 0xFFFFFF
+
+              - button:
+                  x: 20
+                  y: 120
+                  width: 70
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "-10"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: !lambda "return std::max(0.0f, id(nozzle_target).state - 10);"
+
+              - button:
+                  x: 100
+                  y: 120
+                  width: 60
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "-1"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: !lambda "return std::max(0.0f, id(nozzle_target).state - 1);"
+
+              - button:
+                  x: 170
+                  y: 120
+                  width: 60
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "+1"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: !lambda "return id(nozzle_target).state + 1;"
+
+              - button:
+                  x: 240
+                  y: 120
+                  width: 70
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "+10"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: !lambda "return id(nozzle_target).state + 10;"
+
+        # Card Bed
+        - obj:
+            x: 440
+            y: 60
+            width: 340
+            height: 180
+            styles: style_card
+            widgets:
+              - label:
+                  x: 10
+                  y: 10
+                  text: "Cama"
+                  text_font: montserrat_22
+                  text_color: 0x00AE42
+
+              - label:
+                  id: lbl_bed_ctrl
+                  align: CENTER
+                  y: -10
+                  text: "---°C / ---°C"
+                  text_font: montserrat_36
+                  text_color: 0xFFFFFF
+
+              - button:
+                  x: 20
+                  y: 120
+                  width: 70
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "-10"
                         text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
-                          value: "0"
+                          value: !lambda "return std::max(0.0f, id(bed_target).state - 10);"
+
+              - button:
+                  x: 100
+                  y: 120
+                  width: 60
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "-1"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: !lambda "return std::max(0.0f, id(bed_target).state - 1);"
+
+              - button:
+                  x: 170
+                  y: 120
+                  width: 60
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "+1"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: !lambda "return id(bed_target).state + 1;"
+
+              - button:
+                  x: 240
+                  y: 120
+                  width: 70
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "+10"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: !lambda "return id(bed_target).state + 10;"
+
+        # Card Presets y Luz
+        - obj:
+            x: 80
+            y: 260
+            width: 700
+            height: 200
+            styles: style_card
+            widgets:
+              - label:
+                  x: 10
+                  y: 10
+                  text: "Preajustes"
+                  text_font: montserrat_22
+                  text_color: 0x00AE42
+
+              - button:
+                  x: 10
+                  y: 50
+                  width: 155
+                  height: 60
+                  styles: style_btn
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "PLA"
+                        text_font: montserrat_22
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: "220"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: "60"
+
+              - button:
+                  x: 180
+                  y: 50
+                  width: 155
+                  height: 60
+                  styles: style_btn
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "PETG"
+                        text_font: montserrat_22
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: "250"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: "80"
+
+              - button:
+                  x: 350
+                  y: 50
+                  width: 155
+                  height: 60
+                  styles: style_btn
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "ABS"
+                        text_font: montserrat_22
+                  on_press:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
+                          value: "260"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: "100"
+
+              - button:
+                  x: 520
+                  y: 50
+                  width: 155
+                  height: 60
+                  styles: style_btn_red
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "ENFRIAR"
+                        text_font: montserrat_22
+                  on_press:
                     - homeassistant.action:
                         action: number.set_value
                         data:
                           entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_boquilla
                           value: "0"
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.p1s_01p00c581002790_temperatura_objetivo_de_la_cama
+                          value: "0"
 
               # Luz
+              - label:
+                  x: 10
+                  y: 130
+                  text: "Luz cámara"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
               - button:
-                  x: 525
-                  y: 8
-                  width: 100
+                  x: 180
+                  y: 125
+                  width: 120
                   height: 50
-                  bg_color: 0x222222
-                  radius: 8
+                  styles: style_btn
                   widgets:
                     - label:
                         align: CENTER
-                        text: "LUZ"
-                        text_color: 0xFFFFFF
+                        text: "TOGGLE"
                         text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
@@ -608,30 +1035,496 @@ lvgl:
                         data:
                           entity_id: light.p1s_01p00c581002790_luz_de_la_carcasa
 
-              # Actualizar
+    # ========== PÁGINA MOTION ==========
+    - id: motion_page
+      bg_color: 0x121212
+      widgets:
+        - label:
+            x: 80
+            y: 15
+            text: "Motion: XYZ"
+            text_font: montserrat_28
+            text_color: 0x00AE42
+
+        # Card Tool Head (XY)
+        - obj:
+            x: 80
+            y: 60
+            width: 380
+            height: 400
+            styles: style_card
+            widgets:
+              - label:
+                  align: TOP_MID
+                  y: 5
+                  text: "Tool Head"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+              # Pad XY - Círculo exterior (±10)
+              # Y+10
               - button:
-                  x: 640
-                  y: 8
-                  width: 110
+                  align: TOP_MID
+                  y: 45
+                  width: 70
                   height: 50
-                  bg_color: 0x222222
                   radius: 8
+                  styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "REFRESH"
-                        text_color: 0xFFFFFF
+                        text: "Y+10"
                         text_font: montserrat_18
                   on_press:
                     - homeassistant.action:
-                        action: button.press
+                        action: bambu_lab.send_command
                         data:
-                          entity_id: button.p1s_01p00c581002790_forzar_actualizacion_de_datos
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 Y10 F3000\nG90"
 
-# Actualizar reloj y gestionar brillo
+              # X-10
+              - button:
+                  x: 30
+                  y: 130
+                  width: 70
+                  height: 50
+                  radius: 8
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "X-10"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 X-10 F3000\nG90"
+
+              # X+10
+              - button:
+                  align: TOP_RIGHT
+                  x: -30
+                  y: 130
+                  width: 70
+                  height: 50
+                  radius: 8
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "X+10"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 X10 F3000\nG90"
+
+              # Y-10
+              - button:
+                  align: TOP_MID
+                  y: 215
+                  width: 70
+                  height: 50
+                  radius: 8
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "Y-10"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 Y-10 F3000\nG90"
+
+              # Pad interior (±1)
+              # Y+1
+              - button:
+                  align: TOP_MID
+                  y: 105
+                  width: 50
+                  height: 40
+                  radius: 8
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "+1"
+                        text_font: montserrat_14
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 Y1 F3000\nG90"
+
+              # X-1
+              - button:
+                  x: 110
+                  y: 150
+                  width: 50
+                  height: 40
+                  radius: 8
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "-1"
+                        text_font: montserrat_14
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 X-1 F3000\nG90"
+
+              # HOME (centro)
+              - button:
+                  align: CENTER
+                  y: -30
+                  width: 60
+                  height: 60
+                  radius: 30
+                  styles: style_btn
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "\U000F0A12"
+                        text_font: mdi_32
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G28"
+
+              # X+1
+              - button:
+                  align: TOP_RIGHT
+                  x: -110
+                  y: 150
+                  width: 50
+                  height: 40
+                  radius: 8
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "+1"
+                        text_font: montserrat_14
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 X1 F3000\nG90"
+
+              # Y-1
+              - button:
+                  align: TOP_MID
+                  y: 170
+                  width: 50
+                  height: 40
+                  radius: 8
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "-1"
+                        text_font: montserrat_14
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 Y-1 F3000\nG90"
+
+              # Botones Home individuales
+              - button:
+                  x: 30
+                  y: 290
+                  width: 100
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "Home X"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G28 X"
+
+              - button:
+                  align: TOP_MID
+                  y: 290
+                  width: 100
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "Home Y"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G28 Y"
+
+              - button:
+                  align: TOP_RIGHT
+                  x: -30
+                  y: 290
+                  width: 100
+                  height: 45
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "Home All"
+                        text_font: montserrat_18
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G28"
+
+        # Card Z (Heatbed)
+        - obj:
+            x: 480
+            y: 60
+            width: 300
+            height: 400
+            styles: style_card
+            widgets:
+              - label:
+                  align: TOP_MID
+                  y: 5
+                  text: "Heatbed (Z)"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+              - button:
+                  align: TOP_MID
+                  y: 50
+                  width: 250
+                  height: 70
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "\U000F004D  +10"
+                        text_font: mdi_32
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 Z10 F600\nG90"
+
+              - button:
+                  align: TOP_MID
+                  y: 130
+                  width: 250
+                  height: 70
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "\U000F004D  +1"
+                        text_font: mdi_32
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 Z1 F600\nG90"
+
+              - button:
+                  align: TOP_MID
+                  y: 210
+                  width: 250
+                  height: 70
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "\U000F0045  -1"
+                        text_font: mdi_32
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 Z-1 F600\nG90"
+
+              - button:
+                  align: TOP_MID
+                  y: 290
+                  width: 250
+                  height: 70
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "\U000F0045  -10"
+                        text_font: mdi_32
+                  on_press:
+                    - homeassistant.action:
+                        action: bambu_lab.send_command
+                        data:
+                          device_id: ${bambu_device_id}
+                          command: "G91\nG0 Z-10 F600\nG90"
+
+    # ========== PÁGINA INFO ==========
+    - id: info_page
+      bg_color: 0x121212
+      widgets:
+        - label:
+            x: 80
+            y: 15
+            text: "Información"
+            text_font: montserrat_28
+            text_color: 0x00AE42
+
+        - obj:
+            x: 80
+            y: 60
+            width: 700
+            height: 400
+            styles: style_card
+            widgets:
+              # WiFi
+              - label:
+                  x: 20
+                  y: 20
+                  text: "\U000F05A9"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+
+              - label:
+                  x: 70
+                  y: 25
+                  text: "WiFi Signal"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              - label:
+                  id: lbl_wifi_signal
+                  x: 300
+                  y: 25
+                  text: "-- dBm"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+              # IP
+              - label:
+                  x: 20
+                  y: 80
+                  text: "\U000F05A9"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+
+              - label:
+                  x: 70
+                  y: 85
+                  text: "IP Address"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              - label:
+                  id: lbl_ip
+                  x: 300
+                  y: 85
+                  text: "---.---.---.---"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+              # Uptime
+              - label:
+                  x: 20
+                  y: 140
+                  text: "\U000F0150"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+
+              - label:
+                  x: 70
+                  y: 145
+                  text: "Uptime"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              - label:
+                  id: lbl_uptime
+                  x: 300
+                  y: 145
+                  text: "--"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+              # Estado impresora
+              - label:
+                  x: 20
+                  y: 200
+                  text: "\U000F18B8"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+
+              - label:
+                  x: 70
+                  y: 205
+                  text: "Estado"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              - label:
+                  id: lbl_printer_status
+                  x: 300
+                  y: 205
+                  text: "--"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+              # Versión
+              - label:
+                  x: 20
+                  y: 260
+                  text: "\U000F02FC"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+
+              - label:
+                  x: 70
+                  y: 265
+                  text: "Versión"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              - label:
+                  x: 300
+                  y: 265
+                  text: "ESPHome 2025.x"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+# === Actualización de datos ===
 interval:
   - interval: 1s
     then:
+      # Reloj
       - lvgl.label.update:
           id: lbl_clock
           text: !lambda |-
@@ -639,9 +1532,131 @@ interval:
             auto time = id(ha_time).now();
             snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
             return buf;
-      # Atenuar pantalla después de 60 segundos sin tocar
+
+      # Auto-dim después de 60s
       - lambda: |-
           if (!id(screen_dimmed) && (millis() - id(last_touch_time) > 60000)) {
             id(screen_dimmed) = true;
             id(backlight).turn_on().set_brightness(0.15).perform();
           }
+
+  - interval: 2s
+    then:
+      # Actualizar datos de Home
+      - lvgl.label.update:
+          id: lbl_status
+          text: !lambda |-
+            if (id(printer_status).state.empty()) return "---";
+            return id(printer_status).state.c_str();
+
+      - lvgl.label.update:
+          id: lbl_filename
+          text: !lambda |-
+            if (id(current_file).state.empty() || id(current_file).state == "unavailable")
+              return "Sin tarea";
+            return id(current_file).state.c_str();
+
+      - lvgl.label.update:
+          id: lbl_progress
+          text: !lambda |-
+            static char buf[8];
+            snprintf(buf, sizeof(buf), "%.0f%%", id(print_progress).state);
+            return buf;
+
+      - lvgl.bar.update:
+          id: progress_bar
+          value: !lambda return (int)id(print_progress).state;
+
+      - lvgl.label.update:
+          id: lbl_remaining
+          text: !lambda |-
+            static char buf[32];
+            float hours = id(print_time_remaining).state;
+            if (isnan(hours)) return "Restante: --";
+            int h = (int)hours;
+            int m = (int)((hours - h) * 60);
+            snprintf(buf, sizeof(buf), "Restante: %dh %02dm", h, m);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_nozzle
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f°C", id(nozzle_temp).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_nozzle_target
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "/ %.0f°C", id(nozzle_target).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_bed
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f°C", id(bed_temp).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_bed_target
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "/ %.0f°C", id(bed_target).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_layers
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f / %.0f", id(current_layer).state, id(total_layers).state);
+            return buf;
+
+      # Actualizar datos de Controles
+      - lvgl.label.update:
+          id: lbl_nozzle_ctrl
+          text: !lambda |-
+            static char buf[24];
+            snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", id(nozzle_temp).state, id(nozzle_target).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_bed_ctrl
+          text: !lambda |-
+            static char buf[24];
+            snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", id(bed_temp).state, id(bed_target).state);
+            return buf;
+
+      # Actualizar datos de Info
+      - lvgl.label.update:
+          id: lbl_wifi_signal
+          text: !lambda |-
+            static char buf[16];
+            snprintf(buf, sizeof(buf), "%.0f dBm", id(wifi_signal_db).state);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_ip
+          text: !lambda return id(wifi_ip).state.c_str();
+
+      - lvgl.label.update:
+          id: lbl_uptime
+          text: !lambda |-
+            static char buf[32];
+            float seconds = id(uptime_sensor).state;
+            int days = (int)(seconds / 86400);
+            int hours = (int)((seconds - days * 86400) / 3600);
+            int mins = (int)((seconds - days * 86400 - hours * 3600) / 60);
+            if (days > 0) {
+              snprintf(buf, sizeof(buf), "%dd %dh %dm", days, hours, mins);
+            } else {
+              snprintf(buf, sizeof(buf), "%dh %dm", hours, mins);
+            }
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_printer_status
+          text: !lambda |-
+            if (id(printer_status).state.empty()) return "---";
+            return id(printer_status).state.c_str();
