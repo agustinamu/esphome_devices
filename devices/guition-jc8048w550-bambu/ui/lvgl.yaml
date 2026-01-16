@@ -21,13 +21,15 @@ lvgl:
       radius: 8
       border_width: 0
       width: 80
-      height: 90
+      height: 80
 
     - id: style_sidebar_btn_active
       bg_color: 0x1A1A1A
       text_color: 0x00AE42
       radius: 8
       border_width: 0
+      width: 80
+      height: 80
 
     - id: style_card
       bg_color: 0x1E1E1E
@@ -98,19 +100,13 @@ lvgl:
             - button:
                 id: btn_nav_home
                 x: 0
-                y: 15
+                y: 40
                 styles: style_sidebar_btn_active
                 widgets:
                   - label:
                       align: CENTER
-                      y: -8
                       text: "\U000F02DC"
                       text_font: mdi_32
-                  - label:
-                      align: CENTER
-                      y: 22
-                      text: "Home"
-                      text_font: montserrat_14
                 on_press:
                   - lvgl.page.show: main_page
                   - lvgl.widget.update:
@@ -134,19 +130,13 @@ lvgl:
             - button:
                 id: btn_nav_controls
                 x: 0
-                y: 130
+                y: 140
                 styles: style_sidebar_btn
                 widgets:
                   - label:
                       align: CENTER
-                      y: -8
                       text: "\U000F0493"
                       text_font: mdi_32
-                  - label:
-                      align: CENTER
-                      y: 22
-                      text: "Ctrl"
-                      text_font: montserrat_14
                 on_press:
                   - lvgl.page.show: controls_page
                   - lvgl.widget.update:
@@ -170,19 +160,13 @@ lvgl:
             - button:
                 id: btn_nav_motion
                 x: 0
-                y: 245
+                y: 240
                 styles: style_sidebar_btn
                 widgets:
                   - label:
                       align: CENTER
-                      y: -8
                       text: "\U000F0C90"
                       text_font: mdi_32
-                  - label:
-                      align: CENTER
-                      y: 22
-                      text: "Move"
-                      text_font: montserrat_14
                 on_press:
                   - lvgl.page.show: motion_page
                   - lvgl.widget.update:
@@ -206,19 +190,13 @@ lvgl:
             - button:
                 id: btn_nav_info
                 x: 0
-                y: 360
+                y: 340
                 styles: style_sidebar_btn
                 widgets:
                   - label:
                       align: CENTER
-                      y: -8
                       text: "\U000F02FC"
                       text_font: mdi_32
-                  - label:
-                      align: CENTER
-                      y: 22
-                      text: "Info"
-                      text_font: montserrat_14
                 on_press:
                   - lvgl.page.show: info_page
                   - lvgl.widget.update:
