@@ -88,4 +88,4 @@ display:
     data_pins:
       red: [GPIO45, GPIO48, GPIO47, GPIO21, GPIO14]
       green: [GPIO5, GPIO6, GPIO7, GPIO15, GPIO16, GPIO4]
-      blue: [GPIO8, GPIO3, GPIO46, GPIO9, GPIO10]
+      blue: [GPIO8, GPIO3, GPIO46, GPIO9, GPIO1]
