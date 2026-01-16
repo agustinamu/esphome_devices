@@ -2,42 +2,42 @@
 # Panel de control Bambu Lab P1S
 
 # === Fuentes ===
-# Montserrat custom sin anti-aliasing (bpp: 1) para mejor definicion
+# Montserrat custom sin anti-aliasing (bpp: 2) para mejor definicion
 font:
   - file: "gfonts://Montserrat"
     id: montserrat_14
     size: 14
-    bpp: 1
+    bpp: 2
 
   - file: "gfonts://Montserrat"
     id: montserrat_18
     size: 18
-    bpp: 1
+    bpp: 2
 
   - file: "gfonts://Montserrat"
     id: montserrat_22
     size: 22
-    bpp: 1
+    bpp: 2
 
   - file: "gfonts://Montserrat"
     id: montserrat_28
     size: 28
-    bpp: 1
+    bpp: 2
 
   - file: "gfonts://Montserrat"
     id: montserrat_36
     size: 36
-    bpp: 1
+    bpp: 2
 
   - file: "gfonts://Montserrat"
     id: montserrat_48
     size: 48
-    bpp: 1
+    bpp: 2
 
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_32
     size: 32
-    bpp: 1
+    bpp: 2
     glyphs:
       - "\U000F02DC"  # home
       - "\U000F0493"  # tune-vertical
@@ -66,7 +66,7 @@ font:
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_48
     size: 48
-    bpp: 1
+    bpp: 2
     glyphs:
       - "\U000F004D"  # arrow-up
       - "\U000F0045"  # arrow-down
