@@ -134,27 +134,32 @@ lvgl:
                 styles: style_sidebar_btn
                 widgets:
                   - label:
+                      id: lbl_nav_controls
                       align: CENTER
                       text: "\U000F0493"
                       text_font: mdi_32
                 on_press:
-                  - lvgl.page.show: controls_page
-                  - lvgl.widget.update:
-                      id: btn_nav_home
-                      text_color: 0x666666
-                      bg_color: 0x0D0D0D
-                  - lvgl.widget.update:
-                      id: btn_nav_controls
-                      text_color: 0x00AE42
-                      bg_color: 0x1A1A1A
-                  - lvgl.widget.update:
-                      id: btn_nav_motion
-                      text_color: 0x666666
-                      bg_color: 0x0D0D0D
-                  - lvgl.widget.update:
-                      id: btn_nav_info
-                      text_color: 0x666666
-                      bg_color: 0x0D0D0D
+                  - if:
+                      condition:
+                        binary_sensor.is_on: printer_online
+                      then:
+                        - lvgl.page.show: controls_page
+                        - lvgl.widget.update:
+                            id: btn_nav_home
+                            text_color: 0x666666
+                            bg_color: 0x0D0D0D
+                        - lvgl.widget.update:
+                            id: btn_nav_controls
+                            text_color: 0x00AE42
+                            bg_color: 0x1A1A1A
+                        - lvgl.widget.update:
+                            id: btn_nav_motion
+                            text_color: 0x666666
+                            bg_color: 0x0D0D0D
+                        - lvgl.widget.update:
+                            id: btn_nav_info
+                            text_color: 0x666666
+                            bg_color: 0x0D0D0D
 
             # Motion
             - button:
@@ -164,27 +169,32 @@ lvgl:
                 styles: style_sidebar_btn
                 widgets:
                   - label:
+                      id: lbl_nav_motion
                       align: CENTER
                       text: "\U000F0C90"
                       text_font: mdi_32
                 on_press:
-                  - lvgl.page.show: motion_page
-                  - lvgl.widget.update:
-                      id: btn_nav_home
-                      text_color: 0x666666
-                      bg_color: 0x0D0D0D
-                  - lvgl.widget.update:
-                      id: btn_nav_controls
-                      text_color: 0x666666
-                      bg_color: 0x0D0D0D
-                  - lvgl.widget.update:
-                      id: btn_nav_motion
-                      text_color: 0x00AE42
-                      bg_color: 0x1A1A1A
-                  - lvgl.widget.update:
-                      id: btn_nav_info
-                      text_color: 0x666666
-                      bg_color: 0x0D0D0D
+                  - if:
+                      condition:
+                        binary_sensor.is_on: printer_online
+                      then:
+                        - lvgl.page.show: motion_page
+                        - lvgl.widget.update:
+                            id: btn_nav_home
+                            text_color: 0x666666
+                            bg_color: 0x0D0D0D
+                        - lvgl.widget.update:
+                            id: btn_nav_controls
+                            text_color: 0x666666
+                            bg_color: 0x0D0D0D
+                        - lvgl.widget.update:
+                            id: btn_nav_motion
+                            text_color: 0x00AE42
+                            bg_color: 0x1A1A1A
+                        - lvgl.widget.update:
+                            id: btn_nav_info
+                            text_color: 0x666666
+                            bg_color: 0x0D0D0D
 
             # Info
             - button:
@@ -2030,26 +2040,27 @@ lvgl:
                   text_font: montserrat_22
                   text_color: 0xFFFFFF
 
-              # Estado impresora
+              # Printer Online
               - label:
+                  id: lbl_online_icon
                   x: 20
                   y: 200
-                  text: "\U000F18B8"
+                  text: "\U000F05E0"
                   text_font: mdi_32
                   text_color: 0x00AE42
 
               - label:
                   x: 70
                   y: 205
-                  text: "Estado"
+                  text: "Printer"
                   text_font: montserrat_22
                   text_color: 0xFFFFFF
 
               - label:
-                  id: lbl_printer_status
+                  id: lbl_online_status
                   x: 300
                   y: 205
-                  text: "--"
+                  text: "---"
                   text_font: montserrat_22
                   text_color: 0xFFFFFF
 
@@ -2072,29 +2083,5 @@ lvgl:
                   x: 300
                   y: 265
                   text: "ESPHome 2025.x"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
-
-              # Printer Online
-              - label:
-                  id: lbl_online_icon
-                  x: 20
-                  y: 320
-                  text: "\U000F05E0"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
-
-              - label:
-                  x: 70
-                  y: 325
-                  text: "Printer"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
-
-              - label:
-                  id: lbl_online_status
-                  x: 300
-                  y: 325
-                  text: "---"
                   text_font: montserrat_22
                   text_color: 0xFFFFFF

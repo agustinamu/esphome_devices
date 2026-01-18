@@ -55,15 +55,23 @@ interval:
           id: lbl_nozzle
           text: !lambda |-
             static char buf[16];
+            if (!id(printer_online).state) return "---";
             snprintf(buf, sizeof(buf), "%.0f", id(nozzle_temp).state);
             return buf;
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
+            return lv_color_hex(0x555555);
 
       - lvgl.label.update:
           id: lbl_bed
           text: !lambda |-
             static char buf[16];
+            if (!id(printer_online).state) return "---";
             snprintf(buf, sizeof(buf), "%.0f", id(bed_temp).state);
             return buf;
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
+            return lv_color_hex(0x555555);
 
       - lvgl.label.update:
           id: lbl_layers
@@ -78,27 +86,36 @@ interval:
           text: !lambda |-
             static char buf[8];
             float pct = id(cooling_fan_speed).state;
-            if (isnan(pct)) return "--";
+            if (!id(printer_online).state || isnan(pct)) return "--";
             snprintf(buf, sizeof(buf), "%.0f%%", pct);
             return buf;
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
+            return lv_color_hex(0x555555);
 
       - lvgl.label.update:
           id: lbl_aux_fan
           text: !lambda |-
             static char buf[8];
             float pct = id(aux_fan_speed).state;
-            if (isnan(pct)) return "--";
+            if (!id(printer_online).state || isnan(pct)) return "--";
             snprintf(buf, sizeof(buf), "%.0f%%", pct);
             return buf;
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
+            return lv_color_hex(0x555555);
 
       - lvgl.label.update:
           id: lbl_chamber_fan
           text: !lambda |-
             static char buf[8];
             float pct = id(chamber_fan_speed).state;
-            if (isnan(pct)) return "--";
+            if (!id(printer_online).state || isnan(pct)) return "--";
             snprintf(buf, sizeof(buf), "%.0f%%", pct);
             return buf;
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
+            return lv_color_hex(0x555555);
 
       # === CONTROLS PAGE ===
       - lvgl.label.update:
@@ -188,12 +205,6 @@ interval:
             }
             return buf;
 
-      - lvgl.label.update:
-          id: lbl_printer_status
-          text: !lambda |-
-            if (id(printer_status).state.empty()) return "---";
-            return id(printer_status).state.c_str();
-
       # Online status dinamico
       - lvgl.label.update:
           id: lbl_online_status
@@ -205,3 +216,15 @@ interval:
           text_color: !lambda |-
             if (id(printer_online).state) return lv_color_hex(0x00AE42);
             return lv_color_hex(0xFF4444);
+
+      # Sidebar: deshabilitar visualmente Controls y Motion cuando offline
+      - lvgl.label.update:
+          id: lbl_nav_controls
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0x666666);
+            return lv_color_hex(0x333333);
+      - lvgl.label.update:
+          id: lbl_nav_motion
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0x666666);
+            return lv_color_hex(0x333333);
