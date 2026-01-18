@@ -54,7 +54,7 @@ light:
 i2c:
   sda: GPIO19
   scl: GPIO20
-  scan: false
+  scan: true
 
 # Display RGB 800x480 - ST7262
 # Timings optimizados para panel Guition
