@@ -20,6 +20,23 @@ interval:
             id(backlight).turn_on().set_brightness(0.15).perform();
           }
 
+      # Screensaver despues de 5 minutos (300s)
+      - if:
+          condition:
+            lambda: return !id(screensaver_active) && (millis() - id(last_touch_time) > 300000);
+          then:
+            - lambda: id(screensaver_active) = true;
+            - lvgl.page.show: screensaver_page
+
+      # Actualizar reloj screensaver
+      - lvgl.label.update:
+          id: lbl_screensaver_clock
+          text: !lambda |-
+            static char buf[10];
+            auto time = id(ha_time).now();
+            snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
+            return buf;
+
   - interval: 2s
     then:
       # === HOME PAGE ===
@@ -29,6 +46,82 @@ interval:
             if (id(printer_status).state.empty()) return "---";
             return id(printer_status).state.c_str();
 
+      # Nombre del archivo
+      - lvgl.label.update:
+          id: lbl_filename
+          text: !lambda |-
+            if (id(current_file).state.empty()) return "Sin archivo";
+            return id(current_file).state.c_str();
+
+      # Hora estimada de fin
+      - lvgl.label.update:
+          id: lbl_finish_time
+          text: !lambda |-
+            static char buf[10];
+            float hours_remaining = id(print_time_remaining).state;
+            if (isnan(hours_remaining) || hours_remaining <= 0) return "--:--";
+            auto now = id(ha_time).now();
+            if (!now.is_valid()) return "--:--";
+            int total_mins = now.hour * 60 + now.minute + (int)(hours_remaining * 60);
+            int finish_hour = (total_mins / 60) % 24;
+            int finish_min = total_mins % 60;
+            snprintf(buf, sizeof(buf), "%02d:%02d", finish_hour, finish_min);
+            return buf;
+
+      # Mostrar Pause o Resume según estado
+      - lvgl.widget.update:
+          id: btn_pause
+          hidden: !lambda |-
+            std::string status = id(printer_status).state;
+            // Ocultar pause si está pausado o no está imprimiendo
+            return (status == "paused" || status == "Pausado" ||
+                    status == "idle" || status == "Inactivo" ||
+                    status == "offline" || status == "Desconectado" ||
+                    status == "finish" || status == "Finalizado" ||
+                    status.empty());
+      - lvgl.widget.update:
+          id: btn_resume
+          hidden: !lambda |-
+            std::string status = id(printer_status).state;
+            // Mostrar resume solo si está pausado
+            return !(status == "paused" || status == "Pausado");
+
+      # Mostrar STOP solo cuando imprimiendo o pausado
+      - lvgl.widget.update:
+          id: btn_stop
+          hidden: !lambda |-
+            std::string status = id(printer_status).state;
+            return (status == "idle" || status == "Inactivo" ||
+                    status == "offline" || status == "Desconectado" ||
+                    status == "finish" || status == "Finalizado" ||
+                    status.empty());
+
+      # Mostrar LIGHT cuando idle (reemplaza STOP)
+      - lvgl.widget.update:
+          id: btn_light_home
+          hidden: !lambda |-
+            std::string status = id(printer_status).state;
+            // Mostrar cuando idle, offline o finalizado
+            return !(status == "idle" || status == "Inactivo" ||
+                     status == "offline" || status == "Desconectado" ||
+                     status == "finish" || status == "Finalizado" ||
+                     status.empty());
+
+      # Actualizar estado visual del boton LIGHT
+      - lvgl.label.update:
+          id: icon_light_home
+          text: !lambda |-
+            if (id(chamber_light).state) return "\U000F0238";
+            return "\U000F0336";
+          text_color: !lambda |-
+            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0x888888);
+      - lvgl.label.update:
+          id: lbl_light_home
+          text_color: !lambda |-
+            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0x888888);
+
       - lvgl.label.update:
           id: lbl_progress
           text: !lambda |-
@@ -36,8 +129,8 @@ interval:
             snprintf(buf, sizeof(buf), "%.0f%%", id(print_progress).state);
             return buf;
 
-      - lvgl.bar.update:
-          id: progress_bar
+      - lvgl.arc.update:
+          id: progress_arc
           value: !lambda return (int)id(print_progress).state;
 
       - lvgl.label.update:
@@ -62,6 +155,19 @@ interval:
             if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
             return lv_color_hex(0x555555);
 
+      # Icono nozzle: naranja si calentando, verde si a temperatura
+      - lvgl.label.update:
+          id: icon_nozzle
+          text_color: !lambda |-
+            if (!id(printer_online).state) return lv_color_hex(0x555555);
+            float current = id(nozzle_temp).state;
+            float target = id(nozzle_target).state;
+            if (target > 0 && current < target - 2) {
+              // Calentando - naranja parpadeante
+              return ((millis() / 500) % 2 == 0) ? lv_color_hex(0xFF8800) : lv_color_hex(0xFFAA00);
+            }
+            return lv_color_hex(0x00AE42);  // Normal - verde
+
       - lvgl.label.update:
           id: lbl_bed
           text: !lambda |-
@@ -72,6 +178,19 @@ interval:
           text_color: !lambda |-
             if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
             return lv_color_hex(0x555555);
+
+      # Icono bed: naranja si calentando, verde si a temperatura
+      - lvgl.label.update:
+          id: icon_bed
+          text_color: !lambda |-
+            if (!id(printer_online).state) return lv_color_hex(0x555555);
+            float current = id(bed_temp).state;
+            float target = id(bed_target).state;
+            if (target > 0 && current < target - 2) {
+              // Calentando - naranja parpadeante
+              return ((millis() / 500) % 2 == 0) ? lv_color_hex(0xFF8800) : lv_color_hex(0xFFAA00);
+            }
+            return lv_color_hex(0x00AE42);  // Normal - verde
 
       - lvgl.label.update:
           id: lbl_layers
@@ -151,6 +270,7 @@ interval:
             return lv_color_hex(0x888888);
 
       # === FANS PAGE ===
+      # Cooling fan
       - lvgl.label.update:
           id: lbl_cooling_pct
           text: !lambda |-
@@ -159,7 +279,25 @@ interval:
             if (isnan(pct)) return "0%";
             snprintf(buf, sizeof(buf), "%.0f%%", pct);
             return buf;
+      - lvgl.label.update:
+          id: lbl_cooling_val
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(cooling_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+      - lvgl.arc.update:
+          id: arc_cooling
+          value: !lambda |-
+            float pct = id(cooling_fan_speed).state;
+            return isnan(pct) ? 0 : (int)pct;
+      - lvgl.widget.update:
+          id: sw_cooling
+          state:
+            checked: !lambda return id(cooling_fan_speed).state > 0;
 
+      # Aux fan
       - lvgl.label.update:
           id: lbl_aux_pct
           text: !lambda |-
@@ -168,7 +306,25 @@ interval:
             if (isnan(pct)) return "0%";
             snprintf(buf, sizeof(buf), "%.0f%%", pct);
             return buf;
+      - lvgl.label.update:
+          id: lbl_aux_val
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(aux_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+      - lvgl.arc.update:
+          id: arc_aux
+          value: !lambda |-
+            float pct = id(aux_fan_speed).state;
+            return isnan(pct) ? 0 : (int)pct;
+      - lvgl.widget.update:
+          id: sw_aux
+          state:
+            checked: !lambda return id(aux_fan_speed).state > 0;
 
+      # Chamber fan
       - lvgl.label.update:
           id: lbl_chamber_pct
           text: !lambda |-
@@ -177,6 +333,23 @@ interval:
             if (isnan(pct)) return "0%";
             snprintf(buf, sizeof(buf), "%.0f%%", pct);
             return buf;
+      - lvgl.label.update:
+          id: lbl_chamber_val
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(chamber_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+      - lvgl.arc.update:
+          id: arc_chamber
+          value: !lambda |-
+            float pct = id(chamber_fan_speed).state;
+            return isnan(pct) ? 0 : (int)pct;
+      - lvgl.widget.update:
+          id: sw_chamber
+          state:
+            checked: !lambda return id(chamber_fan_speed).state > 0;
 
       # === INFO PAGE ===
       - lvgl.label.update:
@@ -211,11 +384,69 @@ interval:
           text: !lambda |-
             if (id(printer_online).state) return "Online";
             return "Offline";
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0xFF4444);
       - lvgl.label.update:
           id: lbl_online_icon
           text_color: !lambda |-
             if (id(printer_online).state) return lv_color_hex(0x00AE42);
             return lv_color_hex(0xFF4444);
+
+      # Print error status
+      - lvgl.label.update:
+          id: lbl_print_error
+          text: !lambda |-
+            if (id(print_error).state) return "ERROR";
+            return "OK";
+          text_color: !lambda |-
+            if (id(print_error).state) return lv_color_hex(0xFF4444);
+            return lv_color_hex(0x00AE42);
+      - lvgl.label.update:
+          id: lbl_print_error_icon
+          text_color: !lambda |-
+            if (id(print_error).state) return lv_color_hex(0xFF4444);
+            return lv_color_hex(0x00AE42);
+
+      # HMS error status
+      - lvgl.label.update:
+          id: lbl_hms_status
+          text: !lambda |-
+            if (id(hms_error).state) {
+              // Mostrar el texto del error HMS si existe
+              if (!id(hms_errors).state.empty()) {
+                return id(hms_errors).state.c_str();
+              }
+              return "ERROR";
+            }
+            return "OK";
+          text_color: !lambda |-
+            if (id(hms_error).state) return lv_color_hex(0xFF4444);
+            return lv_color_hex(0x00AE42);
+      - lvgl.label.update:
+          id: lbl_hms_icon
+          text_color: !lambda |-
+            if (id(hms_error).state) return lv_color_hex(0xFF4444);
+            return lv_color_hex(0x00AE42);
+
+      # SD Card status
+      - lvgl.label.update:
+          id: lbl_sd_status
+          text: !lambda |-
+            if (id(sdcard_state).state.empty()) return "---";
+            return id(sdcard_state).state.c_str();
+          text_color: !lambda |-
+            std::string state = id(sdcard_state).state;
+            if (state == "normal" || state == "Normal") return lv_color_hex(0x00AE42);
+            if (state.empty() || state == "unknown") return lv_color_hex(0x888888);
+            return lv_color_hex(0xFFAA00);
+      - lvgl.label.update:
+          id: lbl_sd_icon
+          text_color: !lambda |-
+            std::string state = id(sdcard_state).state;
+            if (state == "normal" || state == "Normal") return lv_color_hex(0x00AE42);
+            if (state.empty() || state == "unknown") return lv_color_hex(0x888888);
+            return lv_color_hex(0xFFAA00);
 
       # Sidebar: deshabilitar visualmente Controls y Motion cuando offline
       - lvgl.label.update:
@@ -228,3 +459,12 @@ interval:
           text_color: !lambda |-
             if (id(printer_online).state) return lv_color_hex(0x666666);
             return lv_color_hex(0x333333);
+
+      # Indicador de error en sidebar (parpadea alternando visibilidad)
+      - lvgl.widget.update:
+          id: lbl_error_indicator
+          hidden: !lambda |-
+            bool has_error = id(print_error).state || id(hms_error).state;
+            if (!has_error) return true;
+            // Parpadeo: alterna cada segundo basado en el tiempo
+            return (millis() / 500) % 2 == 0;

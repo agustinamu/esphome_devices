@@ -72,6 +72,10 @@ text_sensor:
     id: hms_errors
     entity_id: sensor.${bambu_prefix}_errores_hms
 
+  - platform: homeassistant
+    id: sdcard_state
+    entity_id: sensor.${bambu_prefix}_estado_de_la_tarjeta_sd
+
   - platform: wifi_info
     ip_address:
       id: wifi_ip
@@ -84,3 +88,11 @@ binary_sensor:
   - platform: homeassistant
     id: chamber_light
     entity_id: light.${bambu_prefix}_luz_de_la_carcasa
+
+  - platform: homeassistant
+    id: print_error
+    entity_id: binary_sensor.${bambu_prefix}_error_de_la_impresion
+
+  - platform: homeassistant
+    id: hms_error
+    entity_id: binary_sensor.${bambu_prefix}_errores_hms

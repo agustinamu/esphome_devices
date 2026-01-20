@@ -33,6 +33,20 @@ font:
     bpp: 4
 
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+    id: mdi_24
+    size: 24
+    bpp: 4
+    glyphs:
+      - "\U000F05A9"  # wifi
+      - "\U000F0A60"  # ip-network
+      - "\U000F0150"  # clock
+      - "\U000F02FC"  # information
+      - "\U000F05E0"  # checkbox-marked-circle (check ok)
+      - "\U000F0028"  # alert-circle
+      - "\U000F07F3"  # sd
+      - "\U000F0029"  # alert
+
+  - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_32
     size: 32
     bpp: 4
@@ -68,6 +82,12 @@ font:
       - "\U000F0B2F"  # transfer-down (unload)
       - "\U000F0210"  # fan
       - "\U000F0336"  # lightbulb-off
+      - "\U000F0E36"  # rotate-right (rotation)
+      - "\U000F0709"  # restart
+      - "\U000F02D1"  # download (update)
+      - "\U000F0A60"  # ip-network
+      - "\U000F07F3"  # sd
+      - "\U000F0214"  # file
 
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_48

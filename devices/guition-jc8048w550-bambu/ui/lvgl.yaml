@@ -226,6 +226,16 @@ lvgl:
                       text_color: 0x00AE42
                       bg_color: 0x1A1A1A
 
+            # Error indicator (visible cuando hay error)
+            - label:
+                id: lbl_error_indicator
+                x: 24
+                y: 440
+                text: "\U000F0026"
+                text_font: mdi_32
+                text_color: 0xFF4444
+                hidden: true
+
   # === PAGINAS ===
   pages:
     # ==================== HOME ====================
@@ -237,15 +247,15 @@ lvgl:
             x: 100
             y: 10
             text: "BAMBU P1S"
-            text_font: montserrat_28
+            text_font: montserrat_22
             text_color: 0x00AE42
 
         - label:
             id: lbl_status
-            x: 300
+            x: 250
             y: 10
             text: "Idle"
-            text_font: montserrat_28
+            text_font: montserrat_22
             text_color: 0xFFFFFF
 
         - label:
@@ -254,14 +264,33 @@ lvgl:
             x: -20
             y: 10
             text: "--:--"
-            text_font: montserrat_28
+            text_font: montserrat_22
             text_color: 0xFFFFFF
+
+        # Nombre del archivo (mas grande, con icono)
+        - label:
+            x: 100
+            y: 42
+            text: "\U000F0214"
+            text_font: mdi_32
+            text_color: 0x00AE42
+
+        - label:
+            id: lbl_filename
+            x: 140
+            y: 45
+            width: 630
+            text: "---"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+            long_mode: DOT
 
         # === CENTRO: Temperaturas y Ventiladores ===
         # Nozzle
         - label:
+            id: icon_nozzle
             x: 120
-            y: 70
+            y: 85
             text: "\U000F18B8"
             text_font: mdi_48
             text_color: 0x00AE42
@@ -269,22 +298,23 @@ lvgl:
         - label:
             id: lbl_nozzle
             x: 180
-            y: 75
+            y: 90
             text: "---"
             text_font: montserrat_48
             text_color: 0xFFFFFF
 
         - label:
             x: 280
-            y: 90
+            y: 105
             text: "°C"
             text_font: montserrat_22
             text_color: 0x888888
 
         # Bed
         - label:
+            id: icon_bed
             x: 360
-            y: 70
+            y: 85
             text: "\U000F0157"
             text_font: mdi_48
             text_color: 0x00AE42
@@ -292,14 +322,14 @@ lvgl:
         - label:
             id: lbl_bed
             x: 420
-            y: 75
+            y: 90
             text: "---"
             text_font: montserrat_48
             text_color: 0xFFFFFF
 
         - label:
             x: 520
-            y: 90
+            y: 105
             text: "°C"
             text_font: montserrat_22
             text_color: 0x888888
@@ -308,7 +338,7 @@ lvgl:
         # Cooling Fan
         - label:
             x: 120
-            y: 145
+            y: 155
             text: "\U000F0210"
             text_font: mdi_32
             text_color: 0x00AE42
@@ -316,14 +346,14 @@ lvgl:
         - label:
             id: lbl_cooling_fan
             x: 158
-            y: 148
+            y: 158
             text: "--"
             text_font: montserrat_22
             text_color: 0xFFFFFF
 
         - label:
             x: 215
-            y: 148
+            y: 158
             text: "Cool"
             text_font: montserrat_18
             text_color: 0x666666
@@ -331,7 +361,7 @@ lvgl:
         # Aux Fan
         - label:
             x: 310
-            y: 145
+            y: 155
             text: "\U000F0210"
             text_font: mdi_32
             text_color: 0x888888
@@ -339,14 +369,14 @@ lvgl:
         - label:
             id: lbl_aux_fan
             x: 348
-            y: 148
+            y: 158
             text: "--"
             text_font: montserrat_22
             text_color: 0xFFFFFF
 
         - label:
             x: 405
-            y: 148
+            y: 158
             text: "Aux"
             text_font: montserrat_18
             text_color: 0x666666
@@ -354,7 +384,7 @@ lvgl:
         # Chamber Fan
         - label:
             x: 490
-            y: 145
+            y: 155
             text: "\U000F0210"
             text_font: mdi_32
             text_color: 0x888888
@@ -362,127 +392,208 @@ lvgl:
         - label:
             id: lbl_chamber_fan
             x: 528
-            y: 148
+            y: 158
             text: "--"
             text_font: montserrat_22
             text_color: 0xFFFFFF
 
         - label:
             x: 585
-            y: 148
+            y: 158
             text: "Cham"
             text_font: montserrat_18
             text_color: 0x666666
 
-        # === BOTONES: Pause, Resume, Stop ===
+        # === BOTONES: Pause/Resume y Stop ===
+        # PAUSE - visible cuando está imprimiendo
         - button:
+            id: btn_pause
             x: 100
             y: 200
-            width: 210
-            height: 90
+            width: 330
+            height: 80
             styles: style_btn
             widgets:
               - label:
                   align: CENTER
+                  x: -30
                   text: "\U000F03E4"
                   text_font: mdi_48
+              - label:
+                  align: CENTER
+                  x: 40
+                  text: "PAUSE"
+                  text_font: montserrat_28
             on_press:
-              - homeassistant.action:
-                  action: button.press
-                  data:
-                    entity_id: button.${bambu_prefix}_pausar_la_impresion
+              - lvgl.page.show: confirm_pause_page
 
+        # RESUME - visible cuando está pausado (oculto por defecto)
         - button:
-            x: 330
+            id: btn_resume
+            x: 100
             y: 200
-            width: 210
-            height: 90
+            width: 330
+            height: 80
+            hidden: true
             styles: style_btn
             widgets:
               - label:
                   align: CENTER
+                  x: -40
                   text: "\U000F040A"
                   text_font: mdi_48
+              - label:
+                  align: CENTER
+                  x: 45
+                  text: "RESUME"
+                  text_font: montserrat_28
             on_press:
               - homeassistant.action:
                   action: button.press
                   data:
                     entity_id: button.${bambu_prefix}_continuar_la_impresion
 
+        # STOP - visible cuando imprimiendo/pausado
         - button:
-            x: 560
+            id: btn_stop
+            x: 450
             y: 200
-            width: 210
-            height: 90
+            width: 320
+            height: 80
             styles: style_btn_red
             widgets:
               - label:
                   align: CENTER
+                  x: -30
                   text: "\U000F04DB"
                   text_font: mdi_48
+              - label:
+                  align: CENTER
+                  x: 35
+                  text: "STOP"
+                  text_font: montserrat_28
+            on_press:
+              - lvgl.page.show: confirm_stop_page
+
+        # LIGHT - visible cuando idle (reemplaza STOP)
+        - button:
+            id: btn_light_home
+            x: 450
+            y: 200
+            width: 320
+            height: 80
+            hidden: true
+            radius: 12
+            bg_color: 0x1E1E1E
+            widgets:
+              - label:
+                  id: icon_light_home
+                  align: CENTER
+                  x: -30
+                  text: "\U000F0336"
+                  text_font: mdi_48
+                  text_color: 0x888888
+              - label:
+                  id: lbl_light_home
+                  align: CENTER
+                  x: 35
+                  text: "LIGHT"
+                  text_font: montserrat_28
+                  text_color: 0x888888
             on_press:
               - homeassistant.action:
-                  action: button.press
+                  action: light.toggle
                   data:
-                    entity_id: button.${bambu_prefix}_detener_la_impresion
+                    entity_id: light.${bambu_prefix}_luz_de_la_carcasa
 
-        # === BOTTOM: Capas | Progreso | Tiempo ===
-        # Barra de progreso
-        - bar:
-            id: progress_bar
-            x: 100
-            y: 320
-            width: 670
-            height: 16
-            min_value: 0
-            max_value: 100
-            value: 0
-            bg_color: 0x333333
-            radius: 8
-            indicator:
-              bg_color: 0x00AE42
-              radius: 8
-
+        # === BOTTOM: Gauge circular de progreso ===
         # Capas (izquierda)
         - label:
-            x: 100
-            y: 360
+            x: 110
+            y: 320
             text: "\U000F0E4B"
             text_font: mdi_32
             text_color: 0x00AE42
 
         - label:
             id: lbl_layers
-            x: 140
-            y: 362
+            x: 150
+            y: 323
             text: "-- / --"
-            text_font: montserrat_28
+            text_font: montserrat_22
             text_color: 0xFFFFFF
 
-        # Progreso (centro)
+        # Gauge circular (centro) - mas compacto
+        - arc:
+            id: progress_arc
+            x: 320
+            y: 300
+            width: 140
+            height: 140
+            min_value: 0
+            max_value: 100
+            value: 0
+            start_angle: 135
+            end_angle: 45
+            rotation: 0
+            adjustable: false
+            arc_color: 0x333333
+            arc_width: 10
+            indicator:
+              arc_color: 0x00AE42
+              arc_width: 10
+            knob:
+              bg_opa: 0%
+
+        # Porcentaje en centro del gauge
         - label:
             id: lbl_progress
-            x: 370
-            y: 355
+            x: 355
+            y: 345
+            width: 70
             text: "0%"
-            text_font: montserrat_48
+            text_font: montserrat_36
             text_color: 0xFFFFFF
+            text_align: CENTER
 
         # Tiempo restante (derecha)
         - label:
-            x: 530
-            y: 360
+            x: 540
+            y: 320
             text: "\U000F0150"
             text_font: mdi_32
             text_color: 0x00AE42
 
         - label:
             id: lbl_remaining
-            x: 570
-            y: 362
+            x: 580
+            y: 323
+            text: "--:--"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+
+        - label:
+            x: 650
+            y: 323
+            text: "rest"
+            text_font: montserrat_18
+            text_color: 0x666666
+
+        # Fin estimado (debajo del gauge, separado)
+        - label:
+            x: 310
+            y: 450
+            text: "Fin estimado"
+            text_font: montserrat_18
+            text_color: 0x666666
+
+        - label:
+            id: lbl_finish_time
+            x: 450
+            y: 447
             text: "--:--"
             text_font: montserrat_28
-            text_color: 0xFFFFFF
+            text_color: 0x00AE42
 
     # ==================== CONTROLS ====================
     - id: controls_page
@@ -1010,314 +1121,368 @@ lvgl:
             text_font: montserrat_28
             text_color: 0x00AE42
 
-        # Part Cooling Fan
+        # ========== COOLING FAN ==========
         - obj:
             x: 100
-            y: 75
+            y: 70
             width: 680
-            height: 120
+            height: 130
             styles: style_card
             scrollbar_mode: "off"
             scrollable: false
             widgets:
-              - label:
+              # Arc gauge
+              - arc:
+                  id: arc_cooling
                   x: 10
-                  y: 15
-                  text: "\U000F0210"
-                  text_font: mdi_48
-                  text_color: 0x00AE42
-
-              - label:
-                  x: 70
                   y: 10
-                  text: "COOLING"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                  width: 110
+                  height: 110
+                  min_value: 0
+                  max_value: 100
+                  value: 0
+                  start_angle: 135
+                  end_angle: 45
+                  rotation: 0
+                  adjustable: false
+                  arc_color: 0x333333
+                  arc_width: 10
+                  indicator:
+                    arc_color: 0x00AE42
+                    arc_width: 10
+                  knob:
+                    bg_opa: 0%
 
+              # Porcentaje en el centro del arc
               - label:
                   id: lbl_cooling_pct
-                  x: 70
+                  x: 35
                   y: 45
                   text: "0%"
-                  text_font: montserrat_36
+                  text_font: montserrat_28
                   text_color: 0xFFFFFF
 
-              - button:
-                  x: 250
-                  y: 20
-                  width: 90
-                  height: 70
-                  styles: style_btn_red
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "OFF"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: fan.turn_off
-                        data:
-                          entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+              # Nombre + Switch
+              - label:
+                  x: 140
+                  y: 15
+                  text: "Cooling"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
 
+              - switch:
+                  id: sw_cooling
+                  x: 280
+                  y: 12
+                  width: 70
+                  height: 35
+                  bg_color: 0x333333
+                  indicator:
+                    bg_color: 0x00AE42
+                  on_value:
+                    then:
+                      - if:
+                          condition:
+                            lambda: return x;
+                          then:
+                            - homeassistant.action:
+                                action: fan.turn_on
+                                data:
+                                  entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+                          else:
+                            - homeassistant.action:
+                                action: fan.turn_off
+                                data:
+                                  entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+
+              # Botones -10 / valor / +10
               - button:
-                  x: 350
-                  y: 20
-                  width: 90
-                  height: 70
+                  x: 390
+                  y: 60
+                  width: 80
+                  height: 55
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "50%"
+                        text: "-10"
                         text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: fan.set_percentage
                         data:
                           entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
-                          percentage: "50"
+                          percentage: !lambda "return std::max(0, (int)id(cooling_fan_speed).state - 10);"
+
+              - label:
+                  id: lbl_cooling_val
+                  x: 490
+                  y: 70
+                  width: 80
+                  text: "0%"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+                  text_align: CENTER
 
               - button:
-                  x: 450
-                  y: 20
-                  width: 90
-                  height: 70
+                  x: 580
+                  y: 60
+                  width: 80
+                  height: 55
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "75%"
+                        text: "+10"
                         text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: fan.set_percentage
                         data:
                           entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
-                          percentage: "75"
+                          percentage: !lambda "return std::min(100, (int)id(cooling_fan_speed).state + 10);"
 
-              - button:
-                  x: 550
-                  y: 20
-                  width: 90
-                  height: 70
-                  styles: style_btn
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "100%"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: fan.set_percentage
-                        data:
-                          entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
-                          percentage: "100"
-
-        # Aux Fan
+        # ========== AUX FAN ==========
         - obj:
             x: 100
             y: 210
             width: 680
-            height: 120
+            height: 130
             styles: style_card
             scrollbar_mode: "off"
             scrollable: false
             widgets:
-              - label:
+              # Arc gauge
+              - arc:
+                  id: arc_aux
                   x: 10
-                  y: 15
-                  text: "\U000F0210"
-                  text_font: mdi_48
-                  text_color: 0x888888
-
-              - label:
-                  x: 70
                   y: 10
-                  text: "AUX"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                  width: 110
+                  height: 110
+                  min_value: 0
+                  max_value: 100
+                  value: 0
+                  start_angle: 135
+                  end_angle: 45
+                  rotation: 0
+                  adjustable: false
+                  arc_color: 0x333333
+                  arc_width: 10
+                  indicator:
+                    arc_color: 0x888888
+                    arc_width: 10
+                  knob:
+                    bg_opa: 0%
 
+              # Porcentaje en el centro del arc
               - label:
                   id: lbl_aux_pct
-                  x: 70
+                  x: 35
                   y: 45
                   text: "0%"
-                  text_font: montserrat_36
+                  text_font: montserrat_28
                   text_color: 0xFFFFFF
 
-              - button:
-                  x: 250
-                  y: 20
-                  width: 90
-                  height: 70
-                  styles: style_btn_red
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "OFF"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: fan.turn_off
-                        data:
-                          entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+              # Nombre + Switch
+              - label:
+                  x: 140
+                  y: 15
+                  text: "Aux"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
 
+              - switch:
+                  id: sw_aux
+                  x: 280
+                  y: 12
+                  width: 70
+                  height: 35
+                  bg_color: 0x333333
+                  indicator:
+                    bg_color: 0x00AE42
+                  on_value:
+                    then:
+                      - if:
+                          condition:
+                            lambda: return x;
+                          then:
+                            - homeassistant.action:
+                                action: fan.turn_on
+                                data:
+                                  entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+                          else:
+                            - homeassistant.action:
+                                action: fan.turn_off
+                                data:
+                                  entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+
+              # Botones -10 / valor / +10
               - button:
-                  x: 350
-                  y: 20
-                  width: 90
-                  height: 70
+                  x: 390
+                  y: 60
+                  width: 80
+                  height: 55
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "50%"
+                        text: "-10"
                         text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: fan.set_percentage
                         data:
                           entity_id: fan.${bambu_prefix}_ventilador_auxiliar
-                          percentage: "50"
+                          percentage: !lambda "return std::max(0, (int)id(aux_fan_speed).state - 10);"
+
+              - label:
+                  id: lbl_aux_val
+                  x: 490
+                  y: 70
+                  width: 80
+                  text: "0%"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+                  text_align: CENTER
 
               - button:
-                  x: 450
-                  y: 20
-                  width: 90
-                  height: 70
+                  x: 580
+                  y: 60
+                  width: 80
+                  height: 55
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "75%"
+                        text: "+10"
                         text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: fan.set_percentage
                         data:
                           entity_id: fan.${bambu_prefix}_ventilador_auxiliar
-                          percentage: "75"
+                          percentage: !lambda "return std::min(100, (int)id(aux_fan_speed).state + 10);"
 
-              - button:
-                  x: 550
-                  y: 20
-                  width: 90
-                  height: 70
-                  styles: style_btn
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "100%"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: fan.set_percentage
-                        data:
-                          entity_id: fan.${bambu_prefix}_ventilador_auxiliar
-                          percentage: "100"
-
-        # Chamber Fan
+        # ========== CHAMBER FAN ==========
         - obj:
             x: 100
-            y: 345
+            y: 350
             width: 680
-            height: 120
+            height: 130
             styles: style_card
             scrollbar_mode: "off"
             scrollable: false
             widgets:
-              - label:
+              # Arc gauge
+              - arc:
+                  id: arc_chamber
                   x: 10
-                  y: 15
-                  text: "\U000F0210"
-                  text_font: mdi_48
-                  text_color: 0x888888
-
-              - label:
-                  x: 70
                   y: 10
-                  text: "CHAMBER"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                  width: 110
+                  height: 110
+                  min_value: 0
+                  max_value: 100
+                  value: 0
+                  start_angle: 135
+                  end_angle: 45
+                  rotation: 0
+                  adjustable: false
+                  arc_color: 0x333333
+                  arc_width: 10
+                  indicator:
+                    arc_color: 0x888888
+                    arc_width: 10
+                  knob:
+                    bg_opa: 0%
 
+              # Porcentaje en el centro del arc
               - label:
                   id: lbl_chamber_pct
-                  x: 70
+                  x: 35
                   y: 45
                   text: "0%"
-                  text_font: montserrat_36
+                  text_font: montserrat_28
                   text_color: 0xFFFFFF
 
-              - button:
-                  x: 250
-                  y: 20
-                  width: 90
-                  height: 70
-                  styles: style_btn_red
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "OFF"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: fan.turn_off
-                        data:
-                          entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+              # Nombre + Switch
+              - label:
+                  x: 140
+                  y: 15
+                  text: "Chamber"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
 
+              - switch:
+                  id: sw_chamber
+                  x: 280
+                  y: 12
+                  width: 70
+                  height: 35
+                  bg_color: 0x333333
+                  indicator:
+                    bg_color: 0x00AE42
+                  on_value:
+                    then:
+                      - if:
+                          condition:
+                            lambda: return x;
+                          then:
+                            - homeassistant.action:
+                                action: fan.turn_on
+                                data:
+                                  entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+                          else:
+                            - homeassistant.action:
+                                action: fan.turn_off
+                                data:
+                                  entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+
+              # Botones -10 / valor / +10
               - button:
-                  x: 350
-                  y: 20
-                  width: 90
-                  height: 70
+                  x: 390
+                  y: 60
+                  width: 80
+                  height: 55
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "50%"
+                        text: "-10"
                         text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: fan.set_percentage
                         data:
                           entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
-                          percentage: "50"
+                          percentage: !lambda "return std::max(0, (int)id(chamber_fan_speed).state - 10);"
+
+              - label:
+                  id: lbl_chamber_val
+                  x: 490
+                  y: 70
+                  width: 80
+                  text: "0%"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+                  text_align: CENTER
 
               - button:
-                  x: 450
-                  y: 20
-                  width: 90
-                  height: 70
+                  x: 580
+                  y: 60
+                  width: 80
+                  height: 55
                   styles: style_btn_dark
                   widgets:
                     - label:
                         align: CENTER
-                        text: "75%"
+                        text: "+10"
                         text_font: montserrat_22
                   on_press:
                     - homeassistant.action:
                         action: fan.set_percentage
                         data:
                           entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
-                          percentage: "75"
-
-              - button:
-                  x: 550
-                  y: 20
-                  width: 90
-                  height: 70
-                  styles: style_btn
-                  widgets:
-                    - label:
-                        align: CENTER
-                        text: "100%"
-                        text_font: montserrat_22
-                  on_press:
-                    - homeassistant.action:
-                        action: fan.set_percentage
-                        data:
-                          entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
-                          percentage: "100"
+                          percentage: !lambda "return std::min(100, (int)id(chamber_fan_speed).state + 10);"
 
     # ==================== MOTION MENU ====================
     - id: motion_page
@@ -1953,135 +2118,427 @@ lvgl:
                     device_id: ${bambu_device_id}
                     command: "M104 S220\nM109 S220\nM83\nG1 E18 F200\nG1 E2 F20\nG1 E50 F300\nM82"
 
+    # ==================== CONFIRM PAUSE ====================
+    - id: confirm_pause_page
+      bg_color: 0x121212
+      widgets:
+        - obj:
+            align: CENTER
+            width: 500
+            height: 280
+            styles: style_card
+            scrollbar_mode: "off"
+            scrollable: false
+            widgets:
+              - label:
+                  align: TOP_MID
+                  y: 20
+                  text: "\U000F03E4"
+                  text_font: mdi_48
+                  text_color: 0xFFAA00
+
+              - label:
+                  align: TOP_MID
+                  y: 80
+                  text: "Pausar impresion?"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+
+              - label:
+                  align: TOP_MID
+                  y: 120
+                  text: "La impresion se detendra temporalmente"
+                  text_font: montserrat_18
+                  text_color: 0x888888
+
+              - button:
+                  x: 30
+                  y: 170
+                  width: 200
+                  height: 70
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "CANCELAR"
+                        text_font: montserrat_22
+                  on_press:
+                    - lvgl.page.show: main_page
+
+              - button:
+                  x: 250
+                  y: 170
+                  width: 200
+                  height: 70
+                  styles: style_btn
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "PAUSAR"
+                        text_font: montserrat_22
+                  on_press:
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.${bambu_prefix}_pausar_la_impresion
+                    - lvgl.page.show: main_page
+
+    # ==================== CONFIRM STOP ====================
+    - id: confirm_stop_page
+      bg_color: 0x121212
+      widgets:
+        - obj:
+            align: CENTER
+            width: 500
+            height: 300
+            styles: style_card
+            scrollbar_mode: "off"
+            scrollable: false
+            widgets:
+              - label:
+                  align: TOP_MID
+                  y: 20
+                  text: "\U000F04DB"
+                  text_font: mdi_48
+                  text_color: 0xFF4444
+
+              - label:
+                  align: TOP_MID
+                  y: 80
+                  text: "Detener impresion?"
+                  text_font: montserrat_28
+                  text_color: 0xFFFFFF
+
+              - label:
+                  align: TOP_MID
+                  y: 120
+                  text: "Esta accion no se puede deshacer"
+                  text_font: montserrat_18
+                  text_color: 0xFF6666
+
+              - label:
+                  align: TOP_MID
+                  y: 145
+                  text: "Se perdera el progreso actual"
+                  text_font: montserrat_18
+                  text_color: 0x888888
+
+              - button:
+                  x: 30
+                  y: 190
+                  width: 200
+                  height: 70
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "CANCELAR"
+                        text_font: montserrat_22
+                  on_press:
+                    - lvgl.page.show: main_page
+
+              - button:
+                  x: 250
+                  y: 190
+                  width: 200
+                  height: 70
+                  styles: style_btn_red
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "DETENER"
+                        text_font: montserrat_22
+                  on_press:
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.${bambu_prefix}_detener_la_impresion
+                    - lvgl.page.show: main_page
+
     # ==================== INFO ====================
     - id: info_page
       bg_color: 0x121212
       widgets:
         - label:
-            x: 80
+            x: 100
             y: 15
             text: "Info"
             text_font: montserrat_28
             text_color: 0x00AE42
 
+        # Contenedor scrollable
         - obj:
-            x: 80
-            y: 60
-            width: 700
-            height: 400
-            styles: style_card
+            x: 100
+            y: 55
+            width: 680
+            height: 410
+            bg_color: 0x121212
+            border_width: 0
+            pad_all: 0
+            scrollbar_mode: "auto"
             widgets:
-              # WiFi
-              - label:
-                  x: 20
-                  y: 20
-                  text: "\U000F05A9"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
+              # === IMPRESORA ===
+              - obj:
+                  x: 0
+                  y: 0
+                  width: 660
+                  height: 200
+                  styles: style_card
+                  scrollbar_mode: "off"
+                  scrollable: false
+                  widgets:
+                    - label:
+                        x: 15
+                        y: 8
+                        text: "IMPRESORA"
+                        text_font: montserrat_22
+                        text_color: 0x888888
 
-              - label:
-                  x: 70
-                  y: 25
-                  text: "WiFi Signal"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                    # Online status
+                    - label:
+                        id: lbl_online_icon
+                        x: 15
+                        y: 45
+                        text: "\U000F05E0"
+                        text_font: mdi_32
+                        text_color: 0x00AE42
+                    - label:
+                        x: 55
+                        y: 50
+                        text: "Estado"
+                        text_font: montserrat_22
+                        text_color: 0xAAAAAA
+                    - label:
+                        id: lbl_online_status
+                        x: 180
+                        y: 50
+                        text: "---"
+                        text_font: montserrat_22
+                        text_color: 0xFFFFFF
 
-              - label:
-                  id: lbl_wifi_signal
-                  x: 300
-                  y: 25
-                  text: "-- dBm"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                    # Print error
+                    - label:
+                        id: lbl_print_error_icon
+                        x: 340
+                        y: 45
+                        text: "\U000F0028"
+                        text_font: mdi_32
+                        text_color: 0x00AE42
+                    - label:
+                        x: 380
+                        y: 50
+                        text: "Error"
+                        text_font: montserrat_22
+                        text_color: 0xAAAAAA
+                    - label:
+                        id: lbl_print_error
+                        x: 500
+                        y: 50
+                        text: "OK"
+                        text_font: montserrat_22
+                        text_color: 0x00AE42
 
-              # IP
-              - label:
-                  x: 20
-                  y: 80
-                  text: "\U000F05A9"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
+                    # HMS errors
+                    - label:
+                        id: lbl_hms_icon
+                        x: 15
+                        y: 90
+                        text: "\U000F0028"
+                        text_font: mdi_32
+                        text_color: 0x00AE42
+                    - label:
+                        x: 55
+                        y: 95
+                        text: "HMS"
+                        text_font: montserrat_22
+                        text_color: 0xAAAAAA
+                    - label:
+                        id: lbl_hms_status
+                        x: 180
+                        y: 95
+                        width: 460
+                        text: "OK"
+                        text_font: montserrat_22
+                        text_color: 0x00AE42
+                        long_mode: DOT
 
-              - label:
-                  x: 70
-                  y: 85
-                  text: "IP Address"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                    # SD Card
+                    - label:
+                        id: lbl_sd_icon
+                        x: 15
+                        y: 135
+                        text: "\U000F07F3"
+                        text_font: mdi_32
+                        text_color: 0x00AE42
+                    - label:
+                        x: 55
+                        y: 140
+                        text: "SD Card"
+                        text_font: montserrat_22
+                        text_color: 0xAAAAAA
+                    - label:
+                        id: lbl_sd_status
+                        x: 180
+                        y: 140
+                        text: "---"
+                        text_font: montserrat_22
+                        text_color: 0xFFFFFF
 
-              - label:
-                  id: lbl_ip
-                  x: 300
-                  y: 85
-                  text: "---.---.---.---"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+              # === SISTEMA ===
+              - obj:
+                  x: 0
+                  y: 215
+                  width: 660
+                  height: 200
+                  styles: style_card
+                  scrollbar_mode: "off"
+                  scrollable: false
+                  widgets:
+                    - label:
+                        x: 15
+                        y: 8
+                        text: "SISTEMA"
+                        text_font: montserrat_22
+                        text_color: 0x888888
 
-              # Uptime
-              - label:
-                  x: 20
-                  y: 140
-                  text: "\U000F0150"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
+                    # WiFi
+                    - label:
+                        x: 15
+                        y: 45
+                        text: "\U000F05A9"
+                        text_font: mdi_32
+                        text_color: 0x00AE42
+                    - label:
+                        x: 55
+                        y: 50
+                        text: "WiFi"
+                        text_font: montserrat_22
+                        text_color: 0xAAAAAA
+                    - label:
+                        id: lbl_wifi_signal
+                        x: 180
+                        y: 50
+                        text: "-- dBm"
+                        text_font: montserrat_22
+                        text_color: 0xFFFFFF
 
-              - label:
-                  x: 70
-                  y: 145
-                  text: "Uptime"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                    # IP
+                    - label:
+                        x: 340
+                        y: 45
+                        text: "\U000F0A60"
+                        text_font: mdi_32
+                        text_color: 0x00AE42
+                    - label:
+                        x: 380
+                        y: 50
+                        text: "IP"
+                        text_font: montserrat_22
+                        text_color: 0xAAAAAA
+                    - label:
+                        id: lbl_ip
+                        x: 420
+                        y: 50
+                        text: "---.---.---.---"
+                        text_font: montserrat_22
+                        text_color: 0xFFFFFF
 
-              - label:
-                  id: lbl_uptime
-                  x: 300
-                  y: 145
-                  text: "--"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                    # Uptime
+                    - label:
+                        x: 15
+                        y: 90
+                        text: "\U000F0150"
+                        text_font: mdi_32
+                        text_color: 0x00AE42
+                    - label:
+                        x: 55
+                        y: 95
+                        text: "Uptime"
+                        text_font: montserrat_22
+                        text_color: 0xAAAAAA
+                    - label:
+                        id: lbl_uptime
+                        x: 180
+                        y: 95
+                        text: "--"
+                        text_font: montserrat_22
+                        text_color: 0xFFFFFF
 
-              # Printer Online
-              - label:
-                  id: lbl_online_icon
-                  x: 20
-                  y: 200
-                  text: "\U000F05E0"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
+                    # Version
+                    - label:
+                        x: 15
+                        y: 135
+                        text: "\U000F02FC"
+                        text_font: mdi_32
+                        text_color: 0x00AE42
+                    - label:
+                        x: 55
+                        y: 140
+                        text: "Version"
+                        text_font: montserrat_22
+                        text_color: 0xAAAAAA
+                    - label:
+                        x: 180
+                        y: 140
+                        text: "ESPHome 2025.x"
+                        text_font: montserrat_22
+                        text_color: 0xFFFFFF
 
-              - label:
-                  x: 70
-                  y: 205
-                  text: "Printer"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+              # === ACCIONES ===
+              - obj:
+                  x: 0
+                  y: 430
+                  width: 660
+                  height: 80
+                  styles: style_card
+                  scrollbar_mode: "off"
+                  scrollable: false
+                  widgets:
+                    # Reiniciar ESP
+                    - button:
+                        x: 15
+                        y: 12
+                        width: 300
+                        height: 55
+                        styles: style_btn_dark
+                        widgets:
+                          - label:
+                              align: CENTER
+                              text: "REINICIAR"
+                              text_font: montserrat_22
+                        on_press:
+                          - button.press: restart_btn
 
-              - label:
-                  id: lbl_online_status
-                  x: 300
-                  y: 205
-                  text: "---"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+                    # Placeholder
+                    - button:
+                        x: 335
+                        y: 12
+                        width: 300
+                        height: 55
+                        styles: style_btn_dark
+                        widgets:
+                          - label:
+                              align: CENTER
+                              text: "INFO"
+                              text_font: montserrat_22
+                              text_color: 0x888888
 
-              # Version
-              - label:
-                  x: 20
-                  y: 260
-                  text: "\U000F02FC"
-                  text_font: mdi_32
-                  text_color: 0x00AE42
+    # ==================== SCREENSAVER ====================
+    - id: screensaver_page
+      bg_color: 0x000000
+      widgets:
+        # Reloj grande centrado
+        - label:
+            id: lbl_screensaver_clock
+            align: CENTER
+            text: "--:--"
+            text_font: montserrat_48
+            text_color: 0x00AE42
 
-              - label:
-                  x: 70
-                  y: 265
-                  text: "Version"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
-
-              - label:
-                  x: 300
-                  y: 265
-                  text: "ESPHome 2025.x"
-                  text_font: montserrat_22
-                  text_color: 0xFFFFFF
+        # Toca para salir
+        - label:
+            align: BOTTOM_MID
+            y: -30
+            text: "Toca para despertar"
+            text_font: montserrat_18
+            text_color: 0x333333

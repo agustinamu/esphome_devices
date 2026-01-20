@@ -4,7 +4,8 @@
 packages:
   base: !include ../common/guition-jc8048w550-base.yaml
 
-# Globals para auto-dim
+
+# Globals para auto-dim y screensaver
 globals:
   - id: last_touch_time
     type: unsigned long
@@ -12,8 +13,18 @@ globals:
   - id: screen_dimmed
     type: bool
     initial_value: 'false'
+  - id: screensaver_active
+    type: bool
+    initial_value: 'false'
 
-# Touch con callback para restaurar brillo
+# Botón de reinicio interno
+button:
+  - platform: restart
+    id: restart_btn
+    name: "Restart"
+    internal: true
+
+# Touch con callback para restaurar brillo y salir de screensaver
 touchscreen:
   - platform: gt911
     id: my_touch
@@ -24,3 +35,9 @@ touchscreen:
             id(screen_dimmed) = false;
             id(backlight).turn_on().set_brightness(1.0).perform();
           }
+      - if:
+          condition:
+            lambda: return id(screensaver_active);
+          then:
+            - lambda: id(screensaver_active) = false;
+            - lvgl.page.show: main_page

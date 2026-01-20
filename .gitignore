@@ -1,6 +1,10 @@
 # Secretos - nunca subir al repo
 secrets.yaml
 
+# Certificados y scripts con datos personales
+*.pem
+mqtt_connect.sh
+
 # Archivos generados por ESPHome
 .esphome/
 
