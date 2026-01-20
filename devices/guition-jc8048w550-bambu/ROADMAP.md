@@ -5,15 +5,16 @@
 | Pagina | Funcionalidad | Estado |
 |--------|--------------|--------|
 | **Home** | Temperaturas nozzle/bed | OK |
-| | **Indicador calentando** (iconos parpadean) | OK |
+| | Indicador calentando (iconos parpadean) | OK |
 | | Ventiladores (lectura) | OK |
-| | **Gauge circular progreso** | OK |
+| | Gauge circular progreso | OK |
 | | Capas actual/total | OK |
 | | Tiempo restante | OK |
-| | **Nombre del archivo** | OK |
-| | **Hora estimada de fin** | OK |
+| | Nombre del archivo | OK |
+| | Hora estimada de fin | OK |
 | | Pause/Resume/Stop con confirmacion | OK |
-| | **Boton LIGHT cuando idle** | OK |
+| | Boton LIGHT cuando idle | OK |
+| | **Limpieza cuando idle** (oculta elementos) | OK |
 | **Controls** | Ajuste temp nozzle +/-5/+/-10 | OK |
 | | Ajuste temp bed +/-5/+/-10 | OK |
 | | Presets (PLA/PETG/ABS/Enfriar) | OK |
@@ -30,10 +31,13 @@
 | | Errores HMS/Print | OK |
 | | Estado SD Card | OK |
 | | Boton reiniciar | OK |
-| **Sidebar** | **Indicador error parpadeante** | OK |
+| | **Toggle pantalla siempre encendida** | OK |
+| **Sidebar** | Indicador error parpadeante | OK |
 | **Sistema** | Auto-dim 60s | OK |
 | | Touch wake | OK |
-| | **Screensaver 5min** | OK |
+| | Screensaver 5min | OK |
+| | **Modo siempre encendida** (runtime) | OK |
+| **Codigo** | **Refactor UI en archivos modulares** | OK |
 
 ---
 
@@ -120,6 +124,14 @@
 15. ~~**Boton luz en Home**~~ ✅ COMPLETADO
     - LIGHT reemplaza STOP cuando idle
     - Toggle con feedback visual
+
+16. ~~**Modo pantalla siempre encendida**~~ ✅ COMPLETADO
+    - Toggle en pagina Info
+    - Desactiva auto-dim y screensaver en runtime
+
+17. ~~**Home limpio cuando idle**~~ ✅ COMPLETADO
+    - Oculta filename, fans, progreso cuando no imprime
+    - UI mas limpia en estado idle/offline
 
 ---
 
@@ -312,6 +324,16 @@ on_press:
 ---
 
 ## Historial de Cambios
+
+### 2026-01-20 (sesion 3)
+- **Refactor UI modular**: lvgl.yaml dividido en archivos individuales
+  - `styles.yaml` - Estilos reutilizables
+  - `top_layer.yaml` - Sidebar y touch blocker
+  - `pages/*.yaml` - 12 archivos de paginas individuales
+- **Toggle "Pantalla siempre encendida"** en pagina Info
+  - Desactiva auto-dim y screensaver en runtime
+- **Home limpio cuando idle**: oculta filename, fans, progreso cuando no imprime
+- Documentacion completa actualizada
 
 ### 2026-01-20 (sesion 2)
 - Nombre del archivo en Home page

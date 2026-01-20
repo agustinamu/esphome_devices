@@ -23,17 +23,18 @@ interval:
                 id: touch_blocker
                 hidden: true
 
-      # Auto-dim despues de 60s
+      # Auto-dim despues de 60s (si no esta en modo "siempre encendida")
       - lambda: |-
-          if (!id(screen_dimmed) && (millis() - id(last_touch_time) > 60000)) {
+          if (!id(screen_always_on) && !id(screen_dimmed) && (millis() - id(last_touch_time) > 60000)) {
             id(screen_dimmed) = true;
             id(backlight).turn_on().set_brightness(0.15).perform();
           }
 
-      # Screensaver despues de 5 minutos (300s) - SOLO si no esta imprimiendo
+      # Screensaver despues de 5 minutos (300s) - SOLO si no esta imprimiendo y no esta "siempre encendida"
       - if:
           condition:
             lambda: |-
+              if (id(screen_always_on)) return false;
               if (id(screensaver_active)) return false;
               if (millis() - id(last_touch_time) < 300000) return false;
               // No activar screensaver si esta imprimiendo o pausado
@@ -491,3 +492,34 @@ interval:
             if (!has_error) return true;
             // Parpadeo: alterna cada segundo basado en el tiempo
             return (millis() / 500) % 2 == 0;
+
+      # === HOME: Ocultar secciones cuando idle/offline ===
+      # Filename row: ocultar cuando idle o offline
+      - lvgl.widget.update:
+          id: home_filename_row
+          hidden: !lambda |-
+            std::string status = id(printer_status).state;
+            return (status == "idle" || status == "Inactivo" ||
+                    status == "offline" || status == "Desconectado" ||
+                    status == "finish" || status == "Finalizado" ||
+                    status.empty());
+
+      # Fans row: ocultar cuando idle o offline
+      - lvgl.widget.update:
+          id: home_fans_row
+          hidden: !lambda |-
+            std::string status = id(printer_status).state;
+            return (status == "idle" || status == "Inactivo" ||
+                    status == "offline" || status == "Desconectado" ||
+                    status == "finish" || status == "Finalizado" ||
+                    status.empty());
+
+      # Progress section: ocultar cuando idle o offline
+      - lvgl.widget.update:
+          id: home_progress_section
+          hidden: !lambda |-
+            std::string status = id(printer_status).state;
+            return (status == "idle" || status == "Inactivo" ||
+                    status == "offline" || status == "Desconectado" ||
+                    status == "finish" || status == "Finalizado" ||
+                    status.empty());

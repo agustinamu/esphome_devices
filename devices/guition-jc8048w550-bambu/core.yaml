@@ -19,6 +19,9 @@ globals:
   - id: touch_wake_time
     type: unsigned long
     initial_value: '0'
+  - id: screen_always_on
+    type: bool
+    initial_value: 'false'
 
 # Botón de reinicio interno
 button:

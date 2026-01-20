@@ -1,180 +1,192 @@
 # Guition JC8048W550 - Panel Bambu Lab
 
-Dashboard táctil para impresoras Bambu Lab P1S/X1C.
+Dashboard táctil para impresoras Bambu Lab P1S/X1C con pantalla de 5 pulgadas.
 
-## Funcionalidades
+## Características
 
-- **Home**: Progreso, temperaturas, ventiladores, pause/resume/stop
-- **Controls**: Ajuste temperaturas, presets materiales, luz, ventiladores
-- **Motion**: Control manual XYZ, homing
-- **Filament**: Purge zone, extruir/retraer, load/unload, cortar
-- **Info**: WiFi, IP, uptime, estado
+### Página Home
+- **Progreso de impresión** con gauge circular
+- **Temperaturas** de nozzle y bed con indicador de calentamiento (parpadeo naranja)
+- **Nombre del archivo** imprimiéndose
+- **Tiempo restante** y hora estimada de finalización
+- **Capas** actual/total
+- **Ventiladores** (cooling, aux, chamber) - lectura
+- **Botones** Pause/Resume/Stop con confirmación
+- **Botón LIGHT** (reemplaza Stop cuando idle)
+- **Limpieza automática** - oculta elementos cuando no está imprimiendo
+
+### Página Controls
+- Ajuste de temperatura **nozzle** (+/-5, +/-10)
+- Ajuste de temperatura **bed** (+/-5, +/-10)
+- **Presets** de materiales: PLA, PETG, ABS, Enfriar
+- Toggle **luz de carcasa**
+- Acceso a página **Fans**
+
+### Página Fans
+- Control individual de 3 ventiladores:
+  - Part Cooling Fan
+  - Auxiliary Fan
+  - Chamber Fan
+- **Arco visual** de velocidad por ventilador
+- Toggle **on/off**
+- Botones **+/-10%**
+
+### Página Motion
+- Control **XY** del cabezal (+/-1mm, +/-10mm, Home)
+- Control **Z** de la cama (posiciones absolutas: 250, 150, 50mm, Home)
+- *Página Filament desactivada temporalmente*
+
+### Página Info
+- **Estado** de conexión de la impresora
+- **Errores** HMS y de impresión
+- **SD Card** - estado
+- **WiFi** - señal en dBm
+- **IP** del dispositivo
+- **Uptime** del ESP
+- Botón **Reiniciar** ESP
+- Toggle **Pantalla siempre encendida**
+
+### Sistema
+- **Auto-dim** - brillo al 15% tras 60s sin tocar
+- **Screensaver** - pantalla con reloj tras 5min de inactividad
+- **Touch wake** - protección contra toques accidentales al despertar
+- **Indicador de error** - icono parpadea en sidebar cuando hay error
+- **Modo siempre encendida** - desactiva auto-dim y screensaver
 
 ## Requisitos
 
-1. [ha-bambulab](https://github.com/greghesp/ha-bambulab) instalado en HACS
-2. Impresora Bambu Lab conectada a Home Assistant
+1. **Hardware**: Guition JC8048W550 (ESP32-S3 + Display 5" 800x480)
+2. **Home Assistant** con ESPHome Add-on
+3. **[ha-bambulab](https://github.com/greghesp/ha-bambulab)** instalado via HACS
+4. Impresora Bambu Lab P1S o X1C conectada a Home Assistant
 
 ## Configuración
 
+### 1. Obtener datos de la impresora
+
+En Home Assistant:
+1. Ve a **Configuración** → **Dispositivos y servicios** → **Bambu Lab**
+2. Click en el dispositivo de tu impresora
+3. Anota:
+   - **Device ID**: visible en la URL o info del dispositivo
+   - **Prefijo de entidades**: busca cualquier sensor y toma la parte después de `sensor.` y antes del nombre (ej: `p1s_01p00c581002790`)
+
+### 2. Crear dispositivo en ESPHome
+
+1. Abre ESPHome en Home Assistant
+2. Click **+ NEW DEVICE** → **Continue** → nombre → **Skip this step**
+3. Pega el siguiente contenido:
+
 ```yaml
-# esphome.yaml en Home Assistant
 substitutions:
-  bambu_device_id: "TU_DEVICE_ID"      # Configuración > Dispositivos > Bambu
-  bambu_prefix: "p1s_01p00c581002790"  # Prefijo de entidades
+  device_name: "guition-bambu"
+  friendly_name: "Panel Bambu"
+  bambu_device_id: "TU_DEVICE_ID"           # Del paso 1
+  bambu_prefix: "p1s_01p00c581002790"       # Del paso 1
+
+packages:
+  remote:
+    url: https://github.com/agustinamu/esphome_devices
+    ref: develop
+    files: [devices/guition-jc8048w550-bambu/package.yaml]
+    refresh: 1h
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+  encryption:
+    key: !secret api_key
 ```
 
-## Estructura
+4. Configura tus secretos en ESPHome:
+```yaml
+wifi_ssid: "TuRedWiFi"
+wifi_password: "TuPassword"
+api_key: "GeneraUnaClaveAleatoria"  # ESPHome puede generarla
+```
+
+5. Click **INSTALL** → **Plug into this computer** (primera vez)
+
+## Estructura de Archivos
 
 ```
 guition-jc8048w550-bambu/
-├── esphome.yaml      # Config HA + substitutions
-├── package.yaml      # Orquestador
-├── core.yaml         # Hardware + auto-dim
-├── sensors.yaml      # Entidades Bambu
-├── ui.yaml           # Orquestador UI
+├── esphome.yaml          # Ejemplo de config para HA
+├── package.yaml          # Orquestador principal
+├── core.yaml             # Hardware + auto-dim + touch wake
+├── sensors.yaml          # Sensores de Home Assistant (Bambu)
+├── ui.yaml               # Orquestador de UI
+├── test.yaml             # Para validación local
 └── ui/
-    ├── fonts.yaml    # Montserrat + MDI
-    ├── lvgl.yaml     # Estilos + páginas
-    └── intervals.yaml # Actualizaciones
+    ├── fonts.yaml        # Montserrat + Material Design Icons
+    ├── styles.yaml       # Estilos reutilizables (cards, buttons)
+    ├── top_layer.yaml    # Sidebar + touch blocker
+    ├── lvgl.yaml         # Orquestador LVGL
+    ├── intervals.yaml    # Actualizaciones periódicas
+    └── pages/
+        ├── home.yaml           # Página principal
+        ├── controls.yaml       # Control de temperaturas
+        ├── presets.yaml        # Presets de materiales
+        ├── fans.yaml           # Control de ventiladores
+        ├── motion.yaml         # Menú de movimiento
+        ├── motion_xy.yaml      # Control XY
+        ├── motion_z.yaml       # Control Z
+        ├── filament.yaml       # Gestión de filamento (WIP)
+        ├── confirm_pause.yaml  # Diálogo confirmación pause
+        ├── confirm_stop.yaml   # Diálogo confirmación stop
+        ├── info.yaml           # Info del sistema
+        └── screensaver.yaml    # Screensaver con reloj
 ```
 
-## Operaciones de Filamento
+## Solución de Problemas
 
-### Coordenadas del Cortador P1S
+### La impresora no aparece en Home Assistant
+- Verifica que ha-bambulab esté instalado y configurado
+- La impresora debe estar en modo LAN y conectada a la misma red
 
-El cortador de filamento está ubicado fuera del área de impresión:
+### Las temperaturas no se actualizan
+- Verifica el `bambu_prefix` en substitutions
+- Comprueba que los sensores existen en Home Assistant
 
-| Posición | Coordenadas |
-|----------|-------------|
-| Aproximación | X20 Y50 |
-| Cortador | X20 Y-3 |
-| Zona purga | X5 Y5 Z50 |
+### Error "Permitir acciones de Home Assistant"
+- En ESPHome, habilita la opción en la configuración del dispositivo
+- O añade `allow_other_uses: true` en la sección `api:`
 
-### Secuencias G-code
+### La pantalla parpadea durante OTA
+- Es normal. El display muestra artefactos durante la actualización OTA
 
-#### UNLOAD (Descargar filamento)
-```gcode
-M104 S240          ; Calentar nozzle
-M109 S240          ; Esperar temperatura
-M83                ; Extrusión relativa
-G1 E-20 F200       ; Retracción inicial
-G28 X Y            ; Home XY
-G1 X20 Y50 F20000  ; Aproximar al cortador
-G1 Y-3 F3000       ; Enganchar cortador
-G4 P500            ; Pausa 0.5s
-G1 E-80 F1500      ; Retracción completa
-M82                ; Extrusión absoluta
-G28 X Y            ; Home XY
-M104 S0            ; Apagar nozzle
-```
+## Referencia Técnica
 
-#### LOAD (Cargar filamento)
-```gcode
-M104 S220          ; Calentar nozzle (PLA)
-M109 S220          ; Esperar temperatura
-M83                ; Extrusión relativa
-G1 E18 F200        ; Extruir lento
-G1 E2 F20          ; Extruir muy lento (prime)
-G1 E50 F300        ; Extruir rápido
-M82                ; Extrusión absoluta
-```
+### Entidades Principales
 
-#### CUT (Cortar filamento)
-```gcode
-G28 X Y            ; Home XY
-G1 X20 Y50 F20000  ; Aproximar al cortador
-G1 Y-3 F3000       ; Enganchar cortador
-G4 P500            ; Pausa 0.5s
-G28 X Y            ; Home XY
-```
+| Función | Entity ID |
+|---------|-----------|
+| Temperatura nozzle | `sensor.${bambu_prefix}_temperatura_de_la_boquilla` |
+| Temperatura bed | `sensor.${bambu_prefix}_temperatura_de_la_cama` |
+| Progreso | `sensor.${bambu_prefix}_progreso_de_la_impresion` |
+| Tiempo restante | `sensor.${bambu_prefix}_tiempo_restante` |
+| Estado | `sensor.${bambu_prefix}_estado_actual` |
+| Luz | `light.${bambu_prefix}_luz_de_la_carcasa` |
+| Cooling fan | `fan.${bambu_prefix}_ventilador_de_enfriamiento` |
+| Aux fan | `fan.${bambu_prefix}_ventilador_auxiliar` |
+| Chamber fan | `fan.${bambu_prefix}_ventilador_de_la_carcasa` |
 
-### Secuencia de Purga
-```gcode
-G1 X60 Y265 F12000  ; Ir a zona de residuos
-M109 S[temp]        ; Esperar temperatura
-G92 E0              ; Reset extrusor
-G1 E20 F200         ; Purgar 20mm
-G1 E10 F200         ; Purgar 10mm más
-M106 P1 S255        ; Fan para enfriar
-G1 E5 F300          ; Purgar 5mm
-G1 E-1.0 F300       ; Retracción anti-ooze
-; Movimientos de limpieza X65-X165
-```
-
-### Notas
-
-- El cortador requiere el nozzle caliente (>180°C) para funcionar
-- Las coordenadas Y negativas están fuera del área de impresión
-- Zona de residuos/calentamiento: X60-X70 Y265
-- Fuentes:
-  - [BambuStudio Issues](https://github.com/bambulab/BambuStudio/issues/271)
-  - [Community gcode gist](https://gist.github.com/codeincontext/4efc5820e7fd4167b231dffcc4d9ccd6)
-  - [BBL P1S organized start/end gcode](https://forum.bambulab.com/t/bbl-p1s-organized-start-and-end-gcode/38795/7)
-
-## Entidades de Ventiladores
-
-La integración ha-bambulab expone los ventiladores como entidades `fan.*`:
-
-| Ventilador | Entity ID | M-code directo |
-|------------|-----------|----------------|
-| Part Cooling | `fan.{prefix}_ventilador_de_enfriamiento` | `M106 P1 S0-255` |
-| Auxiliar | `fan.{prefix}_ventilador_auxiliar` | `M106 P2 S0-255` |
-| Carcasa/Chamber | `fan.{prefix}_ventilador_de_la_carcasa` | `M106 P3 S0-255` |
-
-Control mediante `fan.set_percentage` con valores 0-100.
-
-## M-codes Útiles P1S
+### M-codes Útiles
 
 | Comando | Descripción |
 |---------|-------------|
-| `M104 Sxxx` | Setear temp nozzle (no espera) |
-| `M109 Sxxx` | Setear temp nozzle (espera) |
-| `M140 Sxxx` | Setear temp cama (no espera) |
-| `M190 Sxxx` | Setear temp cama (espera) |
-| `M106 P1 Sxxx` | Part cooling fan (0-255) |
+| `M104 Sxxx` | Temp nozzle (no espera) |
+| `M109 Sxxx` | Temp nozzle (espera) |
+| `M140 Sxxx` | Temp cama (no espera) |
+| `M190 Sxxx` | Temp cama (espera) |
+| `M106 P1 Sxxx` | Part cooling (0-255) |
 | `M106 P2 Sxxx` | AUX fan (0-255) |
 | `M106 P3 Sxxx` | Chamber fan (0-255) |
-| `M412 S1` | Activar detección filamento |
-| `M975 S1` | Activar supresión vibración |
-| `M620 S255` | Preparar unload a AMS |
-| `T255` | Ejecutar unload a AMS |
-| `M83` | Extrusión relativa |
-| `M82` | Extrusión absoluta |
-| `G28 X Y` | Home ejes X e Y |
-| `G28 Z` | Home eje Z |
-| `G91` | Movimiento relativo |
-| `G90` | Movimiento absoluto |
-
-## Issues Conocidos
-
-### Filament Page (Desactivada)
-
-La página de filamento está temporalmente desactivada por los siguientes problemas:
-
-1. **PURGE ZONE**: Las coordenadas actuales (X5 Y5 Z50) no son correctas para la zona de purga. La zona de purga/calentamiento real está en X60-X70 Y265.
-
-2. **UNLOAD**: El proceso no completa correctamente el ciclo de corte:
-   - La aproximación al cortador debe ser por el eje X primero (X20), luego Y (Y50 → Y-3)
-   - La secuencia actual no activa el corte correctamente
-
-3. **Coordenadas del cortador P1S**:
-   - Posición de aproximación: X20 Y50
-   - Posición del cortador: X20 Y-3 (Y negativo, fuera del área de impresión)
-   - El cortador requiere nozzle caliente (>180°C)
-
-### Para depurar
-
-Probar manualmente via consola de HA:
-```yaml
-action: bambu_lab.send_command
-data:
-  device_id: "tu_device_id"
-  command: "G28 X Y\nG1 X20 Y50 F20000\nG1 Y-3 F3000\nG4 P500\nG28 X Y"
-```
+| `G28 X Y` | Home XY |
+| `G28 Z` | Home Z |
 
 ## Alternativas
 
-- **[OpenHASP](https://www.openhasp.com/)** - Firmware con diseñador visual
-  - [Guition en OpenHASP](https://www.openhasp.com/0.7.0/hardware/guition/jc8048w550/)
-  - Más fácil para diseños simples, menos flexible para lógica compleja
+- **[OpenHASP](https://www.openhasp.com/0.7.0/hardware/guition/jc8048w550/)** - Firmware con diseñador visual, más fácil para diseños simples
