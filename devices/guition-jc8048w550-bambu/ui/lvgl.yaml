@@ -236,6 +236,18 @@ lvgl:
                 text_color: 0xFF4444
                 hidden: true
 
+      # Touch blocker overlay - captura toques por 500ms al despertar
+      - button:
+          id: touch_blocker
+          x: 0
+          y: 0
+          width: 800
+          height: 480
+          bg_opa: 0%
+          border_width: 0
+          shadow_width: 0
+          hidden: true
+
   # === PAGINAS ===
   pages:
     # ==================== HOME ====================

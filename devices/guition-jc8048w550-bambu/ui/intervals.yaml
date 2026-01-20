@@ -13,6 +13,16 @@ interval:
             snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
             return buf;
 
+      # Ocultar touch blocker despues de 500ms
+      - if:
+          condition:
+            lambda: return id(touch_wake_time) > 0 && (millis() - id(touch_wake_time) > 500);
+          then:
+            - lambda: id(touch_wake_time) = 0;
+            - lvgl.widget.update:
+                id: touch_blocker
+                hidden: true
+
       # Auto-dim despues de 60s
       - lambda: |-
           if (!id(screen_dimmed) && (millis() - id(last_touch_time) > 60000)) {
@@ -20,13 +30,26 @@ interval:
             id(backlight).turn_on().set_brightness(0.15).perform();
           }
 
-      # Screensaver despues de 5 minutos (300s)
+      # Screensaver despues de 5 minutos (300s) - SOLO si no esta imprimiendo
       - if:
           condition:
-            lambda: return !id(screensaver_active) && (millis() - id(last_touch_time) > 300000);
+            lambda: |-
+              if (id(screensaver_active)) return false;
+              if (millis() - id(last_touch_time) < 300000) return false;
+              // No activar screensaver si esta imprimiendo o pausado
+              std::string status = id(printer_status).state;
+              if (status == "running" || status == "Imprimiendo" ||
+                  status == "paused" || status == "Pausado" ||
+                  status == "prepare" || status == "Preparando") {
+                return false;
+              }
+              return true;
           then:
             - lambda: id(screensaver_active) = true;
             - lvgl.page.show: screensaver_page
+            - light.turn_on:
+                id: backlight
+                brightness: 5%
 
       # Actualizar reloj screensaver
       - lvgl.label.update:

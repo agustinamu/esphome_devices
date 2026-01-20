@@ -16,6 +16,9 @@ globals:
   - id: screensaver_active
     type: bool
     initial_value: 'false'
+  - id: touch_wake_time
+    type: unsigned long
+    initial_value: '0'
 
 # Botón de reinicio interno
 button:
@@ -25,19 +28,38 @@ button:
     internal: true
 
 # Touch con callback para restaurar brillo y salir de screensaver
+# El primer touch al despertar muestra overlay que bloquea 500ms
 touchscreen:
   - platform: gt911
     id: my_touch
     on_touch:
-      - lambda: |-
-          id(last_touch_time) = millis();
-          if (id(screen_dimmed)) {
-            id(screen_dimmed) = false;
-            id(backlight).turn_on().set_brightness(1.0).perform();
-          }
+      - lambda: id(last_touch_time) = millis();
+      # Si estaba dimmed, restaurar brillo y mostrar blocker
+      - if:
+          condition:
+            lambda: return id(screen_dimmed);
+          then:
+            - lambda: |-
+                id(screen_dimmed) = false;
+                id(touch_wake_time) = millis();
+            - light.turn_on:
+                id: backlight
+                brightness: 100%
+            - lvgl.widget.update:
+                id: touch_blocker
+                hidden: false
+      # Si estaba en screensaver, volver a home y mostrar blocker
       - if:
           condition:
             lambda: return id(screensaver_active);
           then:
-            - lambda: id(screensaver_active) = false;
+            - lambda: |-
+                id(screensaver_active) = false;
+                id(touch_wake_time) = millis();
             - lvgl.page.show: main_page
+            - light.turn_on:
+                id: backlight
+                brightness: 100%
+            - lvgl.widget.update:
+                id: touch_blocker
+                hidden: false
