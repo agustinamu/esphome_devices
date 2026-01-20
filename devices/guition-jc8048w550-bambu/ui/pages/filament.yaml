@@ -1,0 +1,171 @@
+# Filament Page - Carga y descarga de filamento
+# Usa substitution: bambu_device_id
+
+id: filament_page
+bg_color: 0x121212
+widgets:
+  # Header
+  - button:
+      x: 100
+      y: 10
+      width: 80
+      height: 50
+      radius: 8
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            align: CENTER
+            text: "\U000F0141"
+            text_font: mdi_32
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: motion_page
+
+  - label:
+      x: 200
+      y: 20
+      text: "FILAMENT"
+      text_font: montserrat_28
+      text_color: 0x00AE42
+
+  # Fila 1: PURGE ZONE y EXTRUIR
+  # Ir a zona de purga (frente izquierda de la cama)
+  - button:
+      x: 100
+      y: 75
+      width: 230
+      height: 130
+      radius: 12
+      bg_color: 0x1E1E1E
+      widgets:
+        - label:
+            align: CENTER
+            y: -20
+            text: "\U000F0F0C"
+            text_font: mdi_48
+            text_color: 0x00AE42
+        - label:
+            align: CENTER
+            y: 35
+            text: "PURGE ZONE"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.send_command
+            data:
+              device_id: ${bambu_device_id}
+              command: "G28 X Y\nG0 X5 Y5 Z50 F6000"
+
+  # Extruir (empujar filamento hacia abajo)
+  - button:
+      x: 345
+      y: 75
+      width: 215
+      height: 130
+      radius: 12
+      bg_color: 0x1E1E1E
+      widgets:
+        - label:
+            align: CENTER
+            y: -20
+            text: "\U000F0045"
+            text_font: mdi_48
+            text_color: 0x00AE42
+        - label:
+            align: CENTER
+            y: 35
+            text: "EXTRUIR 10"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.send_command
+            data:
+              device_id: ${bambu_device_id}
+              command: "M83\nG1 E10 F200\nM82"
+
+  # Retraer (sacar filamento hacia arriba)
+  - button:
+      x: 575
+      y: 75
+      width: 215
+      height: 130
+      radius: 12
+      bg_color: 0x1E1E1E
+      widgets:
+        - label:
+            align: CENTER
+            y: -20
+            text: "\U000F004D"
+            text_font: mdi_48
+            text_color: 0xFF6B6B
+        - label:
+            align: CENTER
+            y: 35
+            text: "RETRAER 10"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.send_command
+            data:
+              device_id: ${bambu_device_id}
+              command: "M83\nG1 E-10 F200\nM82"
+
+  # Fila 2: UNLOAD y LOAD
+  # Descargar filamento (ciclo completo)
+  - button:
+      x: 100
+      y: 220
+      width: 340
+      height: 130
+      radius: 12
+      bg_color: 0xCC3333
+      widgets:
+        - label:
+            align: CENTER
+            y: -20
+            text: "\U000F0B2F"
+            text_font: mdi_48
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 35
+            text: "UNLOAD"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.send_command
+            data:
+              device_id: ${bambu_device_id}
+              command: "M104 S240\nM109 S240\nM83\nG1 E-20 F200\nG28 X Y\nG1 X20 Y50 F20000\nG1 Y-3 F3000\nG4 P500\nG1 E-80 F1500\nM82\nG28 X Y\nM104 S0"
+
+  # Cargar filamento
+  - button:
+      x: 455
+      y: 220
+      width: 335
+      height: 130
+      radius: 12
+      bg_color: 0x00AE42
+      widgets:
+        - label:
+            align: CENTER
+            y: -20
+            text: "\U000F0B30"
+            text_font: mdi_48
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 35
+            text: "LOAD"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.send_command
+            data:
+              device_id: ${bambu_device_id}
+              command: "M104 S220\nM109 S220\nM83\nG1 E18 F200\nG1 E2 F20\nG1 E50 F300\nM82"

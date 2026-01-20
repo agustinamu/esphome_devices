@@ -1,0 +1,20 @@
+# Screensaver Page - Pantalla de reposo
+
+id: screensaver_page
+bg_color: 0x000000
+widgets:
+  # Reloj grande centrado
+  - label:
+      id: lbl_screensaver_clock
+      align: CENTER
+      text: "--:--"
+      text_font: montserrat_48
+      text_color: 0x00AE42
+
+  # Toca para salir
+  - label:
+      align: BOTTOM_MID
+      y: -30
+      text: "Toca para despertar"
+      text_font: montserrat_18
+      text_color: 0x333333

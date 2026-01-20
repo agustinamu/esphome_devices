@@ -1,0 +1,320 @@
+# Controls Page - Temperaturas, luz y acceso a presets/fans
+# Usa substitution: bambu_prefix
+
+id: controls_page
+bg_color: 0x121212
+widgets:
+  - label:
+      x: 100
+      y: 15
+      text: "Controles"
+      text_font: montserrat_28
+      text_color: 0x00AE42
+
+  # Card Nozzle
+  - obj:
+      x: 100
+      y: 60
+      width: 320
+      height: 200
+      styles: style_card
+      scrollbar_mode: "off"
+      scrollable: false
+      widgets:
+        - label:
+            x: 10
+            y: 5
+            text: "\U000F18B8"
+            text_font: mdi_48
+            text_color: 0x00AE42
+
+        - label:
+            id: lbl_nozzle_ctrl
+            x: 65
+            y: 15
+            text: "---°C / ---°C"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        - button:
+            x: 10
+            y: 70
+            width: 68
+            height: 50
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "-10"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+                    value: !lambda "return std::max(0.0f, id(nozzle_target).state - 10);"
+
+        - button:
+            x: 83
+            y: 70
+            width: 68
+            height: 50
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "-5"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+                    value: !lambda "return std::max(0.0f, id(nozzle_target).state - 5);"
+
+        - button:
+            x: 156
+            y: 70
+            width: 68
+            height: 50
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "+5"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+                    value: !lambda "return id(nozzle_target).state + 5;"
+
+        - button:
+            x: 229
+            y: 70
+            width: 68
+            height: 50
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "+10"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+                    value: !lambda "return id(nozzle_target).state + 10;"
+
+        - button:
+            x: 10
+            y: 130
+            width: 287
+            height: 50
+            styles: style_btn_red
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "ENFRIAR"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+                    value: "0"
+
+  # Card Bed
+  - obj:
+      x: 440
+      y: 60
+      width: 320
+      height: 200
+      styles: style_card
+      scrollbar_mode: "off"
+      scrollable: false
+      widgets:
+        - label:
+            x: 10
+            y: 5
+            text: "\U000F0157"
+            text_font: mdi_48
+            text_color: 0x00AE42
+
+        - label:
+            id: lbl_bed_ctrl
+            x: 65
+            y: 15
+            text: "---°C / ---°C"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        - button:
+            x: 10
+            y: 70
+            width: 68
+            height: 50
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "-10"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+                    value: !lambda "return std::max(0.0f, id(bed_target).state - 10);"
+
+        - button:
+            x: 83
+            y: 70
+            width: 68
+            height: 50
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "-5"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+                    value: !lambda "return std::max(0.0f, id(bed_target).state - 5);"
+
+        - button:
+            x: 156
+            y: 70
+            width: 68
+            height: 50
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "+5"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+                    value: !lambda "return id(bed_target).state + 5;"
+
+        - button:
+            x: 229
+            y: 70
+            width: 68
+            height: 50
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "+10"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+                    value: !lambda "return id(bed_target).state + 10;"
+
+        - button:
+            x: 10
+            y: 130
+            width: 287
+            height: 50
+            styles: style_btn_red
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "ENFRIAR"
+                  text_font: montserrat_18
+            on_press:
+              - homeassistant.action:
+                  action: number.set_value
+                  data:
+                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+                    value: "0"
+
+  # PRESETS button
+  - button:
+      x: 100
+      y: 300
+      width: 215
+      height: 160
+      radius: 12
+      bg_color: 0x1E1E1E
+      widgets:
+        - label:
+            align: CENTER
+            y: -20
+            text: "\U000F0493"
+            text_font: mdi_48
+            text_color: 0x00AE42
+        - label:
+            align: CENTER
+            y: 40
+            text: "PRESETS"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: controls_presets_page
+
+  # LIGHT toggle con feedback
+  - button:
+      id: btn_light
+      x: 325
+      y: 300
+      width: 215
+      height: 160
+      radius: 12
+      bg_color: 0x1E1E1E
+      widgets:
+        - label:
+            id: lbl_light_icon
+            align: CENTER
+            y: -20
+            text: "\U000F0336"
+            text_font: mdi_48
+            text_color: 0x888888
+        - label:
+            id: lbl_light_text
+            align: CENTER
+            y: 40
+            text: "LIGHT"
+            text_font: montserrat_22
+            text_color: 0x888888
+      on_press:
+        - homeassistant.action:
+            action: light.toggle
+            data:
+              entity_id: light.${bambu_prefix}_luz_de_la_carcasa
+
+  # FANS button
+  - button:
+      x: 550
+      y: 300
+      width: 215
+      height: 160
+      radius: 12
+      bg_color: 0x1E1E1E
+      widgets:
+        - label:
+            align: CENTER
+            y: -20
+            text: "\U000F0210"
+            text_font: mdi_48
+            text_color: 0x00AE42
+        - label:
+            align: CENTER
+            y: 40
+            text: "FANS"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: fans_page

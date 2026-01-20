@@ -1,0 +1,95 @@
+# Motion Menu Page - Seleccion de movimiento
+
+id: motion_page
+bg_color: 0x121212
+widgets:
+  - label:
+      x: 100
+      y: 15
+      text: "Motion"
+      text_font: montserrat_28
+      text_color: 0x00AE42
+
+  # TOOL HEAD
+  - button:
+      x: 100
+      y: 70
+      width: 215
+      height: 380
+      radius: 16
+      bg_color: 0x1E1E1E
+      widgets:
+        - label:
+            align: CENTER
+            y: -40
+            text: "\U000F0C90"
+            text_font: mdi_48
+            text_color: 0x00AE42
+        - label:
+            align: CENTER
+            y: 40
+            text: "TOOL"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 75
+            text: "HEAD"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: motion_xy_page
+
+  # BED
+  - button:
+      x: 330
+      y: 70
+      width: 215
+      height: 380
+      radius: 16
+      bg_color: 0x1E1E1E
+      widgets:
+        - label:
+            align: CENTER
+            y: -40
+            text: "\U000F0157"
+            text_font: mdi_48
+            text_color: 0x00AE42
+        - label:
+            align: CENTER
+            y: 40
+            text: "BED"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: motion_z_page
+
+  # FILAMENT (Desactivado - requiere depuracion)
+  - obj:
+      x: 560
+      y: 70
+      width: 215
+      height: 380
+      radius: 16
+      bg_color: 0x1A1A1A
+      scrollbar_mode: "off"
+      scrollable: false
+      widgets:
+        - label:
+            align: CENTER
+            y: -50
+            text: "\U000F08BC"
+            text_font: mdi_48
+            text_color: 0x444444
+        - label:
+            align: CENTER
+            y: 20
+            text: "FILAMENT"
+            text_font: montserrat_22
+            text_color: 0x444444
+        - label:
+            align: CENTER
+            y: 60
+            text: "(disabled)"
+            text_font: montserrat_18
+            text_color: 0x333333

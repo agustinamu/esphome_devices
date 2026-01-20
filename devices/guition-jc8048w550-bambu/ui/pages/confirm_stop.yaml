@@ -1,0 +1,73 @@
+# Confirm Stop Dialog
+# Usa substitution: bambu_prefix
+
+id: confirm_stop_page
+bg_color: 0x121212
+widgets:
+  - obj:
+      align: CENTER
+      width: 500
+      height: 300
+      styles: style_card
+      scrollbar_mode: "off"
+      scrollable: false
+      widgets:
+        - label:
+            align: TOP_MID
+            y: 20
+            text: "\U000F04DB"
+            text_font: mdi_48
+            text_color: 0xFF4444
+
+        - label:
+            align: TOP_MID
+            y: 80
+            text: "Detener impresion?"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        - label:
+            align: TOP_MID
+            y: 120
+            text: "Esta accion no se puede deshacer"
+            text_font: montserrat_18
+            text_color: 0xFF6666
+
+        - label:
+            align: TOP_MID
+            y: 145
+            text: "Se perdera el progreso actual"
+            text_font: montserrat_18
+            text_color: 0x888888
+
+        - button:
+            x: 30
+            y: 190
+            width: 200
+            height: 70
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "CANCELAR"
+                  text_font: montserrat_22
+            on_press:
+              - lvgl.page.show: main_page
+
+        - button:
+            x: 250
+            y: 190
+            width: 200
+            height: 70
+            styles: style_btn_red
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "DETENER"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: button.press
+                  data:
+                    entity_id: button.${bambu_prefix}_detener_la_impresion
+              - lvgl.page.show: main_page

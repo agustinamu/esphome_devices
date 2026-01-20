@@ -1,0 +1,66 @@
+# Confirm Pause Dialog
+# Usa substitution: bambu_prefix
+
+id: confirm_pause_page
+bg_color: 0x121212
+widgets:
+  - obj:
+      align: CENTER
+      width: 500
+      height: 280
+      styles: style_card
+      scrollbar_mode: "off"
+      scrollable: false
+      widgets:
+        - label:
+            align: TOP_MID
+            y: 20
+            text: "\U000F03E4"
+            text_font: mdi_48
+            text_color: 0xFFAA00
+
+        - label:
+            align: TOP_MID
+            y: 80
+            text: "Pausar impresion?"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        - label:
+            align: TOP_MID
+            y: 120
+            text: "La impresion se detendra temporalmente"
+            text_font: montserrat_18
+            text_color: 0x888888
+
+        - button:
+            x: 30
+            y: 170
+            width: 200
+            height: 70
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "CANCELAR"
+                  text_font: montserrat_22
+            on_press:
+              - lvgl.page.show: main_page
+
+        - button:
+            x: 250
+            y: 170
+            width: 200
+            height: 70
+            styles: style_btn
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "PAUSAR"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: button.press
+                  data:
+                    entity_id: button.${bambu_prefix}_pausar_la_impresion
+              - lvgl.page.show: main_page

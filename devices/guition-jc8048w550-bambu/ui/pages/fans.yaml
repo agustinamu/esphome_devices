@@ -1,0 +1,391 @@
+# Fans Page - Control de ventiladores
+# Usa substitution: bambu_prefix
+
+id: fans_page
+bg_color: 0x121212
+widgets:
+  - button:
+      x: 100
+      y: 10
+      width: 80
+      height: 50
+      radius: 8
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            align: CENTER
+            text: "\U000F0141"
+            text_font: mdi_32
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: controls_page
+
+  - label:
+      x: 200
+      y: 20
+      text: "FANS"
+      text_font: montserrat_28
+      text_color: 0x00AE42
+
+  # ========== COOLING FAN ==========
+  - obj:
+      x: 100
+      y: 70
+      width: 680
+      height: 130
+      styles: style_card
+      scrollbar_mode: "off"
+      scrollable: false
+      widgets:
+        # Arc gauge
+        - arc:
+            id: arc_cooling
+            x: 10
+            y: 10
+            width: 110
+            height: 110
+            min_value: 0
+            max_value: 100
+            value: 0
+            start_angle: 135
+            end_angle: 45
+            rotation: 0
+            adjustable: false
+            arc_color: 0x333333
+            arc_width: 10
+            indicator:
+              arc_color: 0x00AE42
+              arc_width: 10
+            knob:
+              bg_opa: 0%
+
+        # Porcentaje en el centro del arc
+        - label:
+            id: lbl_cooling_pct
+            x: 35
+            y: 45
+            text: "0%"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        # Nombre + Switch
+        - label:
+            x: 140
+            y: 15
+            text: "Cooling"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        - switch:
+            id: sw_cooling
+            x: 280
+            y: 12
+            width: 70
+            height: 35
+            bg_color: 0x333333
+            indicator:
+              bg_color: 0x00AE42
+            on_value:
+              then:
+                - if:
+                    condition:
+                      lambda: return x;
+                    then:
+                      - homeassistant.action:
+                          action: fan.turn_on
+                          data:
+                            entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+                    else:
+                      - homeassistant.action:
+                          action: fan.turn_off
+                          data:
+                            entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+
+        # Botones -10 / valor / +10
+        - button:
+            x: 390
+            y: 60
+            width: 80
+            height: 55
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "-10"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: fan.set_percentage
+                  data:
+                    entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+                    percentage: !lambda "return std::max(0, (int)id(cooling_fan_speed).state - 10);"
+
+        - label:
+            id: lbl_cooling_val
+            x: 490
+            y: 70
+            width: 80
+            text: "0%"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+            text_align: CENTER
+
+        - button:
+            x: 580
+            y: 60
+            width: 80
+            height: 55
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "+10"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: fan.set_percentage
+                  data:
+                    entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+                    percentage: !lambda "return std::min(100, (int)id(cooling_fan_speed).state + 10);"
+
+  # ========== AUX FAN ==========
+  - obj:
+      x: 100
+      y: 210
+      width: 680
+      height: 130
+      styles: style_card
+      scrollbar_mode: "off"
+      scrollable: false
+      widgets:
+        # Arc gauge
+        - arc:
+            id: arc_aux
+            x: 10
+            y: 10
+            width: 110
+            height: 110
+            min_value: 0
+            max_value: 100
+            value: 0
+            start_angle: 135
+            end_angle: 45
+            rotation: 0
+            adjustable: false
+            arc_color: 0x333333
+            arc_width: 10
+            indicator:
+              arc_color: 0x888888
+              arc_width: 10
+            knob:
+              bg_opa: 0%
+
+        # Porcentaje en el centro del arc
+        - label:
+            id: lbl_aux_pct
+            x: 35
+            y: 45
+            text: "0%"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        # Nombre + Switch
+        - label:
+            x: 140
+            y: 15
+            text: "Aux"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        - switch:
+            id: sw_aux
+            x: 280
+            y: 12
+            width: 70
+            height: 35
+            bg_color: 0x333333
+            indicator:
+              bg_color: 0x00AE42
+            on_value:
+              then:
+                - if:
+                    condition:
+                      lambda: return x;
+                    then:
+                      - homeassistant.action:
+                          action: fan.turn_on
+                          data:
+                            entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+                    else:
+                      - homeassistant.action:
+                          action: fan.turn_off
+                          data:
+                            entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+
+        # Botones -10 / valor / +10
+        - button:
+            x: 390
+            y: 60
+            width: 80
+            height: 55
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "-10"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: fan.set_percentage
+                  data:
+                    entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+                    percentage: !lambda "return std::max(0, (int)id(aux_fan_speed).state - 10);"
+
+        - label:
+            id: lbl_aux_val
+            x: 490
+            y: 70
+            width: 80
+            text: "0%"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+            text_align: CENTER
+
+        - button:
+            x: 580
+            y: 60
+            width: 80
+            height: 55
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "+10"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: fan.set_percentage
+                  data:
+                    entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+                    percentage: !lambda "return std::min(100, (int)id(aux_fan_speed).state + 10);"
+
+  # ========== CHAMBER FAN ==========
+  - obj:
+      x: 100
+      y: 350
+      width: 680
+      height: 130
+      styles: style_card
+      scrollbar_mode: "off"
+      scrollable: false
+      widgets:
+        # Arc gauge
+        - arc:
+            id: arc_chamber
+            x: 10
+            y: 10
+            width: 110
+            height: 110
+            min_value: 0
+            max_value: 100
+            value: 0
+            start_angle: 135
+            end_angle: 45
+            rotation: 0
+            adjustable: false
+            arc_color: 0x333333
+            arc_width: 10
+            indicator:
+              arc_color: 0x888888
+              arc_width: 10
+            knob:
+              bg_opa: 0%
+
+        # Porcentaje en el centro del arc
+        - label:
+            id: lbl_chamber_pct
+            x: 35
+            y: 45
+            text: "0%"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        # Nombre + Switch
+        - label:
+            x: 140
+            y: 15
+            text: "Chamber"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+
+        - switch:
+            id: sw_chamber
+            x: 280
+            y: 12
+            width: 70
+            height: 35
+            bg_color: 0x333333
+            indicator:
+              bg_color: 0x00AE42
+            on_value:
+              then:
+                - if:
+                    condition:
+                      lambda: return x;
+                    then:
+                      - homeassistant.action:
+                          action: fan.turn_on
+                          data:
+                            entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+                    else:
+                      - homeassistant.action:
+                          action: fan.turn_off
+                          data:
+                            entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+
+        # Botones -10 / valor / +10
+        - button:
+            x: 390
+            y: 60
+            width: 80
+            height: 55
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "-10"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: fan.set_percentage
+                  data:
+                    entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+                    percentage: !lambda "return std::max(0, (int)id(chamber_fan_speed).state - 10);"
+
+        - label:
+            id: lbl_chamber_val
+            x: 490
+            y: 70
+            width: 80
+            text: "0%"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+            text_align: CENTER
+
+        - button:
+            x: 580
+            y: 60
+            width: 80
+            height: 55
+            styles: style_btn_dark
+            widgets:
+              - label:
+                  align: CENTER
+                  text: "+10"
+                  text_font: montserrat_22
+            on_press:
+              - homeassistant.action:
+                  action: fan.set_percentage
+                  data:
+                    entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+                    percentage: !lambda "return std::min(100, (int)id(chamber_fan_speed).state + 10);"

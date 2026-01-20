@@ -1,0 +1,358 @@
+# Home Page - Vista principal con estado de impresion
+# Usa substitution: bambu_prefix
+
+id: main_page
+bg_color: 0x121212
+widgets:
+    # === HEADER ===
+    - label:
+        x: 100
+        y: 10
+        text: "BAMBU P1S"
+        text_font: montserrat_22
+        text_color: 0x00AE42
+
+    - label:
+        id: lbl_status
+        x: 250
+        y: 10
+        text: "Idle"
+        text_font: montserrat_22
+        text_color: 0xFFFFFF
+
+    - label:
+        id: lbl_clock
+        align: TOP_RIGHT
+        x: -20
+        y: 10
+        text: "--:--"
+        text_font: montserrat_22
+        text_color: 0xFFFFFF
+
+    # Nombre del archivo (mas grande, con icono)
+    - label:
+        x: 100
+        y: 42
+        text: "\U000F0214"
+        text_font: mdi_32
+        text_color: 0x00AE42
+
+    - label:
+        id: lbl_filename
+        x: 140
+        y: 45
+        width: 630
+        text: "---"
+        text_font: montserrat_22
+        text_color: 0xFFFFFF
+        long_mode: DOT
+
+    # === CENTRO: Temperaturas y Ventiladores ===
+    # Nozzle
+    - label:
+        id: icon_nozzle
+        x: 120
+        y: 85
+        text: "\U000F18B8"
+        text_font: mdi_48
+        text_color: 0x00AE42
+
+    - label:
+        id: lbl_nozzle
+        x: 180
+        y: 90
+        text: "---"
+        text_font: montserrat_48
+        text_color: 0xFFFFFF
+
+    - label:
+        x: 280
+        y: 105
+        text: "°C"
+        text_font: montserrat_22
+        text_color: 0x888888
+
+    # Bed
+    - label:
+        id: icon_bed
+        x: 360
+        y: 85
+        text: "\U000F0157"
+        text_font: mdi_48
+        text_color: 0x00AE42
+
+    - label:
+        id: lbl_bed
+        x: 420
+        y: 90
+        text: "---"
+        text_font: montserrat_48
+        text_color: 0xFFFFFF
+
+    - label:
+        x: 520
+        y: 105
+        text: "°C"
+        text_font: montserrat_22
+        text_color: 0x888888
+
+    # Ventiladores (3 en fila)
+    # Cooling Fan
+    - label:
+        x: 120
+        y: 155
+        text: "\U000F0210"
+        text_font: mdi_32
+        text_color: 0x00AE42
+
+    - label:
+        id: lbl_cooling_fan
+        x: 158
+        y: 158
+        text: "--"
+        text_font: montserrat_22
+        text_color: 0xFFFFFF
+
+    - label:
+        x: 215
+        y: 158
+        text: "Cool"
+        text_font: montserrat_18
+        text_color: 0x666666
+
+    # Aux Fan
+    - label:
+        x: 310
+        y: 155
+        text: "\U000F0210"
+        text_font: mdi_32
+        text_color: 0x888888
+
+    - label:
+        id: lbl_aux_fan
+        x: 348
+        y: 158
+        text: "--"
+        text_font: montserrat_22
+        text_color: 0xFFFFFF
+
+    - label:
+        x: 405
+        y: 158
+        text: "Aux"
+        text_font: montserrat_18
+        text_color: 0x666666
+
+    # Chamber Fan
+    - label:
+        x: 490
+        y: 155
+        text: "\U000F0210"
+        text_font: mdi_32
+        text_color: 0x888888
+
+    - label:
+        id: lbl_chamber_fan
+        x: 528
+        y: 158
+        text: "--"
+        text_font: montserrat_22
+        text_color: 0xFFFFFF
+
+    - label:
+        x: 585
+        y: 158
+        text: "Cham"
+        text_font: montserrat_18
+        text_color: 0x666666
+
+    # === BOTONES: Pause/Resume y Stop ===
+    # PAUSE - visible cuando está imprimiendo
+    - button:
+        id: btn_pause
+        x: 100
+        y: 200
+        width: 330
+        height: 80
+        styles: style_btn
+        widgets:
+          - label:
+              align: CENTER
+              x: -30
+              text: "\U000F03E4"
+              text_font: mdi_48
+          - label:
+              align: CENTER
+              x: 40
+              text: "PAUSE"
+              text_font: montserrat_28
+        on_press:
+          - lvgl.page.show: confirm_pause_page
+
+    # RESUME - visible cuando está pausado (oculto por defecto)
+    - button:
+        id: btn_resume
+        x: 100
+        y: 200
+        width: 330
+        height: 80
+        hidden: true
+        styles: style_btn
+        widgets:
+          - label:
+              align: CENTER
+              x: -40
+              text: "\U000F040A"
+              text_font: mdi_48
+          - label:
+              align: CENTER
+              x: 45
+              text: "RESUME"
+              text_font: montserrat_28
+        on_press:
+          - homeassistant.action:
+              action: button.press
+              data:
+                entity_id: button.${bambu_prefix}_continuar_la_impresion
+
+    # STOP - visible cuando imprimiendo/pausado
+    - button:
+        id: btn_stop
+        x: 450
+        y: 200
+        width: 320
+        height: 80
+        styles: style_btn_red
+        widgets:
+          - label:
+              align: CENTER
+              x: -30
+              text: "\U000F04DB"
+              text_font: mdi_48
+          - label:
+              align: CENTER
+              x: 35
+              text: "STOP"
+              text_font: montserrat_28
+        on_press:
+          - lvgl.page.show: confirm_stop_page
+
+    # LIGHT - visible cuando idle (reemplaza STOP)
+    - button:
+        id: btn_light_home
+        x: 450
+        y: 200
+        width: 320
+        height: 80
+        hidden: true
+        radius: 12
+        bg_color: 0x1E1E1E
+        widgets:
+          - label:
+              id: icon_light_home
+              align: CENTER
+              x: -30
+              text: "\U000F0336"
+              text_font: mdi_48
+              text_color: 0x888888
+          - label:
+              id: lbl_light_home
+              align: CENTER
+              x: 35
+              text: "LIGHT"
+              text_font: montserrat_28
+              text_color: 0x888888
+        on_press:
+          - homeassistant.action:
+              action: light.toggle
+              data:
+                entity_id: light.${bambu_prefix}_luz_de_la_carcasa
+
+    # === BOTTOM: Gauge circular de progreso ===
+    # Capas (izquierda)
+    - label:
+        x: 110
+        y: 320
+        text: "\U000F0E4B"
+        text_font: mdi_32
+        text_color: 0x00AE42
+
+    - label:
+        id: lbl_layers
+        x: 150
+        y: 323
+        text: "-- / --"
+        text_font: montserrat_22
+        text_color: 0xFFFFFF
+
+    # Gauge circular (centro) - mas compacto
+    - arc:
+        id: progress_arc
+        x: 320
+        y: 300
+        width: 140
+        height: 140
+        min_value: 0
+        max_value: 100
+        value: 0
+        start_angle: 135
+        end_angle: 45
+        rotation: 0
+        adjustable: false
+        arc_color: 0x333333
+        arc_width: 10
+        indicator:
+          arc_color: 0x00AE42
+          arc_width: 10
+        knob:
+          bg_opa: 0%
+
+    # Porcentaje en centro del gauge
+    - label:
+        id: lbl_progress
+        x: 355
+        y: 345
+        width: 70
+        text: "0%"
+        text_font: montserrat_36
+        text_color: 0xFFFFFF
+        text_align: CENTER
+
+    # Tiempo restante (derecha)
+    - label:
+        x: 540
+        y: 320
+        text: "\U000F0150"
+        text_font: mdi_32
+        text_color: 0x00AE42
+
+    - label:
+        id: lbl_remaining
+        x: 580
+        y: 323
+        text: "--:--"
+        text_font: montserrat_22
+        text_color: 0xFFFFFF
+
+    - label:
+        x: 650
+        y: 323
+        text: "rest"
+        text_font: montserrat_18
+        text_color: 0x666666
+
+    # Fin estimado (debajo del gauge, separado)
+    - label:
+        x: 310
+        y: 450
+        text: "Fin estimado"
+        text_font: montserrat_18
+        text_color: 0x666666
+
+    - label:
+        id: lbl_finish_time
+        x: 450
+        y: 447
+        text: "--:--"
+        text_font: montserrat_28
+        text_color: 0x00AE42

@@ -1,0 +1,76 @@
+# Estilos LVGL - Panel Bambu Lab P1S
+
+- id: style_sidebar
+  bg_color: 0x0D0D0D
+  radius: 0
+  border_width: 0
+  pad_all: 0
+
+- id: style_sidebar_btn
+  bg_color: 0x0D0D0D
+  text_color: 0x666666
+  radius: 8
+  border_width: 0
+  width: 80
+  height: 80
+
+- id: style_sidebar_btn_active
+  bg_color: 0x1A1A1A
+  text_color: 0x00AE42
+  radius: 8
+  border_width: 0
+  width: 80
+  height: 80
+
+- id: style_card
+  bg_color: 0x1E1E1E
+  radius: 12
+  pad_all: 12
+  border_width: 0
+  shadow_width: 8
+  shadow_ofs_x: 2
+  shadow_ofs_y: 2
+  shadow_color: 0x000000
+  shadow_opa: 30%
+
+- id: style_btn
+  bg_color: 0x00AE42
+  text_color: 0xFFFFFF
+  radius: 12
+  shadow_width: 6
+  shadow_ofs_x: 2
+  shadow_ofs_y: 2
+  shadow_color: 0x000000
+  shadow_opa: 50%
+
+- id: style_btn_dark
+  bg_color: 0x2A2A2A
+  text_color: 0xFFFFFF
+  radius: 12
+  shadow_width: 4
+  shadow_ofs_x: 1
+  shadow_ofs_y: 1
+  shadow_color: 0x000000
+  shadow_opa: 40%
+
+- id: style_btn_red
+  bg_color: 0xE53935
+  text_color: 0xFFFFFF
+  radius: 12
+  shadow_width: 6
+  shadow_ofs_x: 2
+  shadow_ofs_y: 2
+  shadow_color: 0x000000
+  shadow_opa: 50%
+
+- id: style_btn_disabled
+  bg_color: 0x1A1A1A
+  text_color: 0x555555
+  radius: 12
+
+- id: style_motion_btn
+  bg_color: 0x2A2A2A
+  text_color: 0xFFFFFF
+  radius: 30
+  width: 60
+  height: 60

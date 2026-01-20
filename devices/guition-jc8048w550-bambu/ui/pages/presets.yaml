@@ -1,0 +1,181 @@
+# Presets Page - Temperaturas predefinidas
+# Usa substitution: bambu_prefix
+
+id: controls_presets_page
+bg_color: 0x121212
+widgets:
+  - button:
+      x: 100
+      y: 10
+      width: 80
+      height: 50
+      radius: 8
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            align: CENTER
+            text: "\U000F0141"
+            text_font: mdi_32
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: controls_page
+
+  - label:
+      x: 200
+      y: 20
+      text: "PRESETS"
+      text_font: montserrat_28
+      text_color: 0x00AE42
+
+  # PLA
+  - button:
+      x: 100
+      y: 80
+      width: 335
+      height: 120
+      radius: 12
+      bg_color: 0x00AE42
+      widgets:
+        - label:
+            align: CENTER
+            y: -15
+            text: "PLA"
+            text_font: montserrat_36
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 30
+            text: "220 / 60"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: number.set_value
+            data:
+              entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+              value: "220"
+        - homeassistant.action:
+            action: number.set_value
+            data:
+              entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+              value: "60"
+        - lvgl.page.show: controls_page
+
+  # PETG
+  - button:
+      x: 445
+      y: 80
+      width: 335
+      height: 120
+      radius: 12
+      bg_color: 0x00AE42
+      widgets:
+        - label:
+            align: CENTER
+            y: -15
+            text: "PETG"
+            text_font: montserrat_36
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 30
+            text: "250 / 80"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: number.set_value
+            data:
+              entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+              value: "250"
+        - homeassistant.action:
+            action: number.set_value
+            data:
+              entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+              value: "80"
+        - lvgl.page.show: controls_page
+
+  # ABS
+  - button:
+      x: 100
+      y: 220
+      width: 335
+      height: 120
+      radius: 12
+      bg_color: 0x00AE42
+      widgets:
+        - label:
+            align: CENTER
+            y: -15
+            text: "ABS"
+            text_font: montserrat_36
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 30
+            text: "260 / 100"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: number.set_value
+            data:
+              entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+              value: "260"
+        - homeassistant.action:
+            action: number.set_value
+            data:
+              entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+              value: "100"
+        - lvgl.page.show: controls_page
+
+  # ENFRIAR TODO
+  - button:
+      x: 445
+      y: 220
+      width: 335
+      height: 120
+      radius: 12
+      bg_color: 0xCC3333
+      widgets:
+        - label:
+            align: CENTER
+            y: -15
+            text: "ENFRIAR"
+            text_font: montserrat_36
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 30
+            text: "0 / 0"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: number.set_value
+            data:
+              entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+              value: "0"
+        - homeassistant.action:
+            action: number.set_value
+            data:
+              entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+              value: "0"
+        - lvgl.page.show: controls_page
+
+  # CANCELAR
+  - button:
+      x: 100
+      y: 360
+      width: 680
+      height: 100
+      radius: 12
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            align: CENTER
+            text: "CANCELAR"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: controls_page

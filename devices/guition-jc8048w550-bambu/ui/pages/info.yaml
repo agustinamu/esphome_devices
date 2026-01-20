@@ -1,0 +1,268 @@
+# Info Page - Estado del sistema e impresora
+
+id: info_page
+bg_color: 0x121212
+widgets:
+  - label:
+      x: 100
+      y: 15
+      text: "Info"
+      text_font: montserrat_28
+      text_color: 0x00AE42
+
+  # Contenedor scrollable
+  - obj:
+      x: 100
+      y: 55
+      width: 680
+      height: 410
+      bg_color: 0x121212
+      border_width: 0
+      pad_all: 0
+      scrollbar_mode: "auto"
+      widgets:
+        # === IMPRESORA ===
+        - obj:
+            x: 0
+            y: 0
+            width: 660
+            height: 200
+            styles: style_card
+            scrollbar_mode: "off"
+            scrollable: false
+            widgets:
+              - label:
+                  x: 15
+                  y: 8
+                  text: "IMPRESORA"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+              # Online status
+              - label:
+                  id: lbl_online_icon
+                  x: 15
+                  y: 45
+                  text: "\U000F05E0"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+              - label:
+                  x: 55
+                  y: 50
+                  text: "Estado"
+                  text_font: montserrat_22
+                  text_color: 0xAAAAAA
+              - label:
+                  id: lbl_online_status
+                  x: 180
+                  y: 50
+                  text: "---"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              # Print error
+              - label:
+                  id: lbl_print_error_icon
+                  x: 340
+                  y: 45
+                  text: "\U000F0028"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+              - label:
+                  x: 380
+                  y: 50
+                  text: "Error"
+                  text_font: montserrat_22
+                  text_color: 0xAAAAAA
+              - label:
+                  id: lbl_print_error
+                  x: 500
+                  y: 50
+                  text: "OK"
+                  text_font: montserrat_22
+                  text_color: 0x00AE42
+
+              # HMS errors
+              - label:
+                  id: lbl_hms_icon
+                  x: 15
+                  y: 90
+                  text: "\U000F0028"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+              - label:
+                  x: 55
+                  y: 95
+                  text: "HMS"
+                  text_font: montserrat_22
+                  text_color: 0xAAAAAA
+              - label:
+                  id: lbl_hms_status
+                  x: 180
+                  y: 95
+                  width: 460
+                  text: "OK"
+                  text_font: montserrat_22
+                  text_color: 0x00AE42
+                  long_mode: DOT
+
+              # SD Card
+              - label:
+                  id: lbl_sd_icon
+                  x: 15
+                  y: 135
+                  text: "\U000F07F3"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+              - label:
+                  x: 55
+                  y: 140
+                  text: "SD Card"
+                  text_font: montserrat_22
+                  text_color: 0xAAAAAA
+              - label:
+                  id: lbl_sd_status
+                  x: 180
+                  y: 140
+                  text: "---"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+        # === SISTEMA ===
+        - obj:
+            x: 0
+            y: 215
+            width: 660
+            height: 200
+            styles: style_card
+            scrollbar_mode: "off"
+            scrollable: false
+            widgets:
+              - label:
+                  x: 15
+                  y: 8
+                  text: "SISTEMA"
+                  text_font: montserrat_22
+                  text_color: 0x888888
+
+              # WiFi
+              - label:
+                  x: 15
+                  y: 45
+                  text: "\U000F05A9"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+              - label:
+                  x: 55
+                  y: 50
+                  text: "WiFi"
+                  text_font: montserrat_22
+                  text_color: 0xAAAAAA
+              - label:
+                  id: lbl_wifi_signal
+                  x: 180
+                  y: 50
+                  text: "-- dBm"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              # IP
+              - label:
+                  x: 340
+                  y: 45
+                  text: "\U000F0A60"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+              - label:
+                  x: 380
+                  y: 50
+                  text: "IP"
+                  text_font: montserrat_22
+                  text_color: 0xAAAAAA
+              - label:
+                  id: lbl_ip
+                  x: 420
+                  y: 50
+                  text: "---.---.---.---"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              # Uptime
+              - label:
+                  x: 15
+                  y: 90
+                  text: "\U000F0150"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+              - label:
+                  x: 55
+                  y: 95
+                  text: "Uptime"
+                  text_font: montserrat_22
+                  text_color: 0xAAAAAA
+              - label:
+                  id: lbl_uptime
+                  x: 180
+                  y: 95
+                  text: "--"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+              # Version
+              - label:
+                  x: 15
+                  y: 135
+                  text: "\U000F02FC"
+                  text_font: mdi_32
+                  text_color: 0x00AE42
+              - label:
+                  x: 55
+                  y: 140
+                  text: "Version"
+                  text_font: montserrat_22
+                  text_color: 0xAAAAAA
+              - label:
+                  x: 180
+                  y: 140
+                  text: "ESPHome 2025.x"
+                  text_font: montserrat_22
+                  text_color: 0xFFFFFF
+
+        # === ACCIONES ===
+        - obj:
+            x: 0
+            y: 430
+            width: 660
+            height: 80
+            styles: style_card
+            scrollbar_mode: "off"
+            scrollable: false
+            widgets:
+              # Reiniciar ESP
+              - button:
+                  x: 15
+                  y: 12
+                  width: 300
+                  height: 55
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "REINICIAR"
+                        text_font: montserrat_22
+                  on_press:
+                    - button.press: restart_btn
+
+              # Placeholder
+              - button:
+                  x: 335
+                  y: 12
+                  width: 300
+                  height: 55
+                  styles: style_btn_dark
+                  widgets:
+                    - label:
+                        align: CENTER
+                        text: "INFO"
+                        text_font: montserrat_22
+                        text_color: 0x888888
