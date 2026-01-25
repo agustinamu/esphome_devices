@@ -1,0 +1,18 @@
+# Intercom D1 Mini - Detección de llamada al portal
+
+esp8266:
+  board: d1_mini
+
+logger:
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D1  # GPIO5
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Llamada Portal"
+    device_class: sound
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 2s

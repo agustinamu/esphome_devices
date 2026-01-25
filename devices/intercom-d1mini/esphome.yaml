@@ -1,0 +1,28 @@
+# Copiar este archivo en ESPHome de Home Assistant
+# Archivo: intercom-d1mini.yaml
+
+esphome:
+  name: intercom-d1mini
+  friendly_name: Intercom D1 Mini
+
+packages:
+  - url: https://github.com/agustinamu/esphome_devices
+    ref: develop
+    files: [devices/intercom-d1mini/package.yaml]
+    refresh: 1d
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  min_auth_mode: WPA2
+  ap:
+    ssid: "Intercom Fallback"
+    password: !secret fallback_password
