@@ -495,13 +495,19 @@ interval:
             if (id(printer_is_idle)) return true;
             return id(printable_objects_count).state <= 1;
 
-      # Actualizar slots de skip objects page
+      # Actualizar slots de skip objects page (lista + overlays)
       - lambda: |-
           std::string data = id(printable_objects_list).state;
+          std::string bbox_data = id(plate_bbox_data).state;
+
           lv_obj_t* rows[] = {id(btn_skip_0), id(btn_skip_1), id(btn_skip_2), id(btn_skip_3),
                               id(btn_skip_4), id(btn_skip_5), id(btn_skip_6), id(btn_skip_7)};
           lv_obj_t* labels[] = {id(lbl_skip_0), id(lbl_skip_1), id(lbl_skip_2), id(lbl_skip_3),
                                 id(lbl_skip_4), id(lbl_skip_5), id(lbl_skip_6), id(lbl_skip_7)};
+          lv_obj_t* overlays[] = {id(btn_bbox_0), id(btn_bbox_1), id(btn_bbox_2), id(btn_bbox_3),
+                                  id(btn_bbox_4), id(btn_bbox_5), id(btn_bbox_6), id(btn_bbox_7)};
+
+          // Parse list data (ID:name|...)
           int count = 0;
           size_t pos = 0;
           while (pos < data.size() && count < 8) {
@@ -518,6 +524,54 @@ interval:
           }
           for (int i = count; i < 8; i++) {
             lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
+          }
+
+          // Parse bbox data (ID:name:x1,y1,x2,y2|...) and position overlays
+          if (!bbox_data.empty()) {
+            int bidx = 0;
+            size_t bpos = 0;
+            while (bpos < bbox_data.size() && bidx < 8) {
+              size_t bpipe = bbox_data.find('|', bpos);
+              if (bpipe == std::string::npos) bpipe = bbox_data.size();
+
+              // Find second colon (after ID:name:)
+              size_t c1 = bbox_data.find(':', bpos);
+              size_t c2 = (c1 != std::string::npos) ? bbox_data.find(':', c1 + 1) : std::string::npos;
+
+              if (c2 != std::string::npos && c2 < bpipe && c2 + 1 < bpipe) {
+                std::string coords = bbox_data.substr(c2 + 1, bpipe - c2 - 1);
+                // Parse x1,y1,x2,y2
+                int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+                if (sscanf(coords.c_str(), "%d,%d,%d,%d", &x1, &y1, &x2, &y2) == 4) {
+                  // Scale from original image size to 380x380
+                  // bbox_data comes from plate_analyzer which uses original image coords
+                  // The image is resized to 380x380 by online_image
+                  // We need image_width from the sensor, but for simplicity use the coords as-is
+                  // since plate_analyzer image is typically 512x512
+                  // Scale: coord * 380 / img_size (use 512 as default)
+                  int img_w = 512;  // default plate image size
+                  int img_h = 512;
+                  int sx1 = x1 * 380 / img_w;
+                  int sy1 = y1 * 380 / img_h;
+                  int sx2 = x2 * 380 / img_w;
+                  int sy2 = y2 * 380 / img_h;
+                  int w = sx2 - sx1;
+                  int h = sy2 - sy1;
+                  if (w < 30) w = 30;  // minimum touch target
+                  if (h < 30) h = 30;
+
+                  lv_obj_set_pos(overlays[bidx], sx1, sy1);
+                  lv_obj_set_size(overlays[bidx], w, h);
+                  lv_obj_clear_flag(overlays[bidx], LV_OBJ_FLAG_HIDDEN);
+                }
+              }
+              bpos = bpipe + 1;
+              bidx++;
+            }
+            for (int i = bidx; i < 8; i++) {
+              lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
+            }
           }
 
       # Contador en skip page

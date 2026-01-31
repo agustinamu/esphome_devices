@@ -40,9 +40,9 @@ online_image:
     url: "${ha_url}/api/image_proxy/image.${bambu_prefix}_seleccionar_imagen"
     format: png
     type: RGB565
-    resize: 200x200
+    resize: 380x380
     request_headers:
-      Authorization: !secret ha_token
+      Authorization: ${ha_token}
     on_download_finished:
       - lvgl.image.update:
           id: img_plate

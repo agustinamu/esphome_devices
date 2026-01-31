@@ -85,6 +85,12 @@ text_sensor:
     id: printable_objects_list
     entity_id: sensor.p1s_printable_objects_list
 
+  # Bounding boxes serializados del plate_analyzer (ID:name:x1,y1,x2,y2|...)
+  - platform: homeassistant
+    id: plate_bbox_data
+    entity_id: sensor.analizador_de_plato
+    attribute: bbox_data
+
   - platform: wifi_info
     ip_address:
       id: wifi_ip
