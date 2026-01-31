@@ -32,6 +32,22 @@ globals:
   - id: skip_ids_str
     type: std::string
 
+# HTTP para descargar imagen de placa (skip objects)
+http_request:
+
+online_image:
+  - id: plate_image
+    url: "${ha_url}/api/image_proxy/image.${bambu_prefix}_seleccionar_imagen"
+    format: png
+    type: RGB565
+    resize: 200x200
+    request_headers:
+      Authorization: !secret ha_token
+    on_download_finished:
+      - lvgl.image.update:
+          id: img_plate
+          src: plate_image
+
 # Botón de reinicio interno
 button:
   - platform: restart

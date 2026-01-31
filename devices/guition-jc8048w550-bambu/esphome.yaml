@@ -8,6 +8,7 @@
 substitutions:
   bambu_device_id: !secret bambu_device_id
   bambu_prefix: "p1s_01p00c581002790"
+  ha_url: !secret ha_url
 
 esphome:
   name: guition-bambu

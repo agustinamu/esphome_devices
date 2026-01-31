@@ -135,6 +135,7 @@ widgets:
             text_color: 0xFFFFFF
       on_press:
         - lambda: id(skip_selection) = 0;
+        - component.update: plate_image
         - lvgl.page.show: skip_objects_page
 
   # === VENTILADORES (se ocultan cuando idle) ===

@@ -30,6 +30,8 @@ psram:
   mode: octal
   speed: 80MHz
 
+captive_portal:
+
 logger:
 
 time:
