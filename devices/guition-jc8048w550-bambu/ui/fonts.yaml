@@ -88,6 +88,7 @@ font:
       - "\U000F0A60"  # ip-network
       - "\U000F07F3"  # sd
       - "\U000F0214"  # file
+      - "\U000F04E2"  # skip-next
 
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_48

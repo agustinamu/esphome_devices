@@ -42,5 +42,6 @@ lvgl:
     - !include pages/filament.yaml
     - !include pages/confirm_pause.yaml
     - !include pages/confirm_stop.yaml
+    - !include pages/skip_objects.yaml
     - !include pages/info.yaml
     - !include pages/screensaver.yaml

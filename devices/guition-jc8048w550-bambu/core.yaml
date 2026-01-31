@@ -25,6 +25,12 @@ globals:
   - id: printer_is_idle
     type: bool
     initial_value: 'true'
+  # Skip objects
+  - id: skip_selection
+    type: int
+    initial_value: '0'
+  - id: skip_ids_str
+    type: std::string
 
 # Botón de reinicio interno
 button:

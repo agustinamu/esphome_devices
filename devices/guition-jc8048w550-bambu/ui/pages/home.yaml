@@ -108,6 +108,35 @@ widgets:
       text_font: montserrat_22
       text_color: 0x888888
 
+  # Skip objects button (visible solo imprimiendo con >1 objeto)
+  - button:
+      id: btn_skip_objects
+      x: 600
+      y: 85
+      width: 160
+      height: 55
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 1
+      border_color: 0x444444
+      hidden: true
+      widgets:
+        - label:
+            align: CENTER
+            x: -20
+            text: "\U000F04E2"
+            text_font: mdi_32
+            text_color: 0xFFAA00
+        - label:
+            align: CENTER
+            x: 25
+            text: "SKIP"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - lambda: id(skip_selection) = 0;
+        - lvgl.page.show: skip_objects_page
+
   # === VENTILADORES (se ocultan cuando idle) ===
   - obj:
       id: home_fans_row

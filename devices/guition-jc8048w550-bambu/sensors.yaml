@@ -55,6 +55,10 @@ sensor:
     id: wifi_signal_db
     update_interval: 30s
 
+  - platform: homeassistant
+    id: printable_objects_count
+    entity_id: sensor.${bambu_prefix}_objetos_imprimibles
+
   - platform: uptime
     id: uptime_sensor
     update_interval: 60s
@@ -75,6 +79,11 @@ text_sensor:
   - platform: homeassistant
     id: sdcard_state
     entity_id: sensor.${bambu_prefix}_estado_de_la_tarjeta_sd
+
+  # Skip objects (requiere template sensor en HA: sensor.p1s_printable_objects_list)
+  - platform: homeassistant
+    id: printable_objects_list
+    entity_id: sensor.p1s_printable_objects_list
 
   - platform: wifi_info
     ip_address:

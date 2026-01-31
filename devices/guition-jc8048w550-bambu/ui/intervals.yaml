@@ -486,3 +486,51 @@ interval:
       - lvgl.widget.update:
           id: home_progress_section
           hidden: !lambda return id(printer_is_idle);
+
+      # === SKIP OBJECTS ===
+      # Boton SKIP en home: visible solo imprimiendo con >1 objeto
+      - lvgl.widget.update:
+          id: btn_skip_objects
+          hidden: !lambda |-
+            if (id(printer_is_idle)) return true;
+            return id(printable_objects_count).state <= 1;
+
+      # Actualizar slots de skip objects page
+      - lambda: |-
+          std::string data = id(printable_objects_list).state;
+          lv_obj_t* rows[] = {id(btn_skip_0), id(btn_skip_1), id(btn_skip_2), id(btn_skip_3),
+                              id(btn_skip_4), id(btn_skip_5), id(btn_skip_6), id(btn_skip_7)};
+          lv_obj_t* labels[] = {id(lbl_skip_0), id(lbl_skip_1), id(lbl_skip_2), id(lbl_skip_3),
+                                id(lbl_skip_4), id(lbl_skip_5), id(lbl_skip_6), id(lbl_skip_7)};
+          int count = 0;
+          size_t pos = 0;
+          while (pos < data.size() && count < 8) {
+            size_t pipe = data.find('|', pos);
+            if (pipe == std::string::npos) pipe = data.size();
+            size_t colon = data.find(':', pos);
+            if (colon != std::string::npos && colon < pipe) {
+              std::string name = data.substr(colon + 1, pipe - colon - 1);
+              lv_label_set_text(labels[count], name.c_str());
+              lv_obj_clear_flag(rows[count], LV_OBJ_FLAG_HIDDEN);
+            }
+            pos = pipe + 1;
+            count++;
+          }
+          for (int i = count; i < 8; i++) {
+            lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
+          }
+
+      # Contador en skip page
+      - lvgl.label.update:
+          id: lbl_skip_count
+          text: !lambda |-
+            static char buf[16];
+            int n = (int)id(printable_objects_count).state;
+            if (n <= 0) return "";
+            snprintf(buf, sizeof(buf), "%d objects", n);
+            return buf;
+
+      # Mostrar/ocultar boton SKIP SELECTED segun seleccion
+      - lvgl.widget.update:
+          id: btn_do_skip
+          hidden: !lambda return id(skip_selection) == 0;

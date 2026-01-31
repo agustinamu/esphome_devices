@@ -1,0 +1,330 @@
+# Skip Objects Page - Seleccionar objetos para omitir
+# Usa substitution: bambu_device_id
+
+id: skip_objects_page
+bg_color: 0x121212
+widgets:
+  # Header
+  - button:
+      x: 100
+      y: 10
+      width: 80
+      height: 50
+      radius: 8
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            align: CENTER
+            text: "\U000F0141"
+            text_font: mdi_32
+            text_color: 0xFFFFFF
+      on_press:
+        - lambda: id(skip_selection) = 0;
+        - lvgl.page.show: main_page
+
+  - label:
+      x: 200
+      y: 15
+      text: "\U000F04E2"
+      text_font: mdi_32
+      text_color: 0x00AE42
+
+  - label:
+      x: 240
+      y: 18
+      text: "SKIP OBJECTS"
+      text_font: montserrat_28
+      text_color: 0x00AE42
+
+  - label:
+      id: lbl_skip_count
+      align: TOP_RIGHT
+      x: -20
+      y: 18
+      text: ""
+      text_font: montserrat_22
+      text_color: 0x888888
+
+  # === 8 OBJECT ROWS ===
+  # Row 0
+  - button:
+      id: btn_skip_0
+      x: 100
+      y: 68
+      width: 670
+      height: 42
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 2
+      border_color: 0x2A2A2A
+      hidden: true
+      widgets:
+        - label:
+            id: lbl_skip_0
+            align: LEFT_MID
+            x: 15
+            text: ""
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_click:
+        - lambda: id(skip_selection) ^= (1 << 0);
+        - lvgl.widget.update:
+            id: btn_skip_0
+            border_color: !lambda |-
+              return (id(skip_selection) & (1 << 0)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A);
+            bg_color: !lambda |-
+              return (id(skip_selection) & (1 << 0)) ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A);
+
+  # Row 1
+  - button:
+      id: btn_skip_1
+      x: 100
+      y: 115
+      width: 670
+      height: 42
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 2
+      border_color: 0x2A2A2A
+      hidden: true
+      widgets:
+        - label:
+            id: lbl_skip_1
+            align: LEFT_MID
+            x: 15
+            text: ""
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_click:
+        - lambda: id(skip_selection) ^= (1 << 1);
+        - lvgl.widget.update:
+            id: btn_skip_1
+            border_color: !lambda |-
+              return (id(skip_selection) & (1 << 1)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A);
+            bg_color: !lambda |-
+              return (id(skip_selection) & (1 << 1)) ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A);
+
+  # Row 2
+  - button:
+      id: btn_skip_2
+      x: 100
+      y: 162
+      width: 670
+      height: 42
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 2
+      border_color: 0x2A2A2A
+      hidden: true
+      widgets:
+        - label:
+            id: lbl_skip_2
+            align: LEFT_MID
+            x: 15
+            text: ""
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_click:
+        - lambda: id(skip_selection) ^= (1 << 2);
+        - lvgl.widget.update:
+            id: btn_skip_2
+            border_color: !lambda |-
+              return (id(skip_selection) & (1 << 2)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A);
+            bg_color: !lambda |-
+              return (id(skip_selection) & (1 << 2)) ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A);
+
+  # Row 3
+  - button:
+      id: btn_skip_3
+      x: 100
+      y: 209
+      width: 670
+      height: 42
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 2
+      border_color: 0x2A2A2A
+      hidden: true
+      widgets:
+        - label:
+            id: lbl_skip_3
+            align: LEFT_MID
+            x: 15
+            text: ""
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_click:
+        - lambda: id(skip_selection) ^= (1 << 3);
+        - lvgl.widget.update:
+            id: btn_skip_3
+            border_color: !lambda |-
+              return (id(skip_selection) & (1 << 3)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A);
+            bg_color: !lambda |-
+              return (id(skip_selection) & (1 << 3)) ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A);
+
+  # Row 4
+  - button:
+      id: btn_skip_4
+      x: 100
+      y: 256
+      width: 670
+      height: 42
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 2
+      border_color: 0x2A2A2A
+      hidden: true
+      widgets:
+        - label:
+            id: lbl_skip_4
+            align: LEFT_MID
+            x: 15
+            text: ""
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_click:
+        - lambda: id(skip_selection) ^= (1 << 4);
+        - lvgl.widget.update:
+            id: btn_skip_4
+            border_color: !lambda |-
+              return (id(skip_selection) & (1 << 4)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A);
+            bg_color: !lambda |-
+              return (id(skip_selection) & (1 << 4)) ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A);
+
+  # Row 5
+  - button:
+      id: btn_skip_5
+      x: 100
+      y: 303
+      width: 670
+      height: 42
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 2
+      border_color: 0x2A2A2A
+      hidden: true
+      widgets:
+        - label:
+            id: lbl_skip_5
+            align: LEFT_MID
+            x: 15
+            text: ""
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_click:
+        - lambda: id(skip_selection) ^= (1 << 5);
+        - lvgl.widget.update:
+            id: btn_skip_5
+            border_color: !lambda |-
+              return (id(skip_selection) & (1 << 5)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A);
+            bg_color: !lambda |-
+              return (id(skip_selection) & (1 << 5)) ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A);
+
+  # Row 6
+  - button:
+      id: btn_skip_6
+      x: 100
+      y: 350
+      width: 670
+      height: 42
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 2
+      border_color: 0x2A2A2A
+      hidden: true
+      widgets:
+        - label:
+            id: lbl_skip_6
+            align: LEFT_MID
+            x: 15
+            text: ""
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_click:
+        - lambda: id(skip_selection) ^= (1 << 6);
+        - lvgl.widget.update:
+            id: btn_skip_6
+            border_color: !lambda |-
+              return (id(skip_selection) & (1 << 6)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A);
+            bg_color: !lambda |-
+              return (id(skip_selection) & (1 << 6)) ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A);
+
+  # Row 7
+  - button:
+      id: btn_skip_7
+      x: 100
+      y: 397
+      width: 670
+      height: 42
+      radius: 8
+      bg_color: 0x2A2A2A
+      border_width: 2
+      border_color: 0x2A2A2A
+      hidden: true
+      widgets:
+        - label:
+            id: lbl_skip_7
+            align: LEFT_MID
+            x: 15
+            text: ""
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_click:
+        - lambda: id(skip_selection) ^= (1 << 7);
+        - lvgl.widget.update:
+            id: btn_skip_7
+            border_color: !lambda |-
+              return (id(skip_selection) & (1 << 7)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A);
+            bg_color: !lambda |-
+              return (id(skip_selection) & (1 << 7)) ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A);
+
+  # === SKIP SELECTED BUTTON ===
+  - button:
+      id: btn_do_skip
+      x: 250
+      y: 445
+      width: 300
+      height: 30
+      styles: style_btn_red
+      hidden: true
+      widgets:
+        - label:
+            align: CENTER
+            text: "SKIP SELECTED"
+            text_font: montserrat_22
+      on_press:
+        # Build comma-separated ID list from selected objects
+        - lambda: |-
+            std::string data = id(printable_objects_list).state;
+            std::string result = "";
+            int idx = 0;
+            int selection = id(skip_selection);
+            size_t pos = 0;
+            while (pos < data.size() && idx < 8) {
+              size_t pipe = data.find('|', pos);
+              if (pipe == std::string::npos) pipe = data.size();
+              if (selection & (1 << idx)) {
+                size_t colon = data.find(':', pos);
+                if (colon < pipe) {
+                  std::string obj_id = data.substr(pos, colon - pos);
+                  if (!result.empty()) result += ",";
+                  result += obj_id;
+                }
+              }
+              pos = pipe + 1;
+              idx++;
+            }
+            id(skip_ids_str) = result;
+        - if:
+            condition:
+              lambda: return !id(skip_ids_str).empty();
+            then:
+              - homeassistant.action:
+                  action: bambu_lab.skip_objects
+                  data:
+                    device_id: ${bambu_device_id}
+                    objects: !lambda 'return id(skip_ids_str);'
+              - lambda: |-
+                  id(skip_selection) = 0;
+                  id(skip_ids_str) = "";
+              - lvgl.page.show: main_page
