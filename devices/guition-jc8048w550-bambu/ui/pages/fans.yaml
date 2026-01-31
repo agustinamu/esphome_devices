@@ -85,21 +85,12 @@ widgets:
             bg_color: 0x333333
             indicator:
               bg_color: 0x00AE42
-            on_value:
+            on_click:
               then:
-                - if:
-                    condition:
-                      lambda: return x;
-                    then:
-                      - homeassistant.action:
-                          action: fan.turn_on
-                          data:
-                            entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
-                    else:
-                      - homeassistant.action:
-                          action: fan.turn_off
-                          data:
-                            entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+                - homeassistant.action:
+                    action: fan.toggle
+                    data:
+                      entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
 
         # Botones -10 / valor / +10
         - button:
@@ -206,21 +197,12 @@ widgets:
             bg_color: 0x333333
             indicator:
               bg_color: 0x00AE42
-            on_value:
+            on_click:
               then:
-                - if:
-                    condition:
-                      lambda: return x;
-                    then:
-                      - homeassistant.action:
-                          action: fan.turn_on
-                          data:
-                            entity_id: fan.${bambu_prefix}_ventilador_auxiliar
-                    else:
-                      - homeassistant.action:
-                          action: fan.turn_off
-                          data:
-                            entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+                - homeassistant.action:
+                    action: fan.toggle
+                    data:
+                      entity_id: fan.${bambu_prefix}_ventilador_auxiliar
 
         # Botones -10 / valor / +10
         - button:
@@ -327,21 +309,12 @@ widgets:
             bg_color: 0x333333
             indicator:
               bg_color: 0x00AE42
-            on_value:
+            on_click:
               then:
-                - if:
-                    condition:
-                      lambda: return x;
-                    then:
-                      - homeassistant.action:
-                          action: fan.turn_on
-                          data:
-                            entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
-                    else:
-                      - homeassistant.action:
-                          action: fan.turn_off
-                          data:
-                            entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+                - homeassistant.action:
+                    action: fan.toggle
+                    data:
+                      entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
 
         # Botones -10 / valor / +10
         - button:

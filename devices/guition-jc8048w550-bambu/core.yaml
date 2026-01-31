@@ -22,6 +22,9 @@ globals:
   - id: screen_always_on
     type: bool
     initial_value: 'false'
+  - id: printer_is_idle
+    type: bool
+    initial_value: 'true'
 
 # Botón de reinicio interno
 button:

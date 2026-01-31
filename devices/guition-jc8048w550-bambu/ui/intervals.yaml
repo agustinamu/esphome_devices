@@ -37,14 +37,7 @@ interval:
               if (id(screen_always_on)) return false;
               if (id(screensaver_active)) return false;
               if (millis() - id(last_touch_time) < 300000) return false;
-              // No activar screensaver si esta imprimiendo o pausado
-              std::string status = id(printer_status).state;
-              if (status == "running" || status == "Imprimiendo" ||
-                  status == "paused" || status == "Pausado" ||
-                  status == "prepare" || status == "Preparando") {
-                return false;
-              }
-              return true;
+              return id(printer_is_idle);
           then:
             - lambda: id(screensaver_active) = true;
             - lvgl.page.show: screensaver_page
@@ -63,6 +56,12 @@ interval:
 
   - interval: 2s
     then:
+      # Evaluar estado idle una vez por ciclo (usado en múltiples widgets)
+      # estado_actual usa estados en inglés: idle, offline, printing, paused_*, etc.
+      - lambda: |-
+          std::string status = id(printer_status).state;
+          id(printer_is_idle) = (status == "idle" || status == "offline" || status.empty());
+
       # === HOME PAGE ===
       - lvgl.label.update:
           id: lbl_status
@@ -96,40 +95,24 @@ interval:
       - lvgl.widget.update:
           id: btn_pause
           hidden: !lambda |-
-            std::string status = id(printer_status).state;
-            // Ocultar pause si está pausado o no está imprimiendo
-            return (status == "paused" || status == "Pausado" ||
-                    status == "idle" || status == "Inactivo" ||
-                    status == "offline" || status == "Desconectado" ||
-                    status == "finish" || status == "Finalizado" ||
-                    status.empty());
+            if (id(printer_is_idle)) return true;
+            // Ocultar si cualquier estado paused_*
+            return id(printer_status).state.substr(0, 7) == "paused_";
       - lvgl.widget.update:
           id: btn_resume
           hidden: !lambda |-
-            std::string status = id(printer_status).state;
-            // Mostrar resume solo si está pausado
-            return !(status == "paused" || status == "Pausado");
+            // Mostrar resume solo si cualquier estado paused_*
+            return id(printer_status).state.substr(0, 7) != "paused_";
 
       # Mostrar STOP solo cuando imprimiendo o pausado
       - lvgl.widget.update:
           id: btn_stop
-          hidden: !lambda |-
-            std::string status = id(printer_status).state;
-            return (status == "idle" || status == "Inactivo" ||
-                    status == "offline" || status == "Desconectado" ||
-                    status == "finish" || status == "Finalizado" ||
-                    status.empty());
+          hidden: !lambda return id(printer_is_idle);
 
       # Mostrar LIGHT cuando idle (reemplaza STOP)
       - lvgl.widget.update:
           id: btn_light_home
-          hidden: !lambda |-
-            std::string status = id(printer_status).state;
-            // Mostrar cuando idle, offline o finalizado
-            return !(status == "idle" || status == "Inactivo" ||
-                     status == "offline" || status == "Desconectado" ||
-                     status == "finish" || status == "Finalizado" ||
-                     status.empty());
+          hidden: !lambda return !id(printer_is_idle);
 
       # Actualizar estado visual del boton LIGHT
       - lvgl.label.update:
@@ -494,32 +477,12 @@ interval:
             return (millis() / 500) % 2 == 0;
 
       # === HOME: Ocultar secciones cuando idle/offline ===
-      # Filename row: ocultar cuando idle o offline
       - lvgl.widget.update:
           id: home_filename_row
-          hidden: !lambda |-
-            std::string status = id(printer_status).state;
-            return (status == "idle" || status == "Inactivo" ||
-                    status == "offline" || status == "Desconectado" ||
-                    status == "finish" || status == "Finalizado" ||
-                    status.empty());
-
-      # Fans row: ocultar cuando idle o offline
+          hidden: !lambda return id(printer_is_idle);
       - lvgl.widget.update:
           id: home_fans_row
-          hidden: !lambda |-
-            std::string status = id(printer_status).state;
-            return (status == "idle" || status == "Inactivo" ||
-                    status == "offline" || status == "Desconectado" ||
-                    status == "finish" || status == "Finalizado" ||
-                    status.empty());
-
-      # Progress section: ocultar cuando idle o offline
+          hidden: !lambda return id(printer_is_idle);
       - lvgl.widget.update:
           id: home_progress_section
-          hidden: !lambda |-
-            std::string status = id(printer_status).state;
-            return (status == "idle" || status == "Inactivo" ||
-                    status == "offline" || status == "Desconectado" ||
-                    status == "finish" || status == "Finalizado" ||
-                    status.empty());
+          hidden: !lambda return id(printer_is_idle);
