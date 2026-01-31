@@ -136,8 +136,8 @@ interval:
             snprintf(buf, sizeof(buf), "%.0f%%", id(print_progress).state);
             return buf;
 
-      - lvgl.arc.update:
-          id: progress_arc
+      - lvgl.bar.update:
+          id: progress_bar
           value: !lambda return (int)id(print_progress).state;
 
       - lvgl.label.update:
@@ -148,6 +148,23 @@ interval:
             if (isnan(hours)) return "--:--";
             int h = (int)hours;
             int m = (int)((hours - h) * 60);
+            snprintf(buf, sizeof(buf), "%d:%02d", h, m);
+            return buf;
+
+      - lvgl.label.update:
+          id: lbl_total_duration
+          text: !lambda |-
+            static char buf[16];
+            float remaining = id(print_time_remaining).state;
+            float progress = id(print_progress).state;
+            if (isnan(remaining) || isnan(progress) || progress <= 0.5f) return "--:--";
+            if (progress >= 99.9f) {
+              // Casi terminado, total ≈ elapsed
+              return "0:00";
+            }
+            float total = remaining * 100.0f / (100.0f - progress);
+            int h = (int)total;
+            int m = (int)((total - h) * 60);
             snprintf(buf, sizeof(buf), "%d:%02d", h, m);
             return buf;
 

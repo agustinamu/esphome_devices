@@ -325,86 +325,97 @@ widgets:
       border_width: 0
       pad_all: 0
       widgets:
-        # Capas (izquierda)
+        # Barra de progreso slim (full width) + porcentaje
+        - bar:
+            id: progress_bar
+            x: 0
+            y: 2
+            width: 590
+            height: 14
+            min_value: 0
+            max_value: 100
+            value: 0
+            bg_color: 0x333333
+            radius: 7
+            indicator:
+              bg_color: 0x00AE42
+              radius: 7
         - label:
-            x: 10
-            y: 25
+            id: lbl_progress
+            x: 600
+            y: -2
+            width: 80
+            text: "0%"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+            text_align: RIGHT
+
+        # Fila 1: Capas (izq) | Tiempo restante (der)
+        - label:
+            x: 0
+            y: 35
             text: "\U000F0E4B"
             text_font: mdi_32
             text_color: 0x00AE42
         - label:
             id: lbl_layers
-            x: 50
-            y: 28
+            x: 40
+            y: 38
             text: "-- / --"
-            text_font: montserrat_22
+            text_font: montserrat_28
             text_color: 0xFFFFFF
 
-        # Gauge circular (centro)
-        - arc:
-            id: progress_arc
-            x: 220
-            y: 5
-            width: 140
-            height: 140
-            min_value: 0
-            max_value: 100
-            value: 0
-            start_angle: 135
-            end_angle: 45
-            rotation: 0
-            adjustable: false
-            arc_color: 0x333333
-            arc_width: 10
-            indicator:
-              arc_color: 0x00AE42
-              arc_width: 10
-            knob:
-              bg_opa: 0%
-
-        # Porcentaje en centro del gauge
         - label:
-            id: lbl_progress
-            x: 255
-            y: 50
-            width: 70
-            text: "0%"
-            text_font: montserrat_36
-            text_color: 0xFFFFFF
-            text_align: CENTER
-
-        # Tiempo restante (derecha)
-        - label:
-            x: 440
-            y: 25
+            x: 380
+            y: 35
             text: "\U000F0150"
             text_font: mdi_32
             text_color: 0x00AE42
         - label:
             id: lbl_remaining
-            x: 480
-            y: 28
+            x: 420
+            y: 38
             text: "--:--"
-            text_font: montserrat_22
+            text_font: montserrat_28
             text_color: 0xFFFFFF
         - label:
-            x: 550
-            y: 28
+            x: 530
+            y: 42
             text: "rest"
             text_font: montserrat_18
             text_color: 0x666666
 
-        # Fin estimado (debajo del gauge)
+        # Fila 2: Duracion total (izq) | Fin estimado (der, verde, grande)
         - label:
-            x: 210
-            y: 155
-            text: "Fin estimado"
+            x: 0
+            y: 85
+            text: "\U000F0150"
+            text_font: mdi_32
+            text_color: 0x888888
+        - label:
+            id: lbl_total_duration
+            x: 40
+            y: 88
+            text: "--:--"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+        - label:
+            x: 150
+            y: 92
+            text: "total"
+            text_font: montserrat_18
+            text_color: 0x666666
+
+        - label:
+            x: 380
+            y: 92
+            text: "Fin"
             text_font: montserrat_18
             text_color: 0x666666
         - label:
             id: lbl_finish_time
-            x: 350
-            y: 152
+            x: 420
+            y: 83
             text: "--:--"
-            text_font: montserrat_28
+            text_font: montserrat_36
             text_color: 0x00AE42
