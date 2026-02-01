@@ -268,6 +268,206 @@ widgets:
                   lv_label_set_text(id(lbl_check_7), sel ? "\U000F0134" : "\U000F0131");
                   lv_obj_set_style_text_color(id(lbl_check_7), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
 
+        - button:
+            id: btn_bbox_8
+            x: 0
+            y: 0
+            width: 10
+            height: 10
+            hidden: true
+            bg_opa: 0%
+            border_width: 2
+            border_color: 0x444444
+            border_opa: 80%
+            radius: 2
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 8);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 8);
+                  lv_obj_set_style_border_color(id(btn_bbox_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_8), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_8), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_8), lv_color_hex(0x00AE42), 0);
+                  lv_obj_set_style_border_color(id(btn_skip_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_8), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_8), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+
+        - button:
+            id: btn_bbox_9
+            x: 0
+            y: 0
+            width: 10
+            height: 10
+            hidden: true
+            bg_opa: 0%
+            border_width: 2
+            border_color: 0x444444
+            border_opa: 80%
+            radius: 2
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 9);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 9);
+                  lv_obj_set_style_border_color(id(btn_bbox_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_9), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_9), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_9), lv_color_hex(0x00AE42), 0);
+                  lv_obj_set_style_border_color(id(btn_skip_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_9), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_9), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+
+        - button:
+            id: btn_bbox_10
+            x: 0
+            y: 0
+            width: 10
+            height: 10
+            hidden: true
+            bg_opa: 0%
+            border_width: 2
+            border_color: 0x444444
+            border_opa: 80%
+            radius: 2
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 10);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 10);
+                  lv_obj_set_style_border_color(id(btn_bbox_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_10), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_10), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_10), lv_color_hex(0x00AE42), 0);
+                  lv_obj_set_style_border_color(id(btn_skip_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_10), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_10), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+
+        - button:
+            id: btn_bbox_11
+            x: 0
+            y: 0
+            width: 10
+            height: 10
+            hidden: true
+            bg_opa: 0%
+            border_width: 2
+            border_color: 0x444444
+            border_opa: 80%
+            radius: 2
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 11);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 11);
+                  lv_obj_set_style_border_color(id(btn_bbox_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_11), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_11), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_11), lv_color_hex(0x00AE42), 0);
+                  lv_obj_set_style_border_color(id(btn_skip_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_11), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_11), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+
+        - button:
+            id: btn_bbox_12
+            x: 0
+            y: 0
+            width: 10
+            height: 10
+            hidden: true
+            bg_opa: 0%
+            border_width: 2
+            border_color: 0x444444
+            border_opa: 80%
+            radius: 2
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 12);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 12);
+                  lv_obj_set_style_border_color(id(btn_bbox_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_12), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_12), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_12), lv_color_hex(0x00AE42), 0);
+                  lv_obj_set_style_border_color(id(btn_skip_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_12), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_12), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+
+        - button:
+            id: btn_bbox_13
+            x: 0
+            y: 0
+            width: 10
+            height: 10
+            hidden: true
+            bg_opa: 0%
+            border_width: 2
+            border_color: 0x444444
+            border_opa: 80%
+            radius: 2
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 13);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 13);
+                  lv_obj_set_style_border_color(id(btn_bbox_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_13), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_13), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_13), lv_color_hex(0x00AE42), 0);
+                  lv_obj_set_style_border_color(id(btn_skip_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_13), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_13), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+
+        - button:
+            id: btn_bbox_14
+            x: 0
+            y: 0
+            width: 10
+            height: 10
+            hidden: true
+            bg_opa: 0%
+            border_width: 2
+            border_color: 0x444444
+            border_opa: 80%
+            radius: 2
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 14);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 14);
+                  lv_obj_set_style_border_color(id(btn_bbox_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_14), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_14), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_14), lv_color_hex(0x00AE42), 0);
+                  lv_obj_set_style_border_color(id(btn_skip_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_14), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_14), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+
+        - button:
+            id: btn_bbox_15
+            x: 0
+            y: 0
+            width: 10
+            height: 10
+            hidden: true
+            bg_opa: 0%
+            border_width: 2
+            border_color: 0x444444
+            border_opa: 80%
+            radius: 2
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 15);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 15);
+                  lv_obj_set_style_border_color(id(btn_bbox_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_15), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_15), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_15), lv_color_hex(0x00AE42), 0);
+                  lv_obj_set_style_border_color(id(btn_skip_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_15), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_15), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+
   # === RIGHT PANEL: Object list + SKIP button ===
   # Scrollable list of objects with check indicators
   - obj:
@@ -282,7 +482,7 @@ widgets:
         type: FLEX
         flex_flow: COLUMN
         pad_row: 4
-      scrollbar_mode: "off"
+      scrollbar_mode: "auto"
       widgets:
         # Row 0
         - button:
@@ -605,6 +805,326 @@ widgets:
                   lv_obj_set_style_bg_opa(id(btn_bbox_7), sel ? 40 : 0, 0);
                   lv_obj_set_style_bg_color(id(btn_bbox_7), lv_color_hex(0x00AE42), 0);
 
+        # Row 8
+        - button:
+            id: btn_skip_8
+            width: 380
+            height: 40
+            radius: 8
+            bg_color: 0x2A2A2A
+            border_width: 2
+            border_color: 0x2A2A2A
+            hidden: true
+            widgets:
+              - label:
+                  id: lbl_check_8
+                  align: LEFT_MID
+                  x: 5
+                  text: "\U000F0131"
+                  text_font: mdi_24
+                  text_color: 0x555555
+              - label:
+                  id: lbl_skip_8
+                  align: LEFT_MID
+                  x: 35
+                  text: ""
+                  text_font: montserrat_18
+                  text_color: 0xFFFFFF
+                  long_mode: DOT
+                  width: 330
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 8);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 8);
+                  lv_obj_set_style_border_color(id(btn_skip_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_8), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_8), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+                  lv_obj_set_style_border_color(id(btn_bbox_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_8), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_8), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_8), lv_color_hex(0x00AE42), 0);
+
+        # Row 9
+        - button:
+            id: btn_skip_9
+            width: 380
+            height: 40
+            radius: 8
+            bg_color: 0x2A2A2A
+            border_width: 2
+            border_color: 0x2A2A2A
+            hidden: true
+            widgets:
+              - label:
+                  id: lbl_check_9
+                  align: LEFT_MID
+                  x: 5
+                  text: "\U000F0131"
+                  text_font: mdi_24
+                  text_color: 0x555555
+              - label:
+                  id: lbl_skip_9
+                  align: LEFT_MID
+                  x: 35
+                  text: ""
+                  text_font: montserrat_18
+                  text_color: 0xFFFFFF
+                  long_mode: DOT
+                  width: 330
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 9);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 9);
+                  lv_obj_set_style_border_color(id(btn_skip_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_9), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_9), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+                  lv_obj_set_style_border_color(id(btn_bbox_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_9), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_9), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_9), lv_color_hex(0x00AE42), 0);
+
+        # Row 10
+        - button:
+            id: btn_skip_10
+            width: 380
+            height: 40
+            radius: 8
+            bg_color: 0x2A2A2A
+            border_width: 2
+            border_color: 0x2A2A2A
+            hidden: true
+            widgets:
+              - label:
+                  id: lbl_check_10
+                  align: LEFT_MID
+                  x: 5
+                  text: "\U000F0131"
+                  text_font: mdi_24
+                  text_color: 0x555555
+              - label:
+                  id: lbl_skip_10
+                  align: LEFT_MID
+                  x: 35
+                  text: ""
+                  text_font: montserrat_18
+                  text_color: 0xFFFFFF
+                  long_mode: DOT
+                  width: 330
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 10);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 10);
+                  lv_obj_set_style_border_color(id(btn_skip_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_10), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_10), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+                  lv_obj_set_style_border_color(id(btn_bbox_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_10), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_10), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_10), lv_color_hex(0x00AE42), 0);
+
+        # Row 11
+        - button:
+            id: btn_skip_11
+            width: 380
+            height: 40
+            radius: 8
+            bg_color: 0x2A2A2A
+            border_width: 2
+            border_color: 0x2A2A2A
+            hidden: true
+            widgets:
+              - label:
+                  id: lbl_check_11
+                  align: LEFT_MID
+                  x: 5
+                  text: "\U000F0131"
+                  text_font: mdi_24
+                  text_color: 0x555555
+              - label:
+                  id: lbl_skip_11
+                  align: LEFT_MID
+                  x: 35
+                  text: ""
+                  text_font: montserrat_18
+                  text_color: 0xFFFFFF
+                  long_mode: DOT
+                  width: 330
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 11);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 11);
+                  lv_obj_set_style_border_color(id(btn_skip_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_11), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_11), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+                  lv_obj_set_style_border_color(id(btn_bbox_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_11), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_11), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_11), lv_color_hex(0x00AE42), 0);
+
+        # Row 12
+        - button:
+            id: btn_skip_12
+            width: 380
+            height: 40
+            radius: 8
+            bg_color: 0x2A2A2A
+            border_width: 2
+            border_color: 0x2A2A2A
+            hidden: true
+            widgets:
+              - label:
+                  id: lbl_check_12
+                  align: LEFT_MID
+                  x: 5
+                  text: "\U000F0131"
+                  text_font: mdi_24
+                  text_color: 0x555555
+              - label:
+                  id: lbl_skip_12
+                  align: LEFT_MID
+                  x: 35
+                  text: ""
+                  text_font: montserrat_18
+                  text_color: 0xFFFFFF
+                  long_mode: DOT
+                  width: 330
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 12);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 12);
+                  lv_obj_set_style_border_color(id(btn_skip_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_12), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_12), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+                  lv_obj_set_style_border_color(id(btn_bbox_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_12), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_12), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_12), lv_color_hex(0x00AE42), 0);
+
+        # Row 13
+        - button:
+            id: btn_skip_13
+            width: 380
+            height: 40
+            radius: 8
+            bg_color: 0x2A2A2A
+            border_width: 2
+            border_color: 0x2A2A2A
+            hidden: true
+            widgets:
+              - label:
+                  id: lbl_check_13
+                  align: LEFT_MID
+                  x: 5
+                  text: "\U000F0131"
+                  text_font: mdi_24
+                  text_color: 0x555555
+              - label:
+                  id: lbl_skip_13
+                  align: LEFT_MID
+                  x: 35
+                  text: ""
+                  text_font: montserrat_18
+                  text_color: 0xFFFFFF
+                  long_mode: DOT
+                  width: 330
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 13);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 13);
+                  lv_obj_set_style_border_color(id(btn_skip_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_13), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_13), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+                  lv_obj_set_style_border_color(id(btn_bbox_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_13), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_13), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_13), lv_color_hex(0x00AE42), 0);
+
+        # Row 14
+        - button:
+            id: btn_skip_14
+            width: 380
+            height: 40
+            radius: 8
+            bg_color: 0x2A2A2A
+            border_width: 2
+            border_color: 0x2A2A2A
+            hidden: true
+            widgets:
+              - label:
+                  id: lbl_check_14
+                  align: LEFT_MID
+                  x: 5
+                  text: "\U000F0131"
+                  text_font: mdi_24
+                  text_color: 0x555555
+              - label:
+                  id: lbl_skip_14
+                  align: LEFT_MID
+                  x: 35
+                  text: ""
+                  text_font: montserrat_18
+                  text_color: 0xFFFFFF
+                  long_mode: DOT
+                  width: 330
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 14);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 14);
+                  lv_obj_set_style_border_color(id(btn_skip_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_14), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_14), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+                  lv_obj_set_style_border_color(id(btn_bbox_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_14), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_14), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_14), lv_color_hex(0x00AE42), 0);
+
+        # Row 15
+        - button:
+            id: btn_skip_15
+            width: 380
+            height: 40
+            radius: 8
+            bg_color: 0x2A2A2A
+            border_width: 2
+            border_color: 0x2A2A2A
+            hidden: true
+            widgets:
+              - label:
+                  id: lbl_check_15
+                  align: LEFT_MID
+                  x: 5
+                  text: "\U000F0131"
+                  text_font: mdi_24
+                  text_color: 0x555555
+              - label:
+                  id: lbl_skip_15
+                  align: LEFT_MID
+                  x: 35
+                  text: ""
+                  text_font: montserrat_18
+                  text_color: 0xFFFFFF
+                  long_mode: DOT
+                  width: 330
+            on_click:
+              - lambda: id(skip_selection) ^= (1 << 15);
+              - lambda: |-
+                  bool sel = id(skip_selection) & (1 << 15);
+                  lv_obj_set_style_border_color(id(btn_skip_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
+                  lv_obj_set_style_bg_color(id(btn_skip_15), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+                  lv_label_set_text(id(lbl_check_15), sel ? "\U000F0134" : "\U000F0131");
+                  lv_obj_set_style_text_color(id(lbl_check_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+                  lv_obj_set_style_border_color(id(btn_bbox_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
+                  lv_obj_set_style_border_width(id(btn_bbox_15), sel ? 3 : 2, 0);
+                  lv_obj_set_style_bg_opa(id(btn_bbox_15), sel ? 40 : 0, 0);
+                  lv_obj_set_style_bg_color(id(btn_bbox_15), lv_color_hex(0x00AE42), 0);
+
   # === SKIP BUTTON (bottom right) ===
   - button:
       id: btn_do_skip
@@ -626,7 +1146,7 @@ widgets:
             int idx = 0;
             int selection = id(skip_selection);
             size_t pos = 0;
-            while (pos < data.size() && idx < 8) {
+            while (pos < data.size() && idx < 16) {
               size_t pipe = data.find('|', pos);
               if (pipe == std::string::npos) pipe = data.size();
               if (selection & (1 << idx)) {

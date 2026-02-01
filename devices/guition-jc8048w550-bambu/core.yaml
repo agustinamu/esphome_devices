@@ -38,7 +38,7 @@ http_request:
 online_image:
   - id: plate_image
     url: "${ha_url}/api/image_proxy/image.${bambu_prefix}_seleccionar_imagen"
-    format: png
+    format: jpeg
     type: RGB565
     resize: 380x380
     request_headers:

@@ -518,16 +518,22 @@ interval:
           std::string bbox_data = id(plate_bbox_data).state;
 
           lv_obj_t* rows[] = {id(btn_skip_0), id(btn_skip_1), id(btn_skip_2), id(btn_skip_3),
-                              id(btn_skip_4), id(btn_skip_5), id(btn_skip_6), id(btn_skip_7)};
+                              id(btn_skip_4), id(btn_skip_5), id(btn_skip_6), id(btn_skip_7),
+                              id(btn_skip_8), id(btn_skip_9), id(btn_skip_10), id(btn_skip_11),
+                              id(btn_skip_12), id(btn_skip_13), id(btn_skip_14), id(btn_skip_15)};
           lv_obj_t* labels[] = {id(lbl_skip_0), id(lbl_skip_1), id(lbl_skip_2), id(lbl_skip_3),
-                                id(lbl_skip_4), id(lbl_skip_5), id(lbl_skip_6), id(lbl_skip_7)};
+                                id(lbl_skip_4), id(lbl_skip_5), id(lbl_skip_6), id(lbl_skip_7),
+                                id(lbl_skip_8), id(lbl_skip_9), id(lbl_skip_10), id(lbl_skip_11),
+                                id(lbl_skip_12), id(lbl_skip_13), id(lbl_skip_14), id(lbl_skip_15)};
           lv_obj_t* overlays[] = {id(btn_bbox_0), id(btn_bbox_1), id(btn_bbox_2), id(btn_bbox_3),
-                                  id(btn_bbox_4), id(btn_bbox_5), id(btn_bbox_6), id(btn_bbox_7)};
+                                  id(btn_bbox_4), id(btn_bbox_5), id(btn_bbox_6), id(btn_bbox_7),
+                                  id(btn_bbox_8), id(btn_bbox_9), id(btn_bbox_10), id(btn_bbox_11),
+                                  id(btn_bbox_12), id(btn_bbox_13), id(btn_bbox_14), id(btn_bbox_15)};
 
           // Parse list data (ID:name|...)
           int count = 0;
           size_t pos = 0;
-          while (pos < data.size() && count < 8) {
+          while (pos < data.size() && count < 16) {
             size_t pipe = data.find('|', pos);
             if (pipe == std::string::npos) pipe = data.size();
             size_t colon = data.find(':', pos);
@@ -539,7 +545,7 @@ interval:
             pos = pipe + 1;
             count++;
           }
-          for (int i = count; i < 8; i++) {
+          for (int i = count; i < 16; i++) {
             lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
           }
@@ -548,7 +554,7 @@ interval:
           if (!bbox_data.empty()) {
             int bidx = 0;
             size_t bpos = 0;
-            while (bpos < bbox_data.size() && bidx < 8) {
+            while (bpos < bbox_data.size() && bidx < 16) {
               size_t bpipe = bbox_data.find('|', bpos);
               if (bpipe == std::string::npos) bpipe = bbox_data.size();
 
@@ -586,7 +592,7 @@ interval:
               bpos = bpipe + 1;
               bidx++;
             }
-            for (int i = bidx; i < 8; i++) {
+            for (int i = bidx; i < 16; i++) {
               lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
             }
           }
