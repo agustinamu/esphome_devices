@@ -47,6 +47,8 @@ online_image:
       - lvgl.image.update:
           id: img_plate
           src: plate_image
+    on_error:
+      - logger.log: "Error descargando imagen de plato"
 
 # Botón de reinicio interno
 button:

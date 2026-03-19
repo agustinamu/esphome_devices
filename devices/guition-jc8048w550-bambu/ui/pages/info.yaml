@@ -224,7 +224,8 @@ widgets:
               - label:
                   x: 180
                   y: 140
-                  text: "ESPHome 2025.x"
+                  id: lbl_version
+                  text: "ESPHome"
                   text_font: montserrat_22
                   text_color: 0xFFFFFF
 

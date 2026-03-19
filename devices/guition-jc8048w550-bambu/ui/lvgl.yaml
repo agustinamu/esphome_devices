@@ -26,6 +26,7 @@ lvgl:
   touchscreens:
     - my_touch
   color_depth: 16
+  buffer_size: 25%
 
   style_definitions: !include styles.yaml
 

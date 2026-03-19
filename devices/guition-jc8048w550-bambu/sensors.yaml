@@ -83,7 +83,7 @@ text_sensor:
   # Skip objects (requiere template sensor en HA: sensor.p1s_printable_objects_list)
   - platform: homeassistant
     id: printable_objects_list
-    entity_id: sensor.p1s_printable_objects_list
+    entity_id: sensor.${bambu_prefix}_printable_objects_list
 
   # Bounding boxes serializados del plate_analyzer (ID:name:x1,y1,x2,y2|...)
   - platform: homeassistant

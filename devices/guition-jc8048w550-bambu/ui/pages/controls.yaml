@@ -88,7 +88,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                    value: !lambda "return id(nozzle_target).state + 5;"
+                    value: !lambda "return std::min(300.0f, id(nozzle_target).state + 5);"
 
         - button:
             x: 229
@@ -106,7 +106,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                    value: !lambda "return id(nozzle_target).state + 10;"
+                    value: !lambda "return std::min(300.0f, id(nozzle_target).state + 10);"
 
         - button:
             x: 10
@@ -203,7 +203,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                    value: !lambda "return id(bed_target).state + 5;"
+                    value: !lambda "return std::min(120.0f, id(bed_target).state + 5);"
 
         - button:
             x: 229
@@ -221,7 +221,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                    value: !lambda "return id(bed_target).state + 10;"
+                    value: !lambda "return std::min(120.0f, id(bed_target).state + 10);"
 
         - button:
             x: 10

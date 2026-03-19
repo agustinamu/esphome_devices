@@ -3,11 +3,6 @@
 
 font:
   - file: "gfonts://Montserrat"
-    id: montserrat_14
-    size: 14
-    bpp: 4
-
-  - file: "gfonts://Montserrat"
     id: montserrat_18
     size: 18
     bpp: 4
