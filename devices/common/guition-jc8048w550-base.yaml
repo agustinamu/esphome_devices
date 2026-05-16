@@ -61,7 +61,8 @@ i2c:
 # Display RGB 800x480 - ST7262
 # Timings optimizados para panel Guition
 display:
-  - platform: rpi_dpi_rgb
+  - platform: mipi_rgb
+    model: RPI
     id: my_display
     color_order: RGB
     invert_colors: false
