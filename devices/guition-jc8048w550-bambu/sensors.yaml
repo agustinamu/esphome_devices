@@ -40,16 +40,25 @@ sensor:
     id: aux_fan_speed
     entity_id: fan.${bambu_prefix}_ventilador_auxiliar
     attribute: percentage
+    on_value:
+      then:
+        - script.execute: refresh_fan_aux
 
   - platform: homeassistant
     id: cooling_fan_speed
     entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
     attribute: percentage
+    on_value:
+      then:
+        - script.execute: refresh_fan_cooling
 
   - platform: homeassistant
     id: chamber_fan_speed
     entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
     attribute: percentage
+    on_value:
+      then:
+        - script.execute: refresh_fan_chamber
 
   - platform: wifi_signal
     id: wifi_signal_db
@@ -84,12 +93,18 @@ text_sensor:
   - platform: homeassistant
     id: printable_objects_list
     entity_id: sensor.${bambu_prefix}_printable_objects_list
+    on_value:
+      then:
+        - script.execute: refresh_skip_objects
 
   # Bounding boxes serializados del plate_analyzer (ID:name:x1,y1,x2,y2|...)
   - platform: homeassistant
     id: plate_bbox_data
     entity_id: sensor.analizador_de_plato
     attribute: bbox_data
+    on_value:
+      then:
+        - script.execute: refresh_skip_objects
 
   - platform: wifi_info
     ip_address:
@@ -99,6 +114,12 @@ binary_sensor:
   - platform: homeassistant
     id: printer_online
     entity_id: binary_sensor.${bambu_prefix}_en_linea
+    on_state:
+      then:
+        - script.execute: refresh_fan_cooling
+        - script.execute: refresh_fan_aux
+        - script.execute: refresh_fan_chamber
+        - script.execute: refresh_sidebar
 
   - platform: homeassistant
     id: chamber_light

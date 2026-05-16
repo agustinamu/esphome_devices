@@ -183,19 +183,6 @@ interval:
             if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
             return lv_color_hex(0x555555);
 
-      # Icono nozzle: naranja si calentando, verde si a temperatura
-      - lvgl.label.update:
-          id: icon_nozzle
-          text_color: !lambda |-
-            if (!id(printer_online).state) return lv_color_hex(0x555555);
-            float current = id(nozzle_temp).state;
-            float target = id(nozzle_target).state;
-            if (target > 0 && current < target - 2) {
-              // Calentando - naranja parpadeante
-              return ((millis() / 500) % 2 == 0) ? lv_color_hex(0xFF8800) : lv_color_hex(0xFFAA00);
-            }
-            return lv_color_hex(0x00AE42);  // Normal - verde
-
       - lvgl.label.update:
           id: lbl_bed
           text: !lambda |-
@@ -207,62 +194,12 @@ interval:
             if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
             return lv_color_hex(0x555555);
 
-      # Icono bed: naranja si calentando, verde si a temperatura
-      - lvgl.label.update:
-          id: icon_bed
-          text_color: !lambda |-
-            if (!id(printer_online).state) return lv_color_hex(0x555555);
-            float current = id(bed_temp).state;
-            float target = id(bed_target).state;
-            if (target > 0 && current < target - 2) {
-              // Calentando - naranja parpadeante
-              return ((millis() / 500) % 2 == 0) ? lv_color_hex(0xFF8800) : lv_color_hex(0xFFAA00);
-            }
-            return lv_color_hex(0x00AE42);  // Normal - verde
-
       - lvgl.label.update:
           id: lbl_layers
           text: !lambda |-
             static char buf[16];
             snprintf(buf, sizeof(buf), "%.0f / %.0f", id(current_layer).state, id(total_layers).state);
             return buf;
-
-      # Fans (Home page - compact)
-      - lvgl.label.update:
-          id: lbl_cooling_fan
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(cooling_fan_speed).state;
-            if (!id(printer_online).state || isnan(pct)) return "--";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-          text_color: !lambda |-
-            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
-            return lv_color_hex(0x555555);
-
-      - lvgl.label.update:
-          id: lbl_aux_fan
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(aux_fan_speed).state;
-            if (!id(printer_online).state || isnan(pct)) return "--";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-          text_color: !lambda |-
-            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
-            return lv_color_hex(0x555555);
-
-      - lvgl.label.update:
-          id: lbl_chamber_fan
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(chamber_fan_speed).state;
-            if (!id(printer_online).state || isnan(pct)) return "--";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-          text_color: !lambda |-
-            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
-            return lv_color_hex(0x555555);
 
       # === CONTROLS PAGE ===
       - lvgl.label.update:
@@ -297,89 +234,44 @@ interval:
             if (id(chamber_light).state) return lv_color_hex(0x00AE42);
             return lv_color_hex(0x888888);
 
-      # === FANS PAGE ===
-      # Cooling fan
-      - lvgl.label.update:
-          id: lbl_cooling_pct
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(cooling_fan_speed).state;
-            if (isnan(pct)) return "0%";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-      - lvgl.label.update:
-          id: lbl_cooling_val
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(cooling_fan_speed).state;
-            if (isnan(pct)) return "0%";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-      - lvgl.arc.update:
-          id: arc_cooling
-          value: !lambda |-
-            float pct = id(cooling_fan_speed).state;
-            return isnan(pct) ? 0 : (int)pct;
+      # === HOME: Ocultar secciones cuando idle/offline ===
       - lvgl.widget.update:
-          id: sw_cooling
-          state:
-            checked: !lambda return id(cooling_fan_speed).state > 0;
-
-      # Aux fan
-      - lvgl.label.update:
-          id: lbl_aux_pct
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(aux_fan_speed).state;
-            if (isnan(pct)) return "0%";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-      - lvgl.label.update:
-          id: lbl_aux_val
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(aux_fan_speed).state;
-            if (isnan(pct)) return "0%";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-      - lvgl.arc.update:
-          id: arc_aux
-          value: !lambda |-
-            float pct = id(aux_fan_speed).state;
-            return isnan(pct) ? 0 : (int)pct;
+          id: home_filename_row
+          hidden: !lambda return id(printer_is_idle);
       - lvgl.widget.update:
-          id: sw_aux
-          state:
-            checked: !lambda return id(aux_fan_speed).state > 0;
-
-      # Chamber fan
-      - lvgl.label.update:
-          id: lbl_chamber_pct
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(chamber_fan_speed).state;
-            if (isnan(pct)) return "0%";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-      - lvgl.label.update:
-          id: lbl_chamber_val
-          text: !lambda |-
-            static char buf[8];
-            float pct = id(chamber_fan_speed).state;
-            if (isnan(pct)) return "0%";
-            snprintf(buf, sizeof(buf), "%.0f%%", pct);
-            return buf;
-      - lvgl.arc.update:
-          id: arc_chamber
-          value: !lambda |-
-            float pct = id(chamber_fan_speed).state;
-            return isnan(pct) ? 0 : (int)pct;
+          id: home_fans_row
+          hidden: !lambda return id(printer_is_idle);
       - lvgl.widget.update:
-          id: sw_chamber
-          state:
-            checked: !lambda return id(chamber_fan_speed).state > 0;
+          id: home_progress_section
+          hidden: !lambda return id(printer_is_idle);
 
-      # === INFO PAGE ===
+      # === SKIP OBJECTS ===
+      # Boton SKIP en home: visible solo imprimiendo con >1 objeto
+      - lvgl.widget.update:
+          id: btn_skip_objects
+          hidden: !lambda |-
+            if (id(printer_is_idle)) return true;
+            return id(printable_objects_count).state <= 1;
+
+      # Contador en skip page
+      - lvgl.label.update:
+          id: lbl_skip_count
+          text: !lambda |-
+            static char buf[16];
+            int n = (int)id(printable_objects_count).state;
+            if (n <= 0) return "";
+            snprintf(buf, sizeof(buf), "%d objects", n);
+            return buf;
+
+      # Mostrar/ocultar boton SKIP SELECTED segun seleccion
+      - lvgl.widget.update:
+          id: btn_do_skip
+          hidden: !lambda return id(skip_selection) == 0;
+
+  # Info page: datos que cambian lento (WiFi, IP, uptime, status). Interval propio
+  # lento (10s) para no recargar el interval principal con widgets poco visibles.
+  - interval: 10s
+    then:
       - lvgl.label.update:
           id: lbl_wifi_signal
           text: !lambda |-
@@ -406,212 +298,84 @@ interval:
             }
             return buf;
 
-      # Online status dinamico
       - lvgl.label.update:
           id: lbl_online_status
           text: !lambda |-
             if (id(printer_online).state) return "Online";
             return "Offline";
-          text_color: !lambda |-
-            if (id(printer_online).state) return lv_color_hex(0x00AE42);
-            return lv_color_hex(0xFF4444);
       - lvgl.label.update:
-          id: lbl_online_icon
+          id: [lbl_online_status, lbl_online_icon]
           text_color: !lambda |-
             if (id(printer_online).state) return lv_color_hex(0x00AE42);
             return lv_color_hex(0xFF4444);
 
-      # Print error status
       - lvgl.label.update:
           id: lbl_print_error
           text: !lambda |-
             if (id(print_error).state) return "ERROR";
             return "OK";
-          text_color: !lambda |-
-            if (id(print_error).state) return lv_color_hex(0xFF4444);
-            return lv_color_hex(0x00AE42);
       - lvgl.label.update:
-          id: lbl_print_error_icon
+          id: [lbl_print_error, lbl_print_error_icon]
           text_color: !lambda |-
             if (id(print_error).state) return lv_color_hex(0xFF4444);
             return lv_color_hex(0x00AE42);
 
-      # HMS error status
       - lvgl.label.update:
           id: lbl_hms_status
           text: !lambda |-
             if (id(hms_error).state) {
-              // Mostrar el texto del error HMS si existe
               if (!id(hms_errors).state.empty()) {
                 return id(hms_errors).state.c_str();
               }
               return "ERROR";
             }
             return "OK";
-          text_color: !lambda |-
-            if (id(hms_error).state) return lv_color_hex(0xFF4444);
-            return lv_color_hex(0x00AE42);
       - lvgl.label.update:
-          id: lbl_hms_icon
+          id: [lbl_hms_status, lbl_hms_icon]
           text_color: !lambda |-
             if (id(hms_error).state) return lv_color_hex(0xFF4444);
             return lv_color_hex(0x00AE42);
 
-      # SD Card status
       - lvgl.label.update:
           id: lbl_sd_status
           text: !lambda |-
             if (id(sdcard_state).state.empty()) return "---";
             return id(sdcard_state).state.c_str();
-          text_color: !lambda |-
-            std::string state = id(sdcard_state).state;
-            if (state == "normal" || state == "Normal") return lv_color_hex(0x00AE42);
-            if (state.empty() || state == "unknown") return lv_color_hex(0x888888);
-            return lv_color_hex(0xFFAA00);
       - lvgl.label.update:
-          id: lbl_sd_icon
+          id: [lbl_sd_status, lbl_sd_icon]
           text_color: !lambda |-
             std::string state = id(sdcard_state).state;
             if (state == "normal" || state == "Normal") return lv_color_hex(0x00AE42);
             if (state.empty() || state == "unknown") return lv_color_hex(0x888888);
             return lv_color_hex(0xFFAA00);
 
-      # Sidebar: deshabilitar visualmente Controls y Motion cuando offline
-      - lvgl.label.update:
-          id: lbl_nav_controls
-          text_color: !lambda |-
-            if (id(printer_online).state) return lv_color_hex(0x666666);
-            return lv_color_hex(0x333333);
-      - lvgl.label.update:
-          id: lbl_nav_motion
-          text_color: !lambda |-
-            if (id(printer_online).state) return lv_color_hex(0x666666);
-            return lv_color_hex(0x333333);
-
-      # Indicador de error en sidebar (parpadea alternando visibilidad)
+  # Parpadeo de iconos nozzle/bed cuando calentando y de error_indicator
+  # cuando hay errores (interval propio rapido)
+  - interval: 500ms
+    then:
       - lvgl.widget.update:
           id: lbl_error_indicator
           hidden: !lambda |-
             bool has_error = id(print_error).state || id(hms_error).state;
             if (!has_error) return true;
-            // Parpadeo: alterna cada segundo basado en el tiempo
             return (millis() / 500) % 2 == 0;
-
-      # === HOME: Ocultar secciones cuando idle/offline ===
-      - lvgl.widget.update:
-          id: home_filename_row
-          hidden: !lambda return id(printer_is_idle);
-      - lvgl.widget.update:
-          id: home_fans_row
-          hidden: !lambda return id(printer_is_idle);
-      - lvgl.widget.update:
-          id: home_progress_section
-          hidden: !lambda return id(printer_is_idle);
-
-      # === SKIP OBJECTS ===
-      # Boton SKIP en home: visible solo imprimiendo con >1 objeto
-      - lvgl.widget.update:
-          id: btn_skip_objects
-          hidden: !lambda |-
-            if (id(printer_is_idle)) return true;
-            return id(printable_objects_count).state <= 1;
-
-      # Actualizar slots de skip objects page (lista + overlays)
-      - lambda: |-
-          std::string data = id(printable_objects_list).state;
-          std::string bbox_data = id(plate_bbox_data).state;
-
-          lv_obj_t* rows[] = {id(btn_skip_0), id(btn_skip_1), id(btn_skip_2), id(btn_skip_3),
-                              id(btn_skip_4), id(btn_skip_5), id(btn_skip_6), id(btn_skip_7),
-                              id(btn_skip_8), id(btn_skip_9), id(btn_skip_10), id(btn_skip_11),
-                              id(btn_skip_12), id(btn_skip_13), id(btn_skip_14), id(btn_skip_15)};
-          lv_obj_t* labels[] = {id(lbl_skip_0), id(lbl_skip_1), id(lbl_skip_2), id(lbl_skip_3),
-                                id(lbl_skip_4), id(lbl_skip_5), id(lbl_skip_6), id(lbl_skip_7),
-                                id(lbl_skip_8), id(lbl_skip_9), id(lbl_skip_10), id(lbl_skip_11),
-                                id(lbl_skip_12), id(lbl_skip_13), id(lbl_skip_14), id(lbl_skip_15)};
-          lv_obj_t* overlays[] = {id(btn_bbox_0), id(btn_bbox_1), id(btn_bbox_2), id(btn_bbox_3),
-                                  id(btn_bbox_4), id(btn_bbox_5), id(btn_bbox_6), id(btn_bbox_7),
-                                  id(btn_bbox_8), id(btn_bbox_9), id(btn_bbox_10), id(btn_bbox_11),
-                                  id(btn_bbox_12), id(btn_bbox_13), id(btn_bbox_14), id(btn_bbox_15)};
-
-          // Parse list data (ID:name|...)
-          int count = 0;
-          size_t pos = 0;
-          while (pos < data.size() && count < 16) {
-            size_t pipe = data.find('|', pos);
-            if (pipe == std::string::npos) pipe = data.size();
-            size_t colon = data.find(':', pos);
-            if (colon != std::string::npos && colon < pipe) {
-              std::string name = data.substr(colon + 1, pipe - colon - 1);
-              lv_label_set_text(labels[count], name.c_str());
-              lv_obj_clear_flag(rows[count], LV_OBJ_FLAG_HIDDEN);
-            }
-            pos = pipe + 1;
-            count++;
-          }
-          for (int i = count; i < 16; i++) {
-            lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
-          }
-
-          // Parse bbox data (ID:name:x1,y1,x2,y2|...) and position overlays
-          if (!bbox_data.empty()) {
-            int bidx = 0;
-            size_t bpos = 0;
-            while (bpos < bbox_data.size() && bidx < 16) {
-              size_t bpipe = bbox_data.find('|', bpos);
-              if (bpipe == std::string::npos) bpipe = bbox_data.size();
-
-              // Find second colon (after ID:name:)
-              size_t c1 = bbox_data.find(':', bpos);
-              size_t c2 = (c1 != std::string::npos) ? bbox_data.find(':', c1 + 1) : std::string::npos;
-
-              if (c2 != std::string::npos && c2 < bpipe && c2 + 1 < bpipe) {
-                std::string coords = bbox_data.substr(c2 + 1, bpipe - c2 - 1);
-                // Parse x1,y1,x2,y2
-                int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-                if (sscanf(coords.c_str(), "%d,%d,%d,%d", &x1, &y1, &x2, &y2) == 4) {
-                  // Scale from original image size to 380x380
-                  // bbox_data comes from plate_analyzer which uses original image coords
-                  // The image is resized to 380x380 by online_image
-                  // We need image_width from the sensor, but for simplicity use the coords as-is
-                  // since plate_analyzer image is typically 512x512
-                  // Scale: coord * 380 / img_size (use 512 as default)
-                  int img_w = 512;  // default plate image size
-                  int img_h = 512;
-                  int sx1 = x1 * 380 / img_w;
-                  int sy1 = y1 * 380 / img_h;
-                  int sx2 = x2 * 380 / img_w;
-                  int sy2 = y2 * 380 / img_h;
-                  int w = sx2 - sx1;
-                  int h = sy2 - sy1;
-                  if (w < 30) w = 30;  // minimum touch target
-                  if (h < 30) h = 30;
-
-                  lv_obj_set_pos(overlays[bidx], sx1, sy1);
-                  lv_obj_set_size(overlays[bidx], w, h);
-                  lv_obj_clear_flag(overlays[bidx], LV_OBJ_FLAG_HIDDEN);
-                }
-              }
-              bpos = bpipe + 1;
-              bidx++;
-            }
-            for (int i = bidx; i < 16; i++) {
-              lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
-            }
-          }
-
-      # Contador en skip page
       - lvgl.label.update:
-          id: lbl_skip_count
-          text: !lambda |-
-            static char buf[16];
-            int n = (int)id(printable_objects_count).state;
-            if (n <= 0) return "";
-            snprintf(buf, sizeof(buf), "%d objects", n);
-            return buf;
-
-      # Mostrar/ocultar boton SKIP SELECTED segun seleccion
-      - lvgl.widget.update:
-          id: btn_do_skip
-          hidden: !lambda return id(skip_selection) == 0;
+          id: icon_nozzle
+          text_color: !lambda |-
+            if (!id(printer_online).state) return lv_color_hex(0x555555);
+            float current = id(nozzle_temp).state;
+            float target = id(nozzle_target).state;
+            if (target > 0 && current < target - 2) {
+              return ((millis() / 500) % 2 == 0) ? lv_color_hex(0xFF8800) : lv_color_hex(0xFFAA00);
+            }
+            return lv_color_hex(0x00AE42);
+      - lvgl.label.update:
+          id: icon_bed
+          text_color: !lambda |-
+            if (!id(printer_online).state) return lv_color_hex(0x555555);
+            float current = id(bed_temp).state;
+            float target = id(bed_target).state;
+            if (target > 0 && current < target - 2) {
+              return ((millis() / 500) % 2 == 0) ? lv_color_hex(0xFF8800) : lv_color_hex(0xFFAA00);
+            }
+            return lv_color_hex(0x00AE42);

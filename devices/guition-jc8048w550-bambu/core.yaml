@@ -93,3 +93,184 @@ touchscreen:
             - lvgl.widget.update:
                 id: touch_blocker
                 hidden: false
+
+# Scripts reactivos: disparados por on_value/on_state desde sensors.yaml, no por polling.
+script:
+  - id: refresh_sidebar
+    then:
+      - lvgl.label.update:
+          id: [lbl_nav_controls, lbl_nav_motion]
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0x666666);
+            return lv_color_hex(0x333333);
+
+  - id: refresh_fan_cooling
+    then:
+      - lvgl.label.update:
+          id: lbl_cooling_fan
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(cooling_fan_speed).state;
+            if (!id(printer_online).state || isnan(pct)) return "--";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
+            return lv_color_hex(0x555555);
+      - lvgl.label.update:
+          id: [lbl_cooling_pct, lbl_cooling_val]
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(cooling_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+      - lvgl.arc.update:
+          id: arc_cooling
+          value: !lambda |-
+            float pct = id(cooling_fan_speed).state;
+            return isnan(pct) ? 0 : (int)pct;
+      - lvgl.widget.update:
+          id: sw_cooling
+          state:
+            checked: !lambda return id(cooling_fan_speed).state > 0;
+
+  - id: refresh_fan_aux
+    then:
+      - lvgl.label.update:
+          id: lbl_aux_fan
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(aux_fan_speed).state;
+            if (!id(printer_online).state || isnan(pct)) return "--";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
+            return lv_color_hex(0x555555);
+      - lvgl.label.update:
+          id: [lbl_aux_pct, lbl_aux_val]
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(aux_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+      - lvgl.arc.update:
+          id: arc_aux
+          value: !lambda |-
+            float pct = id(aux_fan_speed).state;
+            return isnan(pct) ? 0 : (int)pct;
+      - lvgl.widget.update:
+          id: sw_aux
+          state:
+            checked: !lambda return id(aux_fan_speed).state > 0;
+
+  - id: refresh_fan_chamber
+    then:
+      - lvgl.label.update:
+          id: lbl_chamber_fan
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(chamber_fan_speed).state;
+            if (!id(printer_online).state || isnan(pct)) return "--";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+          text_color: !lambda |-
+            if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
+            return lv_color_hex(0x555555);
+      - lvgl.label.update:
+          id: [lbl_chamber_pct, lbl_chamber_val]
+          text: !lambda |-
+            static char buf[8];
+            float pct = id(chamber_fan_speed).state;
+            if (isnan(pct)) return "0%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pct);
+            return buf;
+      - lvgl.arc.update:
+          id: arc_chamber
+          value: !lambda |-
+            float pct = id(chamber_fan_speed).state;
+            return isnan(pct) ? 0 : (int)pct;
+      - lvgl.widget.update:
+          id: sw_chamber
+          state:
+            checked: !lambda return id(chamber_fan_speed).state > 0;
+
+  - id: refresh_skip_objects
+    mode: restart
+    then:
+      - lambda: |-
+          // plate_analyzer emite imagenes 512x512; LVGL las muestra como 380x380.
+          // 30 px minimo asegura touch target accesible.
+          const int kPlateSrcSize = 512;
+          const int kPlateDstSize = 380;
+          const int kMinTouchTarget = 30;
+
+          static lv_obj_t* const rows[] = {id(btn_skip_0), id(btn_skip_1), id(btn_skip_2), id(btn_skip_3),
+                              id(btn_skip_4), id(btn_skip_5), id(btn_skip_6), id(btn_skip_7),
+                              id(btn_skip_8), id(btn_skip_9), id(btn_skip_10), id(btn_skip_11),
+                              id(btn_skip_12), id(btn_skip_13), id(btn_skip_14), id(btn_skip_15)};
+          static lv_obj_t* const labels[] = {id(lbl_skip_0), id(lbl_skip_1), id(lbl_skip_2), id(lbl_skip_3),
+                                id(lbl_skip_4), id(lbl_skip_5), id(lbl_skip_6), id(lbl_skip_7),
+                                id(lbl_skip_8), id(lbl_skip_9), id(lbl_skip_10), id(lbl_skip_11),
+                                id(lbl_skip_12), id(lbl_skip_13), id(lbl_skip_14), id(lbl_skip_15)};
+          static lv_obj_t* const overlays[] = {id(btn_bbox_0), id(btn_bbox_1), id(btn_bbox_2), id(btn_bbox_3),
+                                  id(btn_bbox_4), id(btn_bbox_5), id(btn_bbox_6), id(btn_bbox_7),
+                                  id(btn_bbox_8), id(btn_bbox_9), id(btn_bbox_10), id(btn_bbox_11),
+                                  id(btn_bbox_12), id(btn_bbox_13), id(btn_bbox_14), id(btn_bbox_15)};
+
+          std::string data = id(printable_objects_list).state;
+          std::string bbox_data = id(plate_bbox_data).state;
+
+          int count = 0;
+          size_t pos = 0;
+          while (pos < data.size() && count < 16) {
+            size_t pipe = data.find('|', pos);
+            if (pipe == std::string::npos) pipe = data.size();
+            size_t colon = data.find(':', pos);
+            if (colon != std::string::npos && colon < pipe) {
+              std::string name = data.substr(colon + 1, pipe - colon - 1);
+              lv_label_set_text(labels[count], name.c_str());
+              lv_obj_clear_flag(rows[count], LV_OBJ_FLAG_HIDDEN);
+            }
+            pos = pipe + 1;
+            count++;
+          }
+          for (int i = count; i < 16; i++) {
+            lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
+          }
+
+          if (!bbox_data.empty()) {
+            int bidx = 0;
+            size_t bpos = 0;
+            while (bpos < bbox_data.size() && bidx < 16) {
+              size_t bpipe = bbox_data.find('|', bpos);
+              if (bpipe == std::string::npos) bpipe = bbox_data.size();
+              size_t c1 = bbox_data.find(':', bpos);
+              size_t c2 = (c1 != std::string::npos) ? bbox_data.find(':', c1 + 1) : std::string::npos;
+              if (c2 != std::string::npos && c2 < bpipe && c2 + 1 < bpipe) {
+                std::string coords = bbox_data.substr(c2 + 1, bpipe - c2 - 1);
+                int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+                if (sscanf(coords.c_str(), "%d,%d,%d,%d", &x1, &y1, &x2, &y2) == 4) {
+                  int sx1 = x1 * kPlateDstSize / kPlateSrcSize;
+                  int sy1 = y1 * kPlateDstSize / kPlateSrcSize;
+                  int sx2 = x2 * kPlateDstSize / kPlateSrcSize;
+                  int sy2 = y2 * kPlateDstSize / kPlateSrcSize;
+                  int w = sx2 - sx1;
+                  int h = sy2 - sy1;
+                  if (w < kMinTouchTarget) w = kMinTouchTarget;
+                  if (h < kMinTouchTarget) h = kMinTouchTarget;
+                  lv_obj_set_pos(overlays[bidx], sx1, sy1);
+                  lv_obj_set_size(overlays[bidx], w, h);
+                  lv_obj_clear_flag(overlays[bidx], LV_OBJ_FLAG_HIDDEN);
+                }
+              }
+              bpos = bpipe + 1;
+              bidx++;
+            }
+            for (int i = bidx; i < 16; i++) {
+              lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
+            }
+          }
