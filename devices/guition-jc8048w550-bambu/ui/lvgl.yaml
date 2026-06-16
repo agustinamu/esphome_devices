@@ -41,6 +41,7 @@ lvgl:
     - !include pages/motion_xy.yaml
     - !include pages/motion_z.yaml
     - !include pages/filament.yaml
+    - !include pages/filament_select.yaml
     - !include pages/confirm_pause.yaml
     - !include pages/confirm_stop.yaml
     - !include pages/skip_objects.yaml

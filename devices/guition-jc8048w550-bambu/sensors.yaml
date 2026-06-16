@@ -106,6 +106,26 @@ text_sensor:
       then:
         - script.execute: refresh_skip_objects
 
+  # Inventario de Spoolman serializado "id:name:grams|..." (rest sensor en HA, proxy).
+  - platform: homeassistant
+    id: spoolman_inventory
+    entity_id: sensor.spoolman_inventory
+    on_value:
+      then:
+        - script.execute: render_filament_page
+
+  # Spool actualmente cargado (helper de HA que escribe la pantalla; HA propaga a Spoolman).
+  - platform: homeassistant
+    id: filament_loaded
+    entity_id: input_text.filament_loaded_spool
+    on_value:
+      then:
+        - lambda: |-
+            std::string v = id(filament_loaded).state;
+            id(filament_loaded_id) =
+              (v.empty() || v == "unknown" || v == "unavailable") ? -1 : atoi(v.c_str());
+        - script.execute: render_filament_page
+
   - platform: wifi_info
     ip_address:
       id: wifi_ip

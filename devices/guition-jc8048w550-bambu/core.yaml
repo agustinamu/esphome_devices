@@ -31,6 +31,13 @@ globals:
     initial_value: '0'
   - id: skip_ids_str
     type: std::string
+  # Filament select (3.C Fase 2): página actual del picker e id del spool cargado
+  - id: filament_page_idx
+    type: int
+    initial_value: '0'
+  - id: filament_loaded_id
+    type: int
+    initial_value: '-1'
 
 # HTTP para descargar imagen de placa (skip objects)
 http_request:
@@ -274,3 +281,72 @@ script:
               lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
             }
           }
+
+  # Filament select (3.C Fase 2): rellena el pool de 5 slots con la página actual
+  # del inventario serializado "id:name:grams|..." (sensor.spoolman_inventory).
+  - id: render_filament_page
+    mode: restart
+    then:
+      - lambda: |-
+          const int SLOTS = 5;
+          std::string s = id(spoolman_inventory).state;
+
+          lv_obj_t* const rows[] = {id(btn_spool_0), id(btn_spool_1), id(btn_spool_2),
+                                    id(btn_spool_3), id(btn_spool_4)};
+          lv_obj_t* const labels[] = {id(lbl_spool_0), id(lbl_spool_1), id(lbl_spool_2),
+                                      id(lbl_spool_3), id(lbl_spool_4)};
+
+          // Total de entradas no vacías.
+          int total = 0;
+          {
+            size_t pos = 0;
+            while (pos <= s.size()) {
+              size_t pipe = s.find('|', pos);
+              std::string e = (pipe == std::string::npos) ? s.substr(pos) : s.substr(pos, pipe - pos);
+              if (!e.empty()) total++;
+              if (pipe == std::string::npos) break;
+              pos = pipe + 1;
+            }
+          }
+
+          int pages = (total + SLOTS - 1) / SLOTS;
+          if (pages < 1) pages = 1;
+          if (id(filament_page_idx) >= pages) id(filament_page_idx) = pages - 1;
+          if (id(filament_page_idx) < 0) id(filament_page_idx) = 0;
+          int page = id(filament_page_idx);
+          int start = page * SLOTS;
+
+          for (int i = 0; i < SLOTS; i++) lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
+
+          int n = 0;
+          size_t pos = 0;
+          while (pos <= s.size()) {
+            size_t pipe = s.find('|', pos);
+            std::string e = (pipe == std::string::npos) ? s.substr(pos) : s.substr(pos, pipe - pos);
+            if (!e.empty()) {
+              if (n >= start && n < start + SLOTS) {
+                int i = n - start;
+                size_t c1 = e.find(':');
+                size_t c2 = (c1 != std::string::npos) ? e.find(':', c1 + 1) : std::string::npos;
+                int sid = (c1 != std::string::npos) ? atoi(e.substr(0, c1).c_str()) : -1;
+                std::string name = (c1 != std::string::npos)
+                  ? ((c2 != std::string::npos) ? e.substr(c1 + 1, c2 - c1 - 1) : e.substr(c1 + 1))
+                  : e;
+                std::string grams = (c2 != std::string::npos) ? e.substr(c2 + 1) : "";
+                std::string text = name;
+                if (!grams.empty()) text += "   " + grams + " g";
+                lv_label_set_text(labels[i], text.c_str());
+                lv_obj_clear_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
+                lv_obj_set_style_bg_color(rows[i],
+                  (sid == id(filament_loaded_id)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x1E1E1E),
+                  LV_PART_MAIN);
+              }
+              n++;
+            }
+            if (pipe == std::string::npos) break;
+            pos = pipe + 1;
+          }
+
+          static char pbuf[16];
+          snprintf(pbuf, sizeof(pbuf), "%d/%d", page + 1, pages);
+          lv_label_set_text(id(lbl_spool_page), pbuf);
