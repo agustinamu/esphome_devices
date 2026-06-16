@@ -64,32 +64,26 @@ widgets:
       on_press:
         - lvgl.page.show: motion_z_page
 
-  # FILAMENT (Desactivado - requiere depuracion)
-  - obj:
+  # FILAMENT (carga/descarga via acciones ha-bambulab)
+  - button:
       x: 560
       y: 70
       width: 215
       height: 380
       radius: 16
-      bg_color: 0x1A1A1A
-      scrollbar_mode: "off"
-      scrollable: false
+      bg_color: 0x1E1E1E
       widgets:
         - label:
             align: CENTER
-            y: -50
+            y: -40
             text: "\U000F08BC"
             text_font: mdi_48
-            text_color: 0x444444
+            text_color: 0x00AE42
         - label:
             align: CENTER
-            y: 20
+            y: 40
             text: "FILAMENT"
             text_font: montserrat_22
-            text_color: 0x444444
-        - label:
-            align: CENTER
-            y: 60
-            text: "(disabled)"
-            text_font: montserrat_18
-            text_color: 0x333333
+            text_color: 0xFFFFFF
+      on_press:
+        - lvgl.page.show: filament_page

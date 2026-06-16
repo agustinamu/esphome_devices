@@ -1,10 +1,24 @@
-# Filament Page - Carga y descarga de filamento
-# Usa substitution: bambu_device_id
+# Filament Page - Carga/descarga de filamento (bobina externa, P1S sin AMS)
+#
+# Usa acciones NATIVAS de la integracion ha-bambulab via Home Assistant
+# (no gcode crudo, no MQTT directo). Verificado contra HA real 2026-06-16:
+# integracion v2.2.22 (fix de bobina externa #1849 presente).
+#
+# Flujo bobina externa:
+#   - LOAD <material>: bambu_lab.load_filament (entity_id del tray externo + temperatura)
+#                      -> la impresora calienta y pide insertar/empujar el filamento.
+#   - DONE:            bambu_lab.done_load_filament (device_id) -> confirma fin de carga.
+#   - RETRY:           bambu_lab.retry_load_filament (device_id) -> reintenta el avance.
+#   - UNLOAD:          bambu_lab.unload_filament (device_id) -> descarga (un solo paso).
+#   - EXTRUDE/RETRACT: bambu_lab.extrude_retract (device_id, type) -> ajuste manual.
+#
+# Substitutions: bambu_device_id (!secret), bambu_prefix.
+# Tray bobina externa: sensor.${bambu_prefix}_externalspool_bobina_externa
 
 id: filament_page
 bg_color: 0x121212
 widgets:
-  # Header
+  # Header: volver a Motion
   - button:
       x: 100
       y: 10
@@ -28,144 +42,205 @@ widgets:
       text_font: montserrat_28
       text_color: 0x00AE42
 
-  # Fila 1: PURGE ZONE y EXTRUIR
-  # Ir a zona de purga (frente izquierda de la cama)
+  # Fila 1: cargar por material (fija la temperatura de carga)
   - button:
       x: 100
       y: 75
-      width: 230
-      height: 130
-      radius: 12
-      bg_color: 0x1E1E1E
-      widgets:
-        - label:
-            align: CENTER
-            y: -20
-            text: "\U000F0F0C"
-            text_font: mdi_48
-            text_color: 0x00AE42
-        - label:
-            align: CENTER
-            y: 35
-            text: "PURGE ZONE"
-            text_font: montserrat_22
-            text_color: 0xFFFFFF
-      on_press:
-        - homeassistant.action:
-            action: bambu_lab.send_command
-            data:
-              device_id: ${bambu_device_id}
-              command: "G28 X Y\nG0 X5 Y5 Z50 F6000"
-
-  # Extruir (empujar filamento hacia abajo)
-  - button:
-      x: 345
-      y: 75
       width: 215
-      height: 130
-      radius: 12
-      bg_color: 0x1E1E1E
-      widgets:
-        - label:
-            align: CENTER
-            y: -20
-            text: "\U000F0045"
-            text_font: mdi_48
-            text_color: 0x00AE42
-        - label:
-            align: CENTER
-            y: 35
-            text: "EXTRUIR 10"
-            text_font: montserrat_22
-            text_color: 0xFFFFFF
-      on_press:
-        - homeassistant.action:
-            action: bambu_lab.send_command
-            data:
-              device_id: ${bambu_device_id}
-              command: "M83\nG1 E10 F200\nM82"
-
-  # Retraer (sacar filamento hacia arriba)
-  - button:
-      x: 575
-      y: 75
-      width: 215
-      height: 130
-      radius: 12
-      bg_color: 0x1E1E1E
-      widgets:
-        - label:
-            align: CENTER
-            y: -20
-            text: "\U000F004D"
-            text_font: mdi_48
-            text_color: 0xFF6B6B
-        - label:
-            align: CENTER
-            y: 35
-            text: "RETRAER 10"
-            text_font: montserrat_22
-            text_color: 0xFFFFFF
-      on_press:
-        - homeassistant.action:
-            action: bambu_lab.send_command
-            data:
-              device_id: ${bambu_device_id}
-              command: "M83\nG1 E-10 F200\nM82"
-
-  # Fila 2: UNLOAD y LOAD
-  # Descargar filamento (ciclo completo)
-  - button:
-      x: 100
-      y: 220
-      width: 340
-      height: 130
-      radius: 12
-      bg_color: 0xCC3333
-      widgets:
-        - label:
-            align: CENTER
-            y: -20
-            text: "\U000F0B2F"
-            text_font: mdi_48
-            text_color: 0xFFFFFF
-        - label:
-            align: CENTER
-            y: 35
-            text: "UNLOAD"
-            text_font: montserrat_28
-            text_color: 0xFFFFFF
-      on_press:
-        - homeassistant.action:
-            action: bambu_lab.send_command
-            data:
-              device_id: ${bambu_device_id}
-              command: "M104 S240\nM109 S240\nM83\nG1 E-20 F200\nG28 X Y\nG1 X20 Y50 F20000\nG1 Y-3 F3000\nG4 P500\nG1 E-80 F1500\nM82\nG28 X Y\nM104 S0"
-
-  # Cargar filamento
-  - button:
-      x: 455
-      y: 220
-      width: 335
-      height: 130
+      height: 110
       radius: 12
       bg_color: 0x00AE42
       widgets:
         - label:
             align: CENTER
-            y: -20
+            y: -18
             text: "\U000F0B30"
             text_font: mdi_48
             text_color: 0xFFFFFF
         - label:
             align: CENTER
             y: 35
-            text: "LOAD"
+            text: "LOAD PLA"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.load_filament
+            data:
+              entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
+              temperature: "220"
+
+  - button:
+      x: 330
+      y: 75
+      width: 215
+      height: 110
+      radius: 12
+      bg_color: 0x00AE42
+      widgets:
+        - label:
+            align: CENTER
+            y: -18
+            text: "\U000F0B30"
+            text_font: mdi_48
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 35
+            text: "LOAD PETG"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.load_filament
+            data:
+              entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
+              temperature: "250"
+
+  - button:
+      x: 560
+      y: 75
+      width: 215
+      height: 110
+      radius: 12
+      bg_color: 0x00AE42
+      widgets:
+        - label:
+            align: CENTER
+            y: -18
+            text: "\U000F0B30"
+            text_font: mdi_48
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            y: 35
+            text: "LOAD TPU"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.load_filament
+            data:
+              entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
+              temperature: "235"
+
+  # Fila 2: confirmar / reintentar la carga (bobina externa)
+  - button:
+      x: 100
+      y: 195
+      width: 335
+      height: 90
+      radius: 12
+      bg_color: 0x1E88E5
+      widgets:
+        - label:
+            align: CENTER
+            text: "DONE"
             text_font: montserrat_28
             text_color: 0xFFFFFF
       on_press:
         - homeassistant.action:
-            action: bambu_lab.send_command
+            action: bambu_lab.done_load_filament
             data:
               device_id: ${bambu_device_id}
-              command: "M104 S220\nM109 S220\nM83\nG1 E18 F200\nG1 E2 F20\nG1 E50 F300\nM82"
+
+  - button:
+      x: 455
+      y: 195
+      width: 335
+      height: 90
+      radius: 12
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            align: CENTER
+            text: "RETRY"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.retry_load_filament
+            data:
+              device_id: ${bambu_device_id}
+
+  # Fila 3: descargar (un solo paso)
+  - button:
+      x: 100
+      y: 295
+      width: 690
+      height: 90
+      radius: 12
+      bg_color: 0xCC3333
+      widgets:
+        - label:
+            align: CENTER
+            y: 0
+            text: "\U000F0B2F"
+            text_font: mdi_48
+            text_color: 0xFFFFFF
+        - label:
+            align: CENTER
+            x: 60
+            text: "UNLOAD"
+            text_font: montserrat_28
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.unload_filament
+            data:
+              device_id: ${bambu_device_id}
+
+  # Fila 4: ajuste manual (extruir / retraer)
+  - button:
+      x: 100
+      y: 395
+      width: 335
+      height: 55
+      radius: 12
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            align: CENTER
+            x: -60
+            text: "\U000F0045"
+            text_font: mdi_32
+            text_color: 0x00AE42
+        - label:
+            align: CENTER
+            x: 20
+            text: "EXTRUDE"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.extrude_retract
+            data:
+              device_id: ${bambu_device_id}
+              type: Extrude
+
+  - button:
+      x: 455
+      y: 395
+      width: 335
+      height: 55
+      radius: 12
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            align: CENTER
+            x: -60
+            text: "\U000F004D"
+            text_font: mdi_32
+            text_color: 0xFF6B6B
+        - label:
+            align: CENTER
+            x: 20
+            text: "RETRACT"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - homeassistant.action:
+            action: bambu_lab.extrude_retract
+            data:
+              device_id: ${bambu_device_id}
+              type: Retract
