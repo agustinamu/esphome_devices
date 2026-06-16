@@ -14,3 +14,6 @@ mqtt_connect.sh
 
 # Demos del fabricante (no necesarios)
 JC3248W535EN/
+
+# Virtual environment
+.venv/
