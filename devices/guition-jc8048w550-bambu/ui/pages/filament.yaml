@@ -80,7 +80,7 @@ widgets:
         - lambda: 'id(filament_set_only) = !id(filament_set_only);'
         - lvgl.label.update:
             id: lbl_mode_toggle
-            text: !lambda 'return id(filament_set_only) ? "SOLO TIPO" : "CARGAR";'
+            text: !lambda 'return std::string(id(filament_set_only) ? "SOLO TIPO" : "CARGAR");'
         - lvgl.widget.update:
             id: btn_mode_toggle
             bg_color: !lambda 'return id(filament_set_only) ? lv_color_hex(0xB8860B) : lv_color_hex(0x2A2A2A);'
