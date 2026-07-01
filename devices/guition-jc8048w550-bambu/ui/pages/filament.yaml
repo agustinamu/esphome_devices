@@ -192,13 +192,13 @@ widgets:
       widgets:
         - label:
             align: CENTER
-            y: 0
+            x: -75
             text: "\U000F0B2F"
             text_font: mdi_48
             text_color: 0xFFFFFF
         - label:
             align: CENTER
-            x: 60
+            x: 20
             text: "UNLOAD"
             text_font: montserrat_28
             text_color: 0xFFFFFF
