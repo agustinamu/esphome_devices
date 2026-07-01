@@ -60,7 +60,32 @@ widgets:
         - lvgl.page.show: filament_select_page
         - script.execute: render_filament_page
 
-  # Fila 1: cargar por material (fija la temperatura de carga)
+  # Interruptor de modo: CARGAR (fija tipo + carga física) vs SOLO TIPO (solo set_filament, corrige Orca)
+  - button:
+      id: btn_mode_toggle
+      x: 345
+      y: 10
+      width: 245
+      height: 50
+      radius: 8
+      bg_color: 0x2A2A2A
+      widgets:
+        - label:
+            id: lbl_mode_toggle
+            align: CENTER
+            text: "CARGAR"
+            text_font: montserrat_22
+            text_color: 0xFFFFFF
+      on_press:
+        - lambda: 'id(filament_set_only) = !id(filament_set_only);'
+        - lvgl.label.update:
+            id: lbl_mode_toggle
+            text: !lambda 'return id(filament_set_only) ? "SOLO TIPO" : "CARGAR";'
+        - lvgl.widget.update:
+            id: btn_mode_toggle
+            bg_color: !lambda 'return id(filament_set_only) ? lv_color_hex(0xB8860B) : lv_color_hex(0x2A2A2A);'
+
+  # Fila 1: material -> fija el tipo (set_filament) y, en modo CARGAR, además carga físico (load_filament)
   - button:
       x: 100
       y: 75
@@ -78,15 +103,28 @@ widgets:
         - label:
             align: CENTER
             y: 35
-            text: "LOAD PLA"
+            text: "PLA"
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
         - homeassistant.action:
-            action: bambu_lab.load_filament
+            action: bambu_lab.set_filament
             data:
               entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
-              temperature: "220"
+              tray_type: "PLA"
+              tray_info_idx: "GFL99"
+              tray_color: "FFFFFFFF"
+              nozzle_temp_min: "190"
+              nozzle_temp_max: "230"
+        - if:
+            condition:
+              lambda: 'return !id(filament_set_only);'
+            then:
+              - homeassistant.action:
+                  action: bambu_lab.load_filament
+                  data:
+                    entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
+                    temperature: "220"
 
   - button:
       x: 330
@@ -105,15 +143,28 @@ widgets:
         - label:
             align: CENTER
             y: 35
-            text: "LOAD PETG"
+            text: "PETG"
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
         - homeassistant.action:
-            action: bambu_lab.load_filament
+            action: bambu_lab.set_filament
             data:
               entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
-              temperature: "250"
+              tray_type: "PETG"
+              tray_info_idx: "GFG99"
+              tray_color: "FFFFFFFF"
+              nozzle_temp_min: "230"
+              nozzle_temp_max: "280"
+        - if:
+            condition:
+              lambda: 'return !id(filament_set_only);'
+            then:
+              - homeassistant.action:
+                  action: bambu_lab.load_filament
+                  data:
+                    entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
+                    temperature: "250"
 
   - button:
       x: 560
@@ -132,15 +183,28 @@ widgets:
         - label:
             align: CENTER
             y: 35
-            text: "LOAD TPU"
+            text: "TPU"
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
         - homeassistant.action:
-            action: bambu_lab.load_filament
+            action: bambu_lab.set_filament
             data:
               entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
-              temperature: "235"
+              tray_type: "TPU"
+              tray_info_idx: "GFU99"
+              tray_color: "FFFFFFFF"
+              nozzle_temp_min: "210"
+              nozzle_temp_max: "240"
+        - if:
+            condition:
+              lambda: 'return !id(filament_set_only);'
+            then:
+              - homeassistant.action:
+                  action: bambu_lab.load_filament
+                  data:
+                    entity_id: sensor.${bambu_prefix}_externalspool_bobina_externa
+                    temperature: "235"
 
   # Fila 2: confirmar / reintentar la carga (bobina externa)
   - button:

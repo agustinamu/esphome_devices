@@ -72,6 +72,7 @@ font:
       - "\U000F0028"  # alert-circle
       - "\U000F05E0"  # checkbox-marked-circle (check ok)
       - "\U000F0141"  # chevron-left (back)
+      - "\U000F0142"  # chevron-right (next)
       - "\U000F08BC"  # reload (filament)
       - "\U000F019F"  # content-cut
       - "\U000F0F0C"  # target (purge zone)
@@ -79,6 +80,7 @@ font:
       - "\U000F0B2F"  # transfer-down (unload)
       - "\U000F0210"  # fan
       - "\U000F0336"  # lightbulb-off
+      - "\U000F0335"  # lightbulb-on (screen always-on toggle)
       - "\U000F0E36"  # rotate-right (rotation)
       - "\U000F0709"  # restart
       - "\U000F02D1"  # download (update)
