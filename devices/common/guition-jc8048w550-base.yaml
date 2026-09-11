@@ -12,13 +12,12 @@
 # Uso: Incluir desde package.yaml de cada dispositivo
 
 esphome:
-  platformio_options:
-    build_flags:
-      - "-DBOARD_HAS_PSRAM"
-      - "-DLV_USE_FONT_SUBPX=1"
-      - "-DLV_FONT_SUBPX_BGR=0"
-    board_build.esp-idf.memory_type: qio_opi
-    board_build.flash_mode: dio
+  # Subpixel rendering de LVGL (fuentes mas nitidas en panel RGB)
+  # BOARD_HAS_PSRAM / memory_type / flash_mode los gestiona el componente
+  # psram: y el toolchain ESP-IDF nativo; no hacen falta aqui.
+  build_flags:
+    - "-DLV_USE_FONT_SUBPX=1"
+    - "-DLV_FONT_SUBPX_BGR=0"
 
 esp32:
   board: esp32-s3-devkitc-1

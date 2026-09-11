@@ -47,8 +47,9 @@ globals:
 # HTTP para descargar imagen de placa (skip objects)
 http_request:
 
-online_image:
-  - id: plate_image
+image:
+  - platform: online_image
+    id: plate_image
     url: "${ha_url}/api/image_proxy/image.${bambu_prefix}_seleccionar_imagen"
     format: jpeg
     type: RGB565
