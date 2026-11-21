@@ -33,9 +33,9 @@ devices/
 ## Dispositivos
 
 ### 1. Humidificador
-- **Placa**: ESP8266 ESP-01 1M
-- **Pines**: GPIO14 (power), GPIO16 (luz)
-- **Función**: Pulsos para simular botones físicos
+- **Placa**: ESP32-C3 Super Mini (antes ESP8266; migrado por WPA3)
+- **Pines**: GPIO5 (power), GPIO6 (luz), open-drain input+output
+- **Función**: Pulsos para simular botones físicos y detectar pulsaciones manuales
 
 ### 2. Guition JC8048W550 (básico)
 - **Placa**: ESP32-S3 N16R8

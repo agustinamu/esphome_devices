@@ -1,115 +1,115 @@
-# Humidificador - Control mediante pulsos en GPIO
+# Humidificador - ESP32-C3 Super Mini
+#
+# Cada GPIO va en paralelo a un pulsador del humidificador y es bidireccional:
+# - Salida open-drain: "on" tira la línea a GND (= pulsar). "off" la suelta y el
+#   pull-up del humidificador la devuelve a HIGH.
+# - Entrada: detecta pulsaciones físicas para mantener el estado del switch.
+# Output y binary_sensor comparten pin con el mismo modo (input+output+open_drain);
+# si el binary_sensor declarara solo input, su setup anularía la salida.
 
-esp8266:
-  board: esp01_1m
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+  framework:
+    type: esp-idf
 
 logger:
 
-esphome:
-  on_boot:
-    priority: 1000
-    then:
-      - lambda: |-
-          pinMode(14, OUTPUT);
-          digitalWrite(14, HIGH);
-          delay(10);
-          pinMode(14, INPUT_PULLUP);
-          pinMode(16, OUTPUT);
-          digitalWrite(16, HIGH);
-          delay(10);
-          pinMode(16, INPUT_PULLUP);
+output:
+  - platform: gpio
+    id: out_power
+    pin: &pin_power
+      number: GPIO5
+      inverted: true
+      mode: {input: true, output: true, open_drain: true}
+      allow_other_uses: true
 
-globals:
-  - id: luz_bloqueo
-    type: bool
-    initial_value: 'false'
-  - id: power_bloqueo
-    type: bool
-    initial_value: 'false'
+  - platform: gpio
+    id: out_luz
+    pin: &pin_luz
+      number: GPIO6
+      inverted: true
+      mode: {input: true, output: true, open_drain: true}
+      allow_other_uses: true
 
 script:
-  - id: pulse_luz
-    mode: queued
-    max_runs: 2
-    then:
-      - lambda: 'id(luz_bloqueo) = true;'
-      - lambda: |-
-          pinMode(16, OUTPUT);
-          digitalWrite(16, LOW);
-      - delay: 500ms
-      - lambda: 'pinMode(16, INPUT);'
-      - delay: 100ms
-      - lambda: 'id(luz_bloqueo) = false;'
-      - delay: 300ms
-
+  # Mientras el script corre, on_press ignora la línea (es nuestro propio pulso).
+  # Los 100 ms finales cubren el filtro delayed_off tras soltar.
   - id: pulse_power
     mode: queued
     max_runs: 2
     then:
-      - lambda: 'id(power_bloqueo) = true;'
-      - lambda: |-
-          pinMode(14, OUTPUT);
-          digitalWrite(14, LOW);
+      - output.turn_on: out_power
       - delay: 500ms
-      - lambda: 'pinMode(14, INPUT);'
+      - output.turn_off: out_power
       - delay: 100ms
-      - lambda: 'id(power_bloqueo) = false;'
-      - delay: 300ms
+
+  - id: pulse_luz
+    mode: queued
+    max_runs: 2
+    then:
+      - output.turn_on: out_luz
+      - delay: 500ms
+      - output.turn_off: out_luz
+      - delay: 100ms
 
 switch:
-  - platform: template
-    name: "Luz"
-    id: switch_luz
-    icon: "mdi:lightbulb"
-    optimistic: true
-    turn_on_action:
-      - lambda: 'id(luz_bloqueo) = true;'
-      - script.execute: pulse_luz
-    turn_off_action:
-      - lambda: 'id(luz_bloqueo) = true;'
-      - script.execute: pulse_luz
-
+  # El aparato arranca apagado al recibir corriente: no restaurar estado de flash.
   - platform: template
     name: "Power"
     id: switch_power
     icon: "mdi:power"
     optimistic: true
+    restore_mode: ALWAYS_OFF
     turn_on_action:
-      - lambda: 'id(power_bloqueo) = true;'
       - script.execute: pulse_power
     turn_off_action:
-      - lambda: 'id(power_bloqueo) = true;'
       - script.execute: pulse_power
 
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: 16
-      mode: INPUT
-    name: "Sensor Luz"
-    id: sensor_luz
-    internal: true
-    filters:
-      - delayed_on: 50ms
-      - delayed_off: 50ms
-    on_state:
-      - lambda: |-
-          if (!id(luz_bloqueo)) {
-            id(switch_luz).toggle();
-          }
+  - platform: template
+    name: "Luz"
+    id: switch_luz
+    icon: "mdi:lightbulb"
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    turn_on_action:
+      - script.execute: pulse_luz
+    turn_off_action:
+      - script.execute: pulse_luz
 
+binary_sensor:
+  # Pulsación física: publish cambia el estado sin disparar turn_on/off_action
+  # (toggle() sí las dispararía y mandaría un segundo pulso).
   - platform: gpio
-    pin:
-      number: 14
-      mode: INPUT
-    name: "Sensor Power"
+    pin: *pin_power
     id: sensor_power
     internal: true
     filters:
-      - delayed_on: 50ms
-      - delayed_off: 50ms
-    on_state:
-      - lambda: |-
-          if (!id(power_bloqueo)) {
-            id(switch_power).toggle();
-          }
+      - delayed_on: 20ms
+      - delayed_off: 20ms
+    on_press:
+      - if:
+          condition:
+            not:
+              script.is_running: pulse_power
+          then:
+            - switch.template.publish:
+                id: switch_power
+                state: !lambda 'return !id(switch_power).state;'
+
+  - platform: gpio
+    pin: *pin_luz
+    id: sensor_luz
+    internal: true
+    filters:
+      - delayed_on: 20ms
+      - delayed_off: 20ms
+    on_press:
+      - if:
+          condition:
+            not:
+              script.is_running: pulse_luz
+          then:
+            - switch.template.publish:
+                id: switch_luz
+                state: !lambda 'return !id(switch_luz).state;'
