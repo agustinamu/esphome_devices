@@ -46,6 +46,13 @@ Dashboard táctil para impresoras Bambu Lab P1S/X1C con pantalla de 5 pulgadas.
 - Botón **Reiniciar** ESP
 - Toggle **Pantalla siempre encendida**
 
+### Página Skip objects
+- Botón **SKIP** en Home (solo imprimiendo y con más de 1 objeto)
+- Imagen del plato con un recuadro tocable por objeto + lista (hasta 16)
+- **SKIP SELECTED** llama a `bambu_lab.skip_objects` con los IDs marcados
+- Lista, IDs y recuadros salen de `sensor.analizador_de_plato` (atributo `bbox_data`,
+  formato `ID:nombre:x1,y1,x2,y2|...`), así fila, recuadro e ID siempre coinciden
+
 ### Sistema
 - **Auto-dim** - brillo al 15% tras 60s sin tocar
 - **Screensaver** - pantalla con reloj tras 5min de inactividad
@@ -59,6 +66,7 @@ Dashboard táctil para impresoras Bambu Lab P1S/X1C con pantalla de 5 pulgadas.
 2. **Home Assistant** con ESPHome Add-on
 3. **[ha-bambulab](https://github.com/greghesp/ha-bambulab)** instalado via HACS
 4. Impresora Bambu Lab P1S o X1C conectada a Home Assistant
+5. **bambu-plate-analyzer** (integración propia) para la página Skip objects
 
 ## Configuración
 

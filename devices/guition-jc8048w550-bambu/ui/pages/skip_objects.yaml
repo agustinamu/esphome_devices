@@ -66,7 +66,7 @@ widgets:
             y: 0
             src: plate_image
 
-        # 8 overlay buttons (hidden by default, positioned by lambda)
+        # 16 overlay buttons (ocultos; refresh_skip_objects los posiciona)
         - button:
             id: btn_bbox_0
             x: 0
@@ -81,17 +81,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 0);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_0), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_0), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_0), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_0), lv_color_hex(0x00AE42), 0);
-                  // Update list row
-                  lv_obj_set_style_border_color(id(btn_skip_0), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_0), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_0), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_0), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_1
@@ -107,16 +97,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 1);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 1);
-                  lv_obj_set_style_border_color(id(btn_bbox_1), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_1), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_1), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_1), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_1), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_1), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_1), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_1), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_2
@@ -132,16 +113,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 2);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 2);
-                  lv_obj_set_style_border_color(id(btn_bbox_2), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_2), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_2), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_2), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_2), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_2), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_2), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_2), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_3
@@ -157,16 +129,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 3);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 3);
-                  lv_obj_set_style_border_color(id(btn_bbox_3), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_3), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_3), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_3), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_3), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_3), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_3), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_3), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_4
@@ -182,16 +145,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 4);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 4);
-                  lv_obj_set_style_border_color(id(btn_bbox_4), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_4), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_4), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_4), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_4), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_4), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_4), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_4), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_5
@@ -207,16 +161,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 5);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 5);
-                  lv_obj_set_style_border_color(id(btn_bbox_5), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_5), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_5), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_5), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_5), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_5), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_5), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_5), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_6
@@ -232,16 +177,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 6);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 6);
-                  lv_obj_set_style_border_color(id(btn_bbox_6), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_6), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_6), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_6), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_6), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_6), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_6), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_6), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_7
@@ -257,16 +193,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 7);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 7);
-                  lv_obj_set_style_border_color(id(btn_bbox_7), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_7), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_7), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_7), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_7), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_7), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_7), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_7), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_8
@@ -282,16 +209,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 8);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 8);
-                  lv_obj_set_style_border_color(id(btn_bbox_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_8), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_8), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_8), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_8), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_8), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_9
@@ -307,16 +225,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 9);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 9);
-                  lv_obj_set_style_border_color(id(btn_bbox_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_9), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_9), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_9), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_9), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_9), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_10
@@ -332,16 +241,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 10);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 10);
-                  lv_obj_set_style_border_color(id(btn_bbox_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_10), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_10), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_10), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_10), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_10), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_11
@@ -357,16 +257,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 11);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 11);
-                  lv_obj_set_style_border_color(id(btn_bbox_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_11), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_11), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_11), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_11), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_11), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_12
@@ -382,16 +273,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 12);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 12);
-                  lv_obj_set_style_border_color(id(btn_bbox_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_12), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_12), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_12), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_12), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_12), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_13
@@ -407,16 +289,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 13);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 13);
-                  lv_obj_set_style_border_color(id(btn_bbox_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_13), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_13), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_13), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_13), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_13), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_14
@@ -432,16 +305,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 14);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 14);
-                  lv_obj_set_style_border_color(id(btn_bbox_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_14), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_14), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_14), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_14), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_14), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
         - button:
             id: btn_bbox_15
@@ -457,16 +321,7 @@ widgets:
             radius: 2
             on_click:
               - lambda: id(skip_selection) ^= (1 << 15);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 15);
-                  lv_obj_set_style_border_color(id(btn_bbox_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_15), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_15), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_15), lv_color_hex(0x00AE42), 0);
-                  lv_obj_set_style_border_color(id(btn_skip_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_15), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_15), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
+              - script.execute: paint_skip_selection
 
   # === RIGHT PANEL: Object list + SKIP button ===
   # Scrollable list of objects with check indicators
@@ -513,17 +368,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 0);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 0);
-                  lv_obj_set_style_border_color(id(btn_skip_0), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_0), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_0), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_0), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  // Sync overlay
-                  lv_obj_set_style_border_color(id(btn_bbox_0), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_0), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_0), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_0), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 1
         - button:
@@ -554,16 +399,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 1);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 1);
-                  lv_obj_set_style_border_color(id(btn_skip_1), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_1), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_1), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_1), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_1), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_1), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_1), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_1), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 2
         - button:
@@ -594,16 +430,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 2);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 2);
-                  lv_obj_set_style_border_color(id(btn_skip_2), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_2), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_2), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_2), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_2), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_2), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_2), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_2), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 3
         - button:
@@ -634,16 +461,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 3);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 3);
-                  lv_obj_set_style_border_color(id(btn_skip_3), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_3), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_3), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_3), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_3), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_3), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_3), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_3), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 4
         - button:
@@ -674,16 +492,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 4);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 4);
-                  lv_obj_set_style_border_color(id(btn_skip_4), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_4), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_4), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_4), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_4), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_4), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_4), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_4), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 5
         - button:
@@ -714,16 +523,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 5);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 5);
-                  lv_obj_set_style_border_color(id(btn_skip_5), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_5), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_5), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_5), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_5), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_5), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_5), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_5), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 6
         - button:
@@ -754,16 +554,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 6);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 6);
-                  lv_obj_set_style_border_color(id(btn_skip_6), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_6), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_6), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_6), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_6), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_6), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_6), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_6), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 7
         - button:
@@ -794,16 +585,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 7);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 7);
-                  lv_obj_set_style_border_color(id(btn_skip_7), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_7), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_7), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_7), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_7), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_7), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_7), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_7), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 8
         - button:
@@ -834,16 +616,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 8);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 8);
-                  lv_obj_set_style_border_color(id(btn_skip_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_8), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_8), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_8), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_8), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_8), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_8), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 9
         - button:
@@ -874,16 +647,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 9);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 9);
-                  lv_obj_set_style_border_color(id(btn_skip_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_9), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_9), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_9), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_9), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_9), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_9), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 10
         - button:
@@ -914,16 +678,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 10);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 10);
-                  lv_obj_set_style_border_color(id(btn_skip_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_10), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_10), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_10), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_10), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_10), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_10), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 11
         - button:
@@ -954,16 +709,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 11);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 11);
-                  lv_obj_set_style_border_color(id(btn_skip_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_11), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_11), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_11), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_11), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_11), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_11), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 12
         - button:
@@ -994,16 +740,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 12);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 12);
-                  lv_obj_set_style_border_color(id(btn_skip_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_12), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_12), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_12), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_12), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_12), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_12), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 13
         - button:
@@ -1034,16 +771,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 13);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 13);
-                  lv_obj_set_style_border_color(id(btn_skip_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_13), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_13), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_13), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_13), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_13), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_13), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 14
         - button:
@@ -1074,16 +802,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 14);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 14);
-                  lv_obj_set_style_border_color(id(btn_skip_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_14), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_14), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_14), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_14), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_14), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_14), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
         # Row 15
         - button:
@@ -1114,16 +833,7 @@ widgets:
                   width: 330
             on_click:
               - lambda: id(skip_selection) ^= (1 << 15);
-              - lambda: |-
-                  bool sel = id(skip_selection) & (1 << 15);
-                  lv_obj_set_style_border_color(id(btn_skip_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x2A2A2A), 0);
-                  lv_obj_set_style_bg_color(id(btn_skip_15), sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
-                  lv_label_set_text(id(lbl_check_15), sel ? "\U000F0134" : "\U000F0131");
-                  lv_obj_set_style_text_color(id(lbl_check_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x555555), 0);
-                  lv_obj_set_style_border_color(id(btn_bbox_15), sel ? lv_color_hex(0x00AE42) : lv_color_hex(0x444444), 0);
-                  lv_obj_set_style_border_width(id(btn_bbox_15), sel ? 3 : 2, 0);
-                  lv_obj_set_style_bg_opa(id(btn_bbox_15), sel ? 40 : 0, 0);
-                  lv_obj_set_style_bg_color(id(btn_bbox_15), lv_color_hex(0x00AE42), 0);
+              - script.execute: paint_skip_selection
 
   # === SKIP BUTTON (bottom right) ===
   - button:
@@ -1141,7 +851,7 @@ widgets:
             text_font: montserrat_22
       on_press:
         - lambda: |-
-            std::string data = id(printable_objects_list).state;
+            std::string data = id(plate_bbox_data).state;  // ID:name:coords|...
             std::string result = "";
             int idx = 0;
             int selection = id(skip_selection);
@@ -1173,4 +883,5 @@ widgets:
               - lambda: |-
                   id(skip_selection) = 0;
                   id(skip_ids_str) = "";
+              - script.execute: paint_skip_selection
               - lvgl.page.show: main_page

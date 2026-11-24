@@ -89,15 +89,9 @@ text_sensor:
     id: sdcard_state
     entity_id: sensor.${bambu_prefix}_estado_de_la_tarjeta_sd
 
-  # Skip objects (requiere template sensor en HA: sensor.p1s_printable_objects_list)
-  - platform: homeassistant
-    id: printable_objects_list
-    entity_id: sensor.${bambu_prefix}_printable_objects_list
-    on_value:
-      then:
-        - script.execute: refresh_skip_objects
-
-  # Bounding boxes serializados del plate_analyzer (ID:name:x1,y1,x2,y2|...)
+  # Skip objects: única fuente de lista, IDs y overlays. El plate_analyzer la
+  # deriva de los objetos imprimibles de bambu_lab: ID:name:x1,y1,x2,y2|...
+  # (coordenadas vacías si el objeto no tiene bbox).
   - platform: homeassistant
     id: plate_bbox_data
     entity_id: sensor.analizador_de_plato

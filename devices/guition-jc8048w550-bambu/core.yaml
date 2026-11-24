@@ -210,6 +210,8 @@ script:
           state:
             checked: !lambda return id(chamber_fan_speed).state > 0;
 
+  # Lista y overlays salen de la misma cadena (plate_analyzer), así el índice i
+  # de fila, overlay y bit de skip_selection es siempre el mismo objeto.
   - id: refresh_skip_objects
     mode: restart
     then:
@@ -233,19 +235,33 @@ script:
                                   id(btn_bbox_8), id(btn_bbox_9), id(btn_bbox_10), id(btn_bbox_11),
                                   id(btn_bbox_12), id(btn_bbox_13), id(btn_bbox_14), id(btn_bbox_15)};
 
-          std::string data = id(printable_objects_list).state;
-          std::string bbox_data = id(plate_bbox_data).state;
-
+          // Formato: ID:name:x1,y1,x2,y2|...  (coords vacías si no hay bbox)
+          const std::string &data = id(plate_bbox_data).state;
           int count = 0;
           size_t pos = 0;
           while (pos < data.size() && count < 16) {
             size_t pipe = data.find('|', pos);
             if (pipe == std::string::npos) pipe = data.size();
-            size_t colon = data.find(':', pos);
-            if (colon != std::string::npos && colon < pipe) {
-              std::string name = data.substr(colon + 1, pipe - colon - 1);
-              lv_label_set_text(labels[count], name.c_str());
-              lv_obj_clear_flag(rows[count], LV_OBJ_FLAG_HIDDEN);
+            size_t c1 = data.find(':', pos);
+            if (c1 == std::string::npos || c1 >= pipe) { pos = pipe + 1; continue; }
+            size_t c2 = data.find(':', c1 + 1);
+            if (c2 == std::string::npos || c2 > pipe) c2 = pipe;
+            std::string name = data.substr(c1 + 1, c2 - c1 - 1);
+            lv_label_set_text(labels[count], name.c_str());
+            lv_obj_clear_flag(rows[count], LV_OBJ_FLAG_HIDDEN);
+
+            int x1, y1, x2, y2;
+            if (c2 + 1 < pipe &&
+                sscanf(data.c_str() + c2 + 1, "%d,%d,%d,%d", &x1, &y1, &x2, &y2) == 4) {
+              int sx1 = x1 * kPlateDstSize / kPlateSrcSize;
+              int sy1 = y1 * kPlateDstSize / kPlateSrcSize;
+              int w = std::max((x2 - x1) * kPlateDstSize / kPlateSrcSize, kMinTouchTarget);
+              int h = std::max((y2 - y1) * kPlateDstSize / kPlateSrcSize, kMinTouchTarget);
+              lv_obj_set_pos(overlays[count], sx1, sy1);
+              lv_obj_set_size(overlays[count], w, h);
+              lv_obj_clear_flag(overlays[count], LV_OBJ_FLAG_HIDDEN);
+            } else {
+              lv_obj_add_flag(overlays[count], LV_OBJ_FLAG_HIDDEN);
             }
             pos = pipe + 1;
             count++;
@@ -254,39 +270,42 @@ script:
             lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
           }
+          // Objetos nuevos: la selección anterior ya no significa nada.
+          id(skip_selection) = 0;
+      - script.execute: paint_skip_selection
 
-          if (!bbox_data.empty()) {
-            int bidx = 0;
-            size_t bpos = 0;
-            while (bpos < bbox_data.size() && bidx < 16) {
-              size_t bpipe = bbox_data.find('|', bpos);
-              if (bpipe == std::string::npos) bpipe = bbox_data.size();
-              size_t c1 = bbox_data.find(':', bpos);
-              size_t c2 = (c1 != std::string::npos) ? bbox_data.find(':', c1 + 1) : std::string::npos;
-              if (c2 != std::string::npos && c2 < bpipe && c2 + 1 < bpipe) {
-                std::string coords = bbox_data.substr(c2 + 1, bpipe - c2 - 1);
-                int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-                if (sscanf(coords.c_str(), "%d,%d,%d,%d", &x1, &y1, &x2, &y2) == 4) {
-                  int sx1 = x1 * kPlateDstSize / kPlateSrcSize;
-                  int sy1 = y1 * kPlateDstSize / kPlateSrcSize;
-                  int sx2 = x2 * kPlateDstSize / kPlateSrcSize;
-                  int sy2 = y2 * kPlateDstSize / kPlateSrcSize;
-                  int w = sx2 - sx1;
-                  int h = sy2 - sy1;
-                  if (w < kMinTouchTarget) w = kMinTouchTarget;
-                  if (h < kMinTouchTarget) h = kMinTouchTarget;
-                  lv_obj_set_pos(overlays[bidx], sx1, sy1);
-                  lv_obj_set_size(overlays[bidx], w, h);
-                  lv_obj_clear_flag(overlays[bidx], LV_OBJ_FLAG_HIDDEN);
-                }
-              }
-              bpos = bpipe + 1;
-              bidx++;
-            }
-            for (int i = bidx; i < 16; i++) {
-              lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
-            }
+  # Pinta filas y overlays según skip_selection (un bit por objeto).
+  - id: paint_skip_selection
+    mode: restart
+    then:
+      - lambda: |-
+          static lv_obj_t* const rows[] = {id(btn_skip_0), id(btn_skip_1), id(btn_skip_2), id(btn_skip_3),
+                              id(btn_skip_4), id(btn_skip_5), id(btn_skip_6), id(btn_skip_7),
+                              id(btn_skip_8), id(btn_skip_9), id(btn_skip_10), id(btn_skip_11),
+                              id(btn_skip_12), id(btn_skip_13), id(btn_skip_14), id(btn_skip_15)};
+          static lv_obj_t* const checks[] = {id(lbl_check_0), id(lbl_check_1), id(lbl_check_2), id(lbl_check_3),
+                                id(lbl_check_4), id(lbl_check_5), id(lbl_check_6), id(lbl_check_7),
+                                id(lbl_check_8), id(lbl_check_9), id(lbl_check_10), id(lbl_check_11),
+                                id(lbl_check_12), id(lbl_check_13), id(lbl_check_14), id(lbl_check_15)};
+          static lv_obj_t* const overlays[] = {id(btn_bbox_0), id(btn_bbox_1), id(btn_bbox_2), id(btn_bbox_3),
+                                  id(btn_bbox_4), id(btn_bbox_5), id(btn_bbox_6), id(btn_bbox_7),
+                                  id(btn_bbox_8), id(btn_bbox_9), id(btn_bbox_10), id(btn_bbox_11),
+                                  id(btn_bbox_12), id(btn_bbox_13), id(btn_bbox_14), id(btn_bbox_15)};
+          const lv_color_t green = lv_color_hex(0x00AE42);
+          for (int i = 0; i < 16; i++) {
+            bool sel = id(skip_selection) & (1 << i);
+            lv_obj_set_style_border_color(rows[i], sel ? green : lv_color_hex(0x2A2A2A), 0);
+            lv_obj_set_style_bg_color(rows[i], sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);
+            lv_label_set_text(checks[i], sel ? "\U000F0134" : "\U000F0131");
+            lv_obj_set_style_text_color(checks[i], sel ? green : lv_color_hex(0x555555), 0);
+            lv_obj_set_style_border_color(overlays[i], sel ? green : lv_color_hex(0x444444), 0);
+            lv_obj_set_style_border_width(overlays[i], sel ? 3 : 2, 0);
+            lv_obj_set_style_bg_opa(overlays[i], sel ? 40 : 0, 0);
+            lv_obj_set_style_bg_color(overlays[i], green, 0);
           }
+      - lvgl.widget.update:
+          id: btn_do_skip
+          hidden: !lambda return id(skip_selection) == 0;
 
   # Filament select (3.C Fase 2): rellena el pool de 5 slots con la página actual
   # del inventario serializado "id:name:grams|..." (sensor.spoolman_inventory).
