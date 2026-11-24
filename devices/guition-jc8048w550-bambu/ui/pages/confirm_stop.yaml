@@ -2,6 +2,10 @@
 # Usa substitution: bambu_prefix
 
 id: confirm_stop_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 0
 bg_color: 0x121212
 widgets:
   - obj:

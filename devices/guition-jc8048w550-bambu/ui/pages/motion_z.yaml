@@ -2,6 +2,10 @@
 # Usa substitution: bambu_device_id
 
 id: motion_z_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 2
 bg_color: 0x121212
 widgets:
   - button:

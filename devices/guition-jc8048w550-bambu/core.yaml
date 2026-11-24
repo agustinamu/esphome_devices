@@ -16,21 +16,27 @@ globals:
   - id: screensaver_active
     type: bool
     initial_value: 'false'
-  - id: touch_wake_time
-    type: unsigned long
-    initial_value: '0'
   - id: screen_always_on
     type: bool
     initial_value: 'false'
   - id: printer_is_idle
     type: bool
     initial_value: 'true'
+  - id: printer_is_paused
+    type: bool
+    initial_value: 'false'
   # Skip objects
   - id: skip_selection
     type: int
     initial_value: '0'
-  - id: skip_ids_str
-    type: std::string
+  # ID de bambu_lab de cada fila (-1 = vacía); lo rellena refresh_skip_objects.
+  - id: skip_obj_ids
+    type: std::array<int, 16>
+    initial_value: '{{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}}'
+  # SKIP pulsado una vez: el siguiente toque omite.
+  - id: skip_armed
+    type: bool
+    initial_value: 'false'
   # Bit i = objeto i de la lista ya omitido por la impresora (no seleccionable).
   - id: skip_done
     type: int
@@ -42,6 +48,13 @@ globals:
   - id: filament_loaded_id
     type: int
     initial_value: '-1'
+  # IDs de Spoolman de los 5 slots visibles (-1 = vacío) y total; los rellena render_filament_page.
+  - id: spool_slot_ids
+    type: std::array<int, 5>
+    initial_value: '{{-1, -1, -1, -1, -1}}'
+  - id: spool_total
+    type: int
+    initial_value: '0'
   # Modo de los botones de material: false = CARGAR (set_filament + load_filament),
   # true = SOLO TIPO / fix (solo set_filament, corrige lo que ve Orca sin recargar).
   - id: filament_set_only
@@ -54,18 +67,22 @@ http_request:
 image:
   - platform: online_image
     id: plate_image
-    url: "${ha_url}/api/image_proxy/image.${bambu_prefix}_seleccionar_imagen"
+    # URL real (con token de la entidad) la pone el script load_plate_image.
+    url: "${ha_url}/api/image_proxy/image.seleccionar_imagen"
     format: jpeg
     type: RGB565
     resize: 380x380
-    request_headers:
-      Authorization: ${ha_token}
     on_download_finished:
       - lvgl.image.update:
           id: img_plate
           src: plate_image
     on_error:
-      - logger.log: "Error descargando imagen de plato"
+      - logger.log:
+          level: WARN
+          format: "Error descargando imagen de plato"
+      - script.execute:
+          id: show_toast
+          msg: "No se pudo descargar la imagen del plato"
 
 # Botón de reinicio interno
 button:
@@ -76,6 +93,10 @@ button:
 
 # Touch con callback para restaurar brillo y salir de screensaver
 # El primer touch al despertar muestra overlay que bloquea 500ms
+# INFO en vez de DEBUG: menos cadenas de log compiladas (flash) y menos ruido.
+logger:
+  level: INFO
+
 touchscreen:
   - platform: gt911
     id: my_touch
@@ -86,30 +107,22 @@ touchscreen:
           condition:
             lambda: return id(screen_dimmed);
           then:
-            - lambda: |-
-                id(screen_dimmed) = false;
-                id(touch_wake_time) = millis();
+            - script.execute: wake_block
+            - lambda: id(screen_dimmed) = false;
             - light.turn_on:
                 id: backlight
                 brightness: 100%
-            - lvgl.widget.update:
-                id: touch_blocker
-                hidden: false
       # Si estaba en screensaver, volver a home y mostrar blocker
       - if:
           condition:
             lambda: return id(screensaver_active);
           then:
-            - lambda: |-
-                id(screensaver_active) = false;
-                id(touch_wake_time) = millis();
+            - script.execute: wake_block
+            - lambda: id(screensaver_active) = false;
             - lvgl.page.show: main_page
             - light.turn_on:
                 id: backlight
                 brightness: 100%
-            - lvgl.widget.update:
-                id: touch_blocker
-                hidden: false
 
 # Scripts reactivos: disparados por on_value/on_state desde sensors.yaml, no por polling.
 script:
@@ -219,18 +232,27 @@ script:
   - id: refresh_printer_status
     mode: restart
     then:
-      # Evaluar estado idle una vez por ciclo (usado en múltiples widgets)
-      # estado_actual usa estados en inglés: idle, offline, printing, paused_*, etc.
+      # Activa = trabajo en curso; todo lo demás (idle, finish, failed, offline,
+      # unknown, unavailable, sin dato) cuenta como inactiva.
       - lambda: |-
-          std::string status = id(printer_status).state;
-          id(printer_is_idle) = (status == "idle" || status == "offline" || status.empty());
+          const std::string &s = id(printer_status).state;
+          id(printer_is_paused) = (s == "pause");
+          id(printer_is_idle) = !(s == "running" || s == "pause" || s == "prepare" ||
+                                  s == "slicing" || s == "init");
 
       # === HOME PAGE ===
       - lvgl.label.update:
           id: lbl_status
           text: !lambda |-
-            if (id(printer_status).state.empty()) return "---";
-            return id(printer_status).state.c_str();
+            const std::string &s = id(printer_status).state;
+            if (s == "running") return "Imprimiendo";
+            if (s == "pause") return "En pausa";
+            if (s == "prepare" || s == "slicing" || s == "init") return "Preparando";
+            if (s == "finish") return "Terminada";
+            if (s == "failed") return "Fallida";
+            if (s == "idle") return "En espera";
+            if (s == "offline") return "Desconectada";
+            return "---";
 
       # Nombre del archivo
       - lvgl.label.update:
@@ -242,14 +264,11 @@ script:
       - lvgl.widget.update:
           id: btn_pause
           hidden: !lambda |-
-            if (id(printer_is_idle)) return true;
-            // Ocultar si cualquier estado paused_*
-            return id(printer_status).state.substr(0, 7) == "paused_";
+            return id(printer_is_idle) || id(printer_is_paused);
       - lvgl.widget.update:
           id: btn_resume
           hidden: !lambda |-
-            // Mostrar resume solo si cualquier estado paused_*
-            return id(printer_status).state.substr(0, 7) != "paused_";
+            return !id(printer_is_paused);
 
       # Mostrar STOP solo cuando imprimiendo o pausado
       - lvgl.widget.update:
@@ -286,7 +305,7 @@ script:
             static char buf[16];
             int n = (int)id(printable_objects_count).state;
             if (n <= 0) return "";
-            snprintf(buf, sizeof(buf), "%d objects", n);
+            snprintf(buf, sizeof(buf), "%d objetos", n);
             return buf;
 
   # Luz de la carcasa: iconos de Home y Controls (reactivo a chamber_light).
@@ -324,6 +343,57 @@ script:
           text_color: !lambda |-
             if (id(chamber_light).state) return lv_color_hex(0x00AE42);
             return lv_color_hex(0x888888);
+
+  # Resalta la sección activa de la barra lateral (0 home, 1 controles, 2 motion, 3 info).
+  # Lo llama on_load de cada página, así vale para cualquier camino (atrás, diálogos, despertar).
+  - id: nav_highlight
+    mode: restart
+    parameters:
+      idx: int
+    then:
+      - lambda: |-
+          lv_obj_t *const btns[] = {id(btn_nav_home), id(btn_nav_controls), id(btn_nav_motion), id(btn_nav_info)};
+          for (int i = 0; i < 4; i++) {
+            bool on = (i == idx);
+            lv_obj_set_style_text_color(btns[i], lv_color_hex(on ? 0x00AE42 : 0x666666), 0);
+            lv_obj_set_style_bg_color(btns[i], lv_color_hex(on ? 0x1A1A1A : 0x0D0D0D), 0);
+          }
+
+  # Al despertar, el primer toque no debe pulsar nada: capa transparente 500 ms.
+  - id: wake_block
+    mode: restart
+    then:
+      - lvgl.widget.show: touch_blocker
+      - delay: 500ms
+      - lvgl.widget.hide: touch_blocker
+
+  # Aviso temporal en la parte inferior (4 s).
+  - id: show_toast
+    mode: restart
+    parameters:
+      msg: string
+    then:
+      - lvgl.label.update:
+          id: lbl_toast
+          text: !lambda return msg.c_str();
+      - lvgl.widget.show: lbl_toast
+      - delay: 4s
+      - lvgl.widget.hide: lbl_toast
+
+  # Imagen del plato (JPEG del plate_analyzer) vía image_proxy con el access_token
+  # de la propia entidad: no hace falta un token de larga duración en el firmware.
+  - id: load_plate_image
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: return !id(plate_image_token).state.empty();
+          then:
+            - online_image.set_url:
+                id: plate_image
+                url: !lambda |-
+                  return std::string("${ha_url}/api/image_proxy/image.seleccionar_imagen?token=") +
+                         id(plate_image_token).state;
 
   # Lista y overlays salen de la misma cadena (plate_analyzer), así el índice i
   # de fila, overlay y bit de skip_selection es siempre el mismo objeto.
@@ -363,18 +433,22 @@ script:
           }
           int done = 0;
           int count = 0;
+          std::array<int, 16> ids;
+          ids.fill(-1);
           size_t pos = 0;
           while (pos < data.size() && count < 16) {
             size_t pipe = data.find('|', pos);
             if (pipe == std::string::npos) pipe = data.size();
             size_t c1 = data.find(':', pos);
             if (c1 == std::string::npos || c1 >= pipe) { pos = pipe + 1; continue; }
-            size_t c2 = data.find(':', c1 + 1);
-            if (c2 == std::string::npos || c2 > pipe) c2 = pipe;
+            // Las coordenadas van tras el último ':' del segmento; el nombre, entre ambos.
+            size_t c2 = data.rfind(':', pipe - 1);
+            if (c2 == std::string::npos || c2 <= c1) c2 = pipe;
             std::string name = data.substr(c1 + 1, c2 - c1 - 1);
             lv_label_set_text(labels[count], name.c_str());
             lv_obj_clear_flag(rows[count], LV_OBJ_FLAG_HIDDEN);
             int obj_id = atoi(data.c_str() + pos);
+            ids[count] = obj_id;
             bool is_done = std::find(done_ids.begin(), done_ids.end(), obj_id) != done_ids.end();
             lv_obj_set_style_text_color(labels[count], lv_color_hex(is_done ? 0x666666 : 0xFFFFFF), 0);
             if (is_done) {
@@ -406,9 +480,12 @@ script:
             lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
           }
-          // Objetos nuevos u omitidos: la selección anterior ya no significa nada.
+          // Lista distinta (otra impresión): la selección anterior ya no vale. Si solo
+          // cambian los omitidos, se conserva lo marcado salvo lo ya omitido.
+          if (ids != id(skip_obj_ids)) id(skip_selection) = 0;
+          id(skip_obj_ids) = ids;
           id(skip_done) = done;
-          id(skip_selection) = 0;
+          id(skip_selection) &= ~done;
       - script.execute: paint_skip_selection
 
   # Pinta filas y overlays según skip_selection (un bit por objeto).
@@ -452,6 +529,10 @@ script:
             lv_obj_set_style_bg_opa(overlays[i], sel ? 40 : 0, 0);
             lv_obj_set_style_bg_color(overlays[i], green, 0);
           }
+      - lambda: id(skip_armed) = false;
+      - lvgl.label.update:
+          id: lbl_do_skip
+          text: "OMITIR"
       - lvgl.widget.update:
           id: btn_do_skip
           hidden: !lambda return id(skip_selection) == 0;
@@ -464,6 +545,8 @@ script:
       - lambda: |-
           const int SLOTS = 5;
           std::string s = id(spoolman_inventory).state;
+          // Sin datos (HA o Spoolman caídos): lista vacía, nunca una fila "unavailable".
+          if (s == "unknown" || s == "unavailable" || s == "None") s.clear();
 
           lv_obj_t* const rows[] = {id(btn_spool_0), id(btn_spool_1), id(btn_spool_2),
                                     id(btn_spool_3), id(btn_spool_4)};
@@ -490,7 +573,11 @@ script:
           int page = id(filament_page_idx);
           int start = page * SLOTS;
 
-          for (int i = 0; i < SLOTS; i++) lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
+          id(spool_total) = total;
+          for (int i = 0; i < SLOTS; i++) {
+            lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
+            id(spool_slot_ids)[i] = -1;
+          }
 
           int n = 0;
           size_t pos = 0;
@@ -511,6 +598,7 @@ script:
                 if (!grams.empty()) text += "   " + grams + " g";
                 lv_label_set_text(labels[i], text.c_str());
                 lv_obj_clear_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
+                id(spool_slot_ids)[i] = sid;
                 lv_obj_set_style_bg_color(rows[i],
                   (sid == id(filament_loaded_id)) ? lv_color_hex(0x00AE42) : lv_color_hex(0x1E1E1E),
                   LV_PART_MAIN);

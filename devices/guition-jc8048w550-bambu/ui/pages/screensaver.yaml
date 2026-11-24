@@ -1,6 +1,10 @@
 # Screensaver Page - Pantalla de reposo
 
 id: screensaver_page
+on_load:
+  - lvgl.widget.hide: sidebar
+on_unload:
+  - lvgl.widget.show: sidebar
 bg_color: 0x000000
 widgets:
   # Reloj grande centrado

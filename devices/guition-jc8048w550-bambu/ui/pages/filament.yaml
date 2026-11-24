@@ -16,6 +16,10 @@
 # Tray bobina externa: sensor.${bambu_prefix}_externalspool_bobina_externa
 
 id: filament_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 2
 bg_color: 0x121212
 widgets:
   # Header: volver a Motion
@@ -294,11 +298,27 @@ widgets:
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
-        - homeassistant.action:
-            action: bambu_lab.extrude_retract
-            data:
-              device_id: ${bambu_device_id}
-              type: Extrude
+        - if:
+            condition:
+              lambda: return id(nozzle_temp).state >= 170;
+            then:
+              - homeassistant.action:
+                  action: bambu_lab.extrude_retract
+                  data:
+                    device_id: ${bambu_device_id}
+                    type: Extrude
+                  # El servicio solo admite llamadas que piden respuesta.
+                  capture_response: true
+                  on_success:
+                    - logger.log: "Extrude OK"
+                  on_error:
+                    - script.execute:
+                        id: show_toast
+                        msg: !lambda 'return std::string("Extrude: ") + error;'
+            else:
+              - script.execute:
+                  id: show_toast
+                  msg: "Calienta la boquilla a 170 °C o más"
 
   - button:
       x: 455
@@ -321,8 +341,24 @@ widgets:
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
-        - homeassistant.action:
-            action: bambu_lab.extrude_retract
-            data:
-              device_id: ${bambu_device_id}
-              type: Retract
+        - if:
+            condition:
+              lambda: return id(nozzle_temp).state >= 170;
+            then:
+              - homeassistant.action:
+                  action: bambu_lab.extrude_retract
+                  data:
+                    device_id: ${bambu_device_id}
+                    type: Retract
+                  # El servicio solo admite llamadas que piden respuesta.
+                  capture_response: true
+                  on_success:
+                    - logger.log: "Retract OK"
+                  on_error:
+                    - script.execute:
+                        id: show_toast
+                        msg: !lambda 'return std::string("Retract: ") + error;'
+            else:
+              - script.execute:
+                  id: show_toast
+                  msg: "Calienta la boquilla a 170 °C o más"

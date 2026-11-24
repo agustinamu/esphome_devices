@@ -4,24 +4,35 @@
 interval:
   - interval: 1s
     then:
-      # Reloj
-      - lvgl.label.update:
-          id: lbl_clock
-          text: !lambda |-
-            static char buf[10];
-            auto time = id(ha_time).now();
-            snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
-            return buf;
-
-      # Ocultar touch blocker despues de 500ms
+      # Reloj (Home y salvapantallas): solo se repinta cuando cambia el minuto.
       - if:
           condition:
-            lambda: return id(touch_wake_time) > 0 && (millis() - id(touch_wake_time) > 500);
+            lambda: |-
+              static int last = -1;
+              auto t = id(ha_time).now();
+              int now = t.is_valid() ? t.hour * 60 + t.minute : -1;
+              if (now == last) return false;
+              last = now;
+              return true;
           then:
-            - lambda: id(touch_wake_time) = 0;
-            - lvgl.widget.update:
-                id: touch_blocker
-                hidden: true
+            - lvgl.label.update:
+                id: [lbl_clock, lbl_screensaver_clock]
+                text: !lambda |-
+                  static char buf[10];
+                  auto t = id(ha_time).now();
+                  if (!t.is_valid()) return "--:--";
+                  snprintf(buf, sizeof(buf), "%02d:%02d", t.hour, t.minute);
+                  return buf;
+
+      # Aviso de HA desconectada (solo toca LVGL cuando cambia).
+      - lambda: |-
+          static int last = -1;
+          int c = esphome::api::global_api_server->is_connected() ? 1 : 0;
+          if (c != last) {
+            last = c;
+            if (c) lv_obj_add_flag(id(lbl_no_ha), LV_OBJ_FLAG_HIDDEN);
+            else lv_obj_clear_flag(id(lbl_no_ha), LV_OBJ_FLAG_HIDDEN);
+          }
 
       # Auto-dim despues de 60s (si no esta en modo "siempre encendida")
       - lambda: |-
@@ -45,19 +56,6 @@ interval:
                 id: backlight
                 brightness: 5%
 
-      # Actualizar reloj screensaver (solo si visible)
-      - if:
-          condition:
-            lambda: return id(screensaver_active);
-          then:
-            - lvgl.label.update:
-                id: lbl_screensaver_clock
-                text: !lambda |-
-                  static char buf[10];
-                  auto time = id(ha_time).now();
-                  snprintf(buf, sizeof(buf), "%02d:%02d", time.hour, time.minute);
-                  return buf;
-
   - interval: 2s
     then:
       # Hora estimada de fin
@@ -79,12 +77,14 @@ interval:
           id: lbl_progress
           text: !lambda |-
             static char buf[8];
-            snprintf(buf, sizeof(buf), "%.0f%%", id(print_progress).state);
+            float pr = id(print_progress).state;
+            if (isnan(pr)) return "--%";
+            snprintf(buf, sizeof(buf), "%.0f%%", pr);
             return buf;
 
       - lvgl.bar.update:
           id: progress_bar
-          value: !lambda return (int)id(print_progress).state;
+          value: !lambda 'float pr = id(print_progress).state; return isnan(pr) ? 0 : (int) pr;'
 
       - lvgl.label.update:
           id: lbl_remaining
@@ -92,9 +92,8 @@ interval:
             static char buf[16];
             float hours = id(print_time_remaining).state;
             if (isnan(hours)) return "--:--";
-            int h = (int)hours;
-            int m = (int)((hours - h) * 60);
-            snprintf(buf, sizeof(buf), "%d:%02d", h, m);
+            long mins = lroundf(hours * 60);
+            snprintf(buf, sizeof(buf), "%ld:%02ld", mins / 60, mins % 60);
             return buf;
 
       - lvgl.label.update:
@@ -109,17 +108,17 @@ interval:
               return "0:00";
             }
             float total = remaining * 100.0f / (100.0f - progress);
-            int h = (int)total;
-            int m = (int)((total - h) * 60);
-            snprintf(buf, sizeof(buf), "%d:%02d", h, m);
+            long mins = lroundf(total * 60);
+            snprintf(buf, sizeof(buf), "%ld:%02ld", mins / 60, mins % 60);
             return buf;
 
       - lvgl.label.update:
           id: lbl_nozzle
           text: !lambda |-
             static char buf[16];
-            if (!id(printer_online).state) return "---";
-            snprintf(buf, sizeof(buf), "%.0f", id(nozzle_temp).state);
+            float t = id(nozzle_temp).state;
+            if (!id(printer_online).state || isnan(t)) return "---";
+            snprintf(buf, sizeof(buf), "%.0f", t);
             return buf;
           text_color: !lambda |-
             if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
@@ -129,8 +128,9 @@ interval:
           id: lbl_bed
           text: !lambda |-
             static char buf[16];
-            if (!id(printer_online).state) return "---";
-            snprintf(buf, sizeof(buf), "%.0f", id(bed_temp).state);
+            float t = id(bed_temp).state;
+            if (!id(printer_online).state || isnan(t)) return "---";
+            snprintf(buf, sizeof(buf), "%.0f", t);
             return buf;
           text_color: !lambda |-
             if (id(printer_online).state) return lv_color_hex(0xFFFFFF);
@@ -140,7 +140,9 @@ interval:
           id: lbl_layers
           text: !lambda |-
             static char buf[16];
-            snprintf(buf, sizeof(buf), "%.0f / %.0f", id(current_layer).state, id(total_layers).state);
+            float c = id(current_layer).state, t = id(total_layers).state;
+            if (isnan(c) || isnan(t)) return "-- / --";
+            snprintf(buf, sizeof(buf), "%.0f / %.0f", c, t);
             return buf;
 
       # === CONTROLS PAGE ===
@@ -148,20 +150,27 @@ interval:
           id: lbl_nozzle_ctrl
           text: !lambda |-
             static char buf[24];
-            snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", id(nozzle_temp).state, id(nozzle_target).state);
+            float c = id(nozzle_temp).state, t = id(nozzle_target).state;
+            if (isnan(c) || isnan(t)) return "---°C / ---°C";
+            snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", c, t);
             return buf;
 
       - lvgl.label.update:
           id: lbl_bed_ctrl
           text: !lambda |-
             static char buf[24];
-            snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", id(bed_temp).state, id(bed_target).state);
+            float c = id(bed_temp).state, t = id(bed_target).state;
+            if (isnan(c) || isnan(t)) return "---°C / ---°C";
+            snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", c, t);
             return buf;
 
   # Info page: datos que cambian lento (WiFi, IP, uptime, status). Interval propio
   # lento (10s) para no recargar el interval principal con widgets poco visibles.
   - interval: 10s
     then:
+      - lvgl.label.update:
+          id: lbl_version
+          text: !lambda return std::string(ESPHOME_VERSION);
       - lvgl.label.update:
           id: lbl_wifi_signal
           text: !lambda |-

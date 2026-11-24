@@ -2,6 +2,10 @@
 # Usa substitution: bambu_prefix
 
 id: controls_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 1
 bg_color: 0x121212
 widgets:
   - label:
@@ -52,7 +56,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                    value: !lambda "return std::max(0.0f, id(nozzle_target).state - 10);"
+                    value: !lambda "float t = id(nozzle_target).state; return std::max(0.0f, (isnan(t) ? 0.0f : t) - 10);"
 
         - button:
             x: 83
@@ -70,7 +74,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                    value: !lambda "return std::max(0.0f, id(nozzle_target).state - 5);"
+                    value: !lambda "float t = id(nozzle_target).state; return std::max(0.0f, (isnan(t) ? 0.0f : t) - 5);"
 
         - button:
             x: 156
@@ -88,7 +92,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                    value: !lambda "return std::min(300.0f, id(nozzle_target).state + 5);"
+                    value: !lambda "float t = id(nozzle_target).state; return std::min(300.0f, (isnan(t) ? 0.0f : t) + 5);"
 
         - button:
             x: 229
@@ -106,7 +110,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                    value: !lambda "return std::min(300.0f, id(nozzle_target).state + 10);"
+                    value: !lambda "float t = id(nozzle_target).state; return std::min(300.0f, (isnan(t) ? 0.0f : t) + 10);"
 
         - button:
             x: 10
@@ -120,11 +124,19 @@ widgets:
                   text: "ENFRIAR"
                   text_font: montserrat_18
             on_press:
-              - homeassistant.action:
-                  action: number.set_value
-                  data:
-                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
-                    value: "0"
+              - if:
+                  condition:
+                    lambda: return id(printer_is_idle);
+                  then:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_boquilla
+                          value: "0"
+                  else:
+                    - script.execute:
+                        id: show_toast
+                        msg: "No disponible mientras imprime"
 
   # Card Bed
   - obj:
@@ -167,7 +179,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                    value: !lambda "return std::max(0.0f, id(bed_target).state - 10);"
+                    value: !lambda "float t = id(bed_target).state; return std::max(0.0f, (isnan(t) ? 0.0f : t) - 10);"
 
         - button:
             x: 83
@@ -185,7 +197,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                    value: !lambda "return std::max(0.0f, id(bed_target).state - 5);"
+                    value: !lambda "float t = id(bed_target).state; return std::max(0.0f, (isnan(t) ? 0.0f : t) - 5);"
 
         - button:
             x: 156
@@ -203,7 +215,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                    value: !lambda "return std::min(120.0f, id(bed_target).state + 5);"
+                    value: !lambda "float t = id(bed_target).state; return std::min(120.0f, (isnan(t) ? 0.0f : t) + 5);"
 
         - button:
             x: 229
@@ -221,7 +233,7 @@ widgets:
                   action: number.set_value
                   data:
                     entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                    value: !lambda "return std::min(120.0f, id(bed_target).state + 10);"
+                    value: !lambda "float t = id(bed_target).state; return std::min(120.0f, (isnan(t) ? 0.0f : t) + 10);"
 
         - button:
             x: 10
@@ -235,11 +247,19 @@ widgets:
                   text: "ENFRIAR"
                   text_font: montserrat_18
             on_press:
-              - homeassistant.action:
-                  action: number.set_value
-                  data:
-                    entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
-                    value: "0"
+              - if:
+                  condition:
+                    lambda: return id(printer_is_idle);
+                  then:
+                    - homeassistant.action:
+                        action: number.set_value
+                        data:
+                          entity_id: number.${bambu_prefix}_temperatura_objetivo_de_la_cama
+                          value: "0"
+                  else:
+                    - script.execute:
+                        id: show_toast
+                        msg: "No disponible mientras imprime"
 
   # PRESETS button
   - button:
@@ -263,7 +283,15 @@ widgets:
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
-        - lvgl.page.show: controls_presets_page
+        - if:
+            condition:
+              lambda: return id(printer_is_idle);
+            then:
+              - lvgl.page.show: controls_presets_page
+            else:
+              - script.execute:
+                  id: show_toast
+                  msg: "No disponible mientras imprime"
 
   # LIGHT toggle con feedback
   - button:

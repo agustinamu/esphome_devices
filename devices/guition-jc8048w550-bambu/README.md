@@ -5,7 +5,7 @@ Dashboard táctil para impresoras Bambu Lab P1S/X1C con pantalla de 5 pulgadas.
 ## Características
 
 ### Página Home
-- **Progreso de impresión** con gauge circular
+- **Progreso de impresión** con barra y porcentaje
 - **Temperaturas** de nozzle y bed con indicador de calentamiento (parpadeo naranja)
 - **Nombre del archivo** imprimiéndose
 - **Tiempo restante** y hora estimada de finalización
@@ -34,7 +34,9 @@ Dashboard táctil para impresoras Bambu Lab P1S/X1C con pantalla de 5 pulgadas.
 ### Página Motion
 - Control **XY** del cabezal (+/-1mm, +/-10mm, Home)
 - Control **Z** de la cama (posiciones absolutas: 250, 150, 50mm, Home)
-- *Página Filament desactivada temporalmente*
+- Página **Filament**: cargar/descargar (PLA/PETG/TPU), EXTRUDE/RETRACT (boquilla ≥ 170 °C) y
+  selector de bobina de Spoolman (**SPOOLS**)
+- Motion, presets y ENFRIAR se bloquean mientras imprime (aviso en pantalla)
 
 ### Página Info
 - **Estado** de conexión de la impresora
@@ -49,7 +51,10 @@ Dashboard táctil para impresoras Bambu Lab P1S/X1C con pantalla de 5 pulgadas.
 ### Página Skip objects
 - Botón **SKIP** en Home (solo imprimiendo y con más de 1 objeto)
 - Imagen del plato con un recuadro tocable por objeto + lista (hasta 16)
-- **SKIP SELECTED** llama a `bambu_lab.skip_objects` con los IDs marcados
+- **OMITIR** pide un segundo toque («¿OMITIR N?») y llama a `bambu_lab.skip_objects`
+- Los objetos ya omitidos (`sensor.<prefix>_objetos_omitidos`) salen en gris y no se pueden marcar
+- La imagen es el JPEG del analizador (`image.seleccionar_imagen`), descargado con el
+  `access_token` de la propia entidad: el firmware no lleva token de HA
 - Lista, IDs y recuadros salen de `sensor.analizador_de_plato` (atributo `bbox_data`,
   formato `ID:nombre:x1,y1,x2,y2|...`), así fila, recuadro e ID siempre coinciden
 
@@ -59,6 +64,8 @@ Dashboard táctil para impresoras Bambu Lab P1S/X1C con pantalla de 5 pulgadas.
 - **Touch wake** - protección contra toques accidentales al despertar
 - **Indicador de error** - icono parpadea en sidebar cuando hay error
 - **Modo siempre encendida** - desactiva auto-dim y screensaver
+- **Aviso «Sin conexión con Home Assistant»** cuando cae la API
+- **Avisos temporales** (abajo) cuando HA rechaza una acción o está bloqueada
 
 ## Requisitos
 
@@ -67,6 +74,8 @@ Dashboard táctil para impresoras Bambu Lab P1S/X1C con pantalla de 5 pulgadas.
 3. **[ha-bambulab](https://github.com/greghesp/ha-bambulab)** instalado via HACS
 4. Impresora Bambu Lab P1S o X1C conectada a Home Assistant
 5. **bambu-plate-analyzer** (integración propia) para la página Skip objects
+6. Para el selector de bobinas: `sensor.spoolman_inventario` con atributo `items`
+   («id:nombre:gramos|...»; plantilla en el paquete `impresora3d.yaml` de HA)
 
 ## Configuración
 
@@ -141,7 +150,9 @@ guition-jc8048w550-bambu/
         ├── motion.yaml         # Menú de movimiento
         ├── motion_xy.yaml      # Control XY
         ├── motion_z.yaml       # Control Z
-        ├── filament.yaml       # Gestión de filamento (WIP)
+        ├── filament.yaml       # Carga/descarga, extrusión
+        ├── filament_select.yaml # Selector de bobina (Spoolman)
+        ├── skip_objects.yaml   # Omitir objetos
         ├── confirm_pause.yaml  # Diálogo confirmación pause
         ├── confirm_stop.yaml   # Diálogo confirmación stop
         ├── info.yaml           # Info del sistema
@@ -175,7 +186,7 @@ guition-jc8048w550-bambu/
 | Temperatura bed | `sensor.${bambu_prefix}_temperatura_de_la_cama` |
 | Progreso | `sensor.${bambu_prefix}_progreso_de_la_impresion` |
 | Tiempo restante | `sensor.${bambu_prefix}_tiempo_restante` |
-| Estado | `sensor.${bambu_prefix}_estado_actual` |
+| Estado | `sensor.${bambu_prefix}_estado_de_la_impresion` |
 | Luz | `light.${bambu_prefix}_luz_de_la_carcasa` |
 | Cooling fan | `fan.${bambu_prefix}_ventilador_de_enfriamiento` |
 | Aux fan | `fan.${bambu_prefix}_ventilador_auxiliar` |

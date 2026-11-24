@@ -2,6 +2,10 @@
 # Usa substitution: bambu_prefix
 
 id: fans_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 1
 bg_color: 0x121212
 widgets:
   - button:
@@ -91,6 +95,12 @@ widgets:
                     action: fan.toggle
                     data:
                       entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
+                    # Si HA rechaza la acción, el interruptor vuelve al estado real.
+                    on_error:
+                      - script.execute: refresh_fan_cooling
+                      - script.execute:
+                          id: show_toast
+                          msg: !lambda 'return std::string("Ventilador: ") + error;'
 
         # Botones -10 / valor / +10
         - button:
@@ -109,7 +119,7 @@ widgets:
                   action: fan.set_percentage
                   data:
                     entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
-                    percentage: !lambda "return std::max(0, (int)id(cooling_fan_speed).state - 10);"
+                    percentage: !lambda "return std::max(0, (isnan(id(cooling_fan_speed).state) ? 0 : (int) id(cooling_fan_speed).state) - 10);"
 
         - label:
             id: lbl_cooling_val
@@ -137,7 +147,7 @@ widgets:
                   action: fan.set_percentage
                   data:
                     entity_id: fan.${bambu_prefix}_ventilador_de_enfriamiento
-                    percentage: !lambda "return std::min(100, (int)id(cooling_fan_speed).state + 10);"
+                    percentage: !lambda "return std::min(100, (isnan(id(cooling_fan_speed).state) ? 0 : (int) id(cooling_fan_speed).state) + 10);"
 
   # ========== AUX FAN ==========
   - obj:
@@ -203,6 +213,12 @@ widgets:
                     action: fan.toggle
                     data:
                       entity_id: fan.${bambu_prefix}_ventilador_auxiliar
+                    # Si HA rechaza la acción, el interruptor vuelve al estado real.
+                    on_error:
+                      - script.execute: refresh_fan_aux
+                      - script.execute:
+                          id: show_toast
+                          msg: !lambda 'return std::string("Ventilador: ") + error;'
 
         # Botones -10 / valor / +10
         - button:
@@ -221,7 +237,7 @@ widgets:
                   action: fan.set_percentage
                   data:
                     entity_id: fan.${bambu_prefix}_ventilador_auxiliar
-                    percentage: !lambda "return std::max(0, (int)id(aux_fan_speed).state - 10);"
+                    percentage: !lambda "return std::max(0, (isnan(id(aux_fan_speed).state) ? 0 : (int) id(aux_fan_speed).state) - 10);"
 
         - label:
             id: lbl_aux_val
@@ -249,7 +265,7 @@ widgets:
                   action: fan.set_percentage
                   data:
                     entity_id: fan.${bambu_prefix}_ventilador_auxiliar
-                    percentage: !lambda "return std::min(100, (int)id(aux_fan_speed).state + 10);"
+                    percentage: !lambda "return std::min(100, (isnan(id(aux_fan_speed).state) ? 0 : (int) id(aux_fan_speed).state) + 10);"
 
   # ========== CHAMBER FAN ==========
   - obj:
@@ -315,6 +331,12 @@ widgets:
                     action: fan.toggle
                     data:
                       entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
+                    # Si HA rechaza la acción, el interruptor vuelve al estado real.
+                    on_error:
+                      - script.execute: refresh_fan_chamber
+                      - script.execute:
+                          id: show_toast
+                          msg: !lambda 'return std::string("Ventilador: ") + error;'
 
         # Botones -10 / valor / +10
         - button:
@@ -333,7 +355,7 @@ widgets:
                   action: fan.set_percentage
                   data:
                     entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
-                    percentage: !lambda "return std::max(0, (int)id(chamber_fan_speed).state - 10);"
+                    percentage: !lambda "return std::max(0, (isnan(id(chamber_fan_speed).state) ? 0 : (int) id(chamber_fan_speed).state) - 10);"
 
         - label:
             id: lbl_chamber_val
@@ -361,4 +383,4 @@ widgets:
                   action: fan.set_percentage
                   data:
                     entity_id: fan.${bambu_prefix}_ventilador_de_la_carcasa
-                    percentage: !lambda "return std::min(100, (int)id(chamber_fan_speed).state + 10);"
+                    percentage: !lambda "return std::min(100, (isnan(id(chamber_fan_speed).state) ? 0 : (int) id(chamber_fan_speed).state) + 10);"

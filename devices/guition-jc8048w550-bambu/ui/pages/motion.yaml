@@ -1,6 +1,10 @@
 # Motion Menu Page - Seleccion de movimiento
 
 id: motion_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 2
 bg_color: 0x121212
 widgets:
   - label:

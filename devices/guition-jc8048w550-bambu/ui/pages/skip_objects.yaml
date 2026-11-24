@@ -3,6 +3,10 @@
 # Usa substitution: bambu_device_id, bambu_prefix, ha_url
 
 id: skip_objects_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 0
 bg_color: 0x121212
 widgets:
   # === HEADER ===
@@ -836,6 +840,7 @@ widgets:
               - script.execute: paint_skip_selection
 
   # === SKIP BUTTON (bottom right) ===
+  # Dos toques: el primero arma ("¿OMITIR N?"), el segundo omite. Omitir es irreversible.
   - button:
       id: btn_do_skip
       x: 530
@@ -846,42 +851,40 @@ widgets:
       hidden: true
       widgets:
         - label:
+            id: lbl_do_skip
             align: CENTER
-            text: "SKIP SELECTED"
+            text: "OMITIR"
             text_font: montserrat_22
       on_press:
-        - lambda: |-
-            std::string data = id(plate_bbox_data).state;  // ID:name:coords|...
-            std::string result = "";
-            int idx = 0;
-            int selection = id(skip_selection);
-            size_t pos = 0;
-            while (pos < data.size() && idx < 16) {
-              size_t pipe = data.find('|', pos);
-              if (pipe == std::string::npos) pipe = data.size();
-              if (selection & (1 << idx)) {
-                size_t colon = data.find(':', pos);
-                if (colon < pipe) {
-                  std::string obj_id = data.substr(pos, colon - pos);
-                  if (!result.empty()) result += ",";
-                  result += obj_id;
-                }
-              }
-              pos = pipe + 1;
-              idx++;
-            }
-            id(skip_ids_str) = result;
         - if:
             condition:
-              lambda: return !id(skip_ids_str).empty();
+              lambda: return !id(skip_armed);
             then:
+              - lambda: id(skip_armed) = true;
+              - lvgl.label.update:
+                  id: lbl_do_skip
+                  text: !lambda |-
+                    static char buf[24];
+                    snprintf(buf, sizeof(buf), "¿OMITIR %d?", __builtin_popcount(id(skip_selection)));
+                    return buf;
+            else:
               - homeassistant.action:
                   action: bambu_lab.skip_objects
                   data:
                     device_id: ${bambu_device_id}
-                    objects: !lambda 'return id(skip_ids_str);'
-              - lambda: |-
-                  id(skip_selection) = 0;
-                  id(skip_ids_str) = "";
+                    objects: !lambda |-
+                      std::string ids;
+                      for (int i = 0; i < 16; i++) {
+                        if ((id(skip_selection) & (1 << i)) && id(skip_obj_ids)[i] >= 0) {
+                          if (!ids.empty()) ids += ",";
+                          ids += to_string(id(skip_obj_ids)[i]);
+                        }
+                      }
+                      return ids;
+                  on_error:
+                    - script.execute:
+                        id: show_toast
+                        msg: !lambda 'return std::string("Skip: ") + error;'
+              - lambda: id(skip_selection) = 0;
               - script.execute: paint_skip_selection
               - lvgl.page.show: main_page

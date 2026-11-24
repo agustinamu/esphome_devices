@@ -1,8 +1,8 @@
 # Filament Select Page - Elegir qué bobina (Spool) está cargada
 #
 # Lista fija PAGINADA (patrón skip_objects): pool de 5 slots + prev/next.
-# Datos: text_sensor spoolman_inventory (serializado "id:name:grams|...") leído
-# de la REST de Spoolman vía un rest sensor en HA (proxy). Ver
+# Datos: text_sensor spoolman_inventory = atributo `items` de sensor.spoolman_inventario
+# ("id:name:grams|...", plantilla en HA que consulta la API de Spoolman). Ver
 # docs/3c-fase2-ha-proxy en filament-lab.
 #
 # Al tocar un slot: input_text.set_value(input_text.filament_loaded_spool, <id>).
@@ -10,6 +10,10 @@
 # anterior. La pantalla queda "tonta": solo fija un helper de HA.
 
 id: filament_select_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 2
 bg_color: 0x121212
 widgets:
   # Volver a filament
@@ -55,28 +59,15 @@ widgets:
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
-        - homeassistant.action:
-            action: input_text.set_value
-            data:
-              entity_id: input_text.filament_loaded_spool
-              value: !lambda |-
-                std::string s = id(spoolman_inventory).state;
-                int target = id(filament_page_idx) * 5 + 0;
-                int n = 0; size_t pos = 0;
-                while (pos <= s.size()) {
-                  size_t pipe = s.find('|', pos);
-                  std::string e = (pipe == std::string::npos) ? s.substr(pos) : s.substr(pos, pipe - pos);
-                  if (!e.empty()) {
-                    if (n == target) {
-                      size_t c1 = e.find(':');
-                      return c1 != std::string::npos ? e.substr(0, c1) : std::string("");
-                    }
-                    n++;
-                  }
-                  if (pipe == std::string::npos) break;
-                  pos = pipe + 1;
-                }
-                return std::string("");
+        - if:
+            condition:
+              lambda: return id(spool_slot_ids)[0] >= 0;
+            then:
+              - homeassistant.action:
+                  action: input_text.set_value
+                  data:
+                    entity_id: input_text.filament_loaded_spool
+                    value: !lambda 'return to_string(id(spool_slot_ids)[0]);'
 
   - button:
       id: btn_spool_1
@@ -96,28 +87,15 @@ widgets:
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
-        - homeassistant.action:
-            action: input_text.set_value
-            data:
-              entity_id: input_text.filament_loaded_spool
-              value: !lambda |-
-                std::string s = id(spoolman_inventory).state;
-                int target = id(filament_page_idx) * 5 + 1;
-                int n = 0; size_t pos = 0;
-                while (pos <= s.size()) {
-                  size_t pipe = s.find('|', pos);
-                  std::string e = (pipe == std::string::npos) ? s.substr(pos) : s.substr(pos, pipe - pos);
-                  if (!e.empty()) {
-                    if (n == target) {
-                      size_t c1 = e.find(':');
-                      return c1 != std::string::npos ? e.substr(0, c1) : std::string("");
-                    }
-                    n++;
-                  }
-                  if (pipe == std::string::npos) break;
-                  pos = pipe + 1;
-                }
-                return std::string("");
+        - if:
+            condition:
+              lambda: return id(spool_slot_ids)[1] >= 0;
+            then:
+              - homeassistant.action:
+                  action: input_text.set_value
+                  data:
+                    entity_id: input_text.filament_loaded_spool
+                    value: !lambda 'return to_string(id(spool_slot_ids)[1]);'
 
   - button:
       id: btn_spool_2
@@ -137,28 +115,15 @@ widgets:
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
-        - homeassistant.action:
-            action: input_text.set_value
-            data:
-              entity_id: input_text.filament_loaded_spool
-              value: !lambda |-
-                std::string s = id(spoolman_inventory).state;
-                int target = id(filament_page_idx) * 5 + 2;
-                int n = 0; size_t pos = 0;
-                while (pos <= s.size()) {
-                  size_t pipe = s.find('|', pos);
-                  std::string e = (pipe == std::string::npos) ? s.substr(pos) : s.substr(pos, pipe - pos);
-                  if (!e.empty()) {
-                    if (n == target) {
-                      size_t c1 = e.find(':');
-                      return c1 != std::string::npos ? e.substr(0, c1) : std::string("");
-                    }
-                    n++;
-                  }
-                  if (pipe == std::string::npos) break;
-                  pos = pipe + 1;
-                }
-                return std::string("");
+        - if:
+            condition:
+              lambda: return id(spool_slot_ids)[2] >= 0;
+            then:
+              - homeassistant.action:
+                  action: input_text.set_value
+                  data:
+                    entity_id: input_text.filament_loaded_spool
+                    value: !lambda 'return to_string(id(spool_slot_ids)[2]);'
 
   - button:
       id: btn_spool_3
@@ -178,28 +143,15 @@ widgets:
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
-        - homeassistant.action:
-            action: input_text.set_value
-            data:
-              entity_id: input_text.filament_loaded_spool
-              value: !lambda |-
-                std::string s = id(spoolman_inventory).state;
-                int target = id(filament_page_idx) * 5 + 3;
-                int n = 0; size_t pos = 0;
-                while (pos <= s.size()) {
-                  size_t pipe = s.find('|', pos);
-                  std::string e = (pipe == std::string::npos) ? s.substr(pos) : s.substr(pos, pipe - pos);
-                  if (!e.empty()) {
-                    if (n == target) {
-                      size_t c1 = e.find(':');
-                      return c1 != std::string::npos ? e.substr(0, c1) : std::string("");
-                    }
-                    n++;
-                  }
-                  if (pipe == std::string::npos) break;
-                  pos = pipe + 1;
-                }
-                return std::string("");
+        - if:
+            condition:
+              lambda: return id(spool_slot_ids)[3] >= 0;
+            then:
+              - homeassistant.action:
+                  action: input_text.set_value
+                  data:
+                    entity_id: input_text.filament_loaded_spool
+                    value: !lambda 'return to_string(id(spool_slot_ids)[3]);'
 
   - button:
       id: btn_spool_4
@@ -219,28 +171,15 @@ widgets:
             text_font: montserrat_22
             text_color: 0xFFFFFF
       on_press:
-        - homeassistant.action:
-            action: input_text.set_value
-            data:
-              entity_id: input_text.filament_loaded_spool
-              value: !lambda |-
-                std::string s = id(spoolman_inventory).state;
-                int target = id(filament_page_idx) * 5 + 4;
-                int n = 0; size_t pos = 0;
-                while (pos <= s.size()) {
-                  size_t pipe = s.find('|', pos);
-                  std::string e = (pipe == std::string::npos) ? s.substr(pos) : s.substr(pos, pipe - pos);
-                  if (!e.empty()) {
-                    if (n == target) {
-                      size_t c1 = e.find(':');
-                      return c1 != std::string::npos ? e.substr(0, c1) : std::string("");
-                    }
-                    n++;
-                  }
-                  if (pipe == std::string::npos) break;
-                  pos = pipe + 1;
-                }
-                return std::string("");
+        - if:
+            condition:
+              lambda: return id(spool_slot_ids)[4] >= 0;
+            then:
+              - homeassistant.action:
+                  action: input_text.set_value
+                  data:
+                    entity_id: input_text.filament_loaded_spool
+                    value: !lambda 'return to_string(id(spool_slot_ids)[4]);'
 
   # Paginación
   - button:
@@ -285,15 +224,5 @@ widgets:
             text_font: mdi_32
             text_color: 0xFFFFFF
       on_press:
-        - lambda: |-
-            std::string s = id(spoolman_inventory).state;
-            int total = 0; size_t pos = 0;
-            while (pos <= s.size()) {
-              size_t pipe = s.find('|', pos);
-              std::string e = (pipe == std::string::npos) ? s.substr(pos) : s.substr(pos, pipe - pos);
-              if (!e.empty()) total++;
-              if (pipe == std::string::npos) break;
-              pos = pipe + 1;
-            }
-            if ((id(filament_page_idx) + 1) * 5 < total) id(filament_page_idx)++;
+        - lambda: if ((id(filament_page_idx) + 1) * 5 < id(spool_total)) id(filament_page_idx)++;
         - script.execute: render_filament_page

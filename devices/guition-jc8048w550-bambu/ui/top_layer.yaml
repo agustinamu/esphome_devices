@@ -24,22 +24,6 @@ widgets:
                   text_font: mdi_32
             on_press:
               - lvgl.page.show: main_page
-              - lvgl.widget.update:
-                  id: btn_nav_home
-                  text_color: 0x00AE42
-                  bg_color: 0x1A1A1A
-              - lvgl.widget.update:
-                  id: btn_nav_controls
-                  text_color: 0x666666
-                  bg_color: 0x0D0D0D
-              - lvgl.widget.update:
-                  id: btn_nav_motion
-                  text_color: 0x666666
-                  bg_color: 0x0D0D0D
-              - lvgl.widget.update:
-                  id: btn_nav_info
-                  text_color: 0x666666
-                  bg_color: 0x0D0D0D
 
         # Controles
         - button:
@@ -59,22 +43,6 @@ widgets:
                     binary_sensor.is_on: printer_online
                   then:
                     - lvgl.page.show: controls_page
-                    - lvgl.widget.update:
-                        id: btn_nav_home
-                        text_color: 0x666666
-                        bg_color: 0x0D0D0D
-                    - lvgl.widget.update:
-                        id: btn_nav_controls
-                        text_color: 0x00AE42
-                        bg_color: 0x1A1A1A
-                    - lvgl.widget.update:
-                        id: btn_nav_motion
-                        text_color: 0x666666
-                        bg_color: 0x0D0D0D
-                    - lvgl.widget.update:
-                        id: btn_nav_info
-                        text_color: 0x666666
-                        bg_color: 0x0D0D0D
 
         # Motion
         - button:
@@ -91,25 +59,17 @@ widgets:
             on_press:
               - if:
                   condition:
-                    binary_sensor.is_on: printer_online
+                    lambda: return id(printer_is_idle);
                   then:
-                    - lvgl.page.show: motion_page
-                    - lvgl.widget.update:
-                        id: btn_nav_home
-                        text_color: 0x666666
-                        bg_color: 0x0D0D0D
-                    - lvgl.widget.update:
-                        id: btn_nav_controls
-                        text_color: 0x666666
-                        bg_color: 0x0D0D0D
-                    - lvgl.widget.update:
-                        id: btn_nav_motion
-                        text_color: 0x00AE42
-                        bg_color: 0x1A1A1A
-                    - lvgl.widget.update:
-                        id: btn_nav_info
-                        text_color: 0x666666
-                        bg_color: 0x0D0D0D
+                    - if:
+                        condition:
+                          binary_sensor.is_on: printer_online
+                        then:
+                          - lvgl.page.show: motion_page
+                  else:
+                    - script.execute:
+                        id: show_toast
+                        msg: "No disponible mientras imprime"
 
         # Info
         - button:
@@ -124,22 +84,6 @@ widgets:
                   text_font: mdi_32
             on_press:
               - lvgl.page.show: info_page
-              - lvgl.widget.update:
-                  id: btn_nav_home
-                  text_color: 0x666666
-                  bg_color: 0x0D0D0D
-              - lvgl.widget.update:
-                  id: btn_nav_controls
-                  text_color: 0x666666
-                  bg_color: 0x0D0D0D
-              - lvgl.widget.update:
-                  id: btn_nav_motion
-                  text_color: 0x666666
-                  bg_color: 0x0D0D0D
-              - lvgl.widget.update:
-                  id: btn_nav_info
-                  text_color: 0x00AE42
-                  bg_color: 0x1A1A1A
 
         # Error indicator (visible cuando hay error)
         - label:
@@ -150,6 +94,39 @@ widgets:
             text_font: mdi_32
             text_color: 0xFF4444
             hidden: true
+
+  # Sin conexión con Home Assistant: los datos en pantalla pueden estar obsoletos.
+  - label:
+      id: lbl_no_ha
+      align: TOP_MID
+      x: 40
+      y: 50
+      text: "Sin conexión con Home Assistant"
+      text_font: montserrat_18
+      text_color: 0xFFFFFF
+      bg_color: 0x8A1F1F
+      bg_opa: 90%
+      radius: 8
+      pad_all: 8
+      hidden: true
+
+  # Aviso temporal (errores de acciones, bloqueos). Lo muestra el script show_toast.
+  - label:
+      id: lbl_toast
+      align: BOTTOM_MID
+      x: 40
+      y: -16
+      width: 640
+      text: ""
+      text_font: montserrat_18
+      text_color: 0xFFFFFF
+      text_align: CENTER
+      long_mode: WRAP
+      bg_color: 0x8A1F1F
+      bg_opa: 90%
+      radius: 10
+      pad_all: 12
+      hidden: true
 
   # Touch blocker overlay - captura toques por 500ms al despertar
   - button:

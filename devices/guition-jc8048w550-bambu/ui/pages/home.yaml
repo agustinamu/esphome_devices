@@ -2,6 +2,10 @@
 # Usa substitution: bambu_prefix
 
 id: main_page
+on_load:
+  - script.execute:
+      id: nav_highlight
+      idx: 0
 bg_color: 0x121212
 widgets:
   # === HEADER ===
@@ -16,7 +20,9 @@ widgets:
       id: lbl_status
       x: 250
       y: 10
-      text: "Idle"
+      width: 330
+      long_mode: DOT
+      text: "---"
       text_font: montserrat_22
       text_color: 0xFFFFFF
 
@@ -33,6 +39,7 @@ widgets:
   # Contenedor para filename (se oculta cuando idle)
   - obj:
       id: home_filename_row
+      hidden: true  # hasta que llegue el estado desde HA
       x: 100
       y: 42
       width: 680
@@ -136,12 +143,13 @@ widgets:
       on_press:
         - lambda: id(skip_selection) = 0;
         - script.execute: paint_skip_selection
-        - component.update: plate_image
+        - script.execute: load_plate_image
         - lvgl.page.show: skip_objects_page
 
   # === VENTILADORES (se ocultan cuando idle) ===
   - obj:
       id: home_fans_row
+      hidden: true  # hasta que llegue el estado desde HA
       x: 100
       y: 150
       width: 580
@@ -217,6 +225,7 @@ widgets:
   # PAUSE - visible cuando está imprimiendo
   - button:
       id: btn_pause
+      hidden: true  # hasta que llegue el estado desde HA
       x: 100
       y: 200
       width: 330
@@ -265,6 +274,7 @@ widgets:
   # STOP - visible cuando imprimiendo/pausado
   - button:
       id: btn_stop
+      hidden: true  # hasta que llegue el estado desde HA
       x: 450
       y: 200
       width: 320
@@ -318,6 +328,7 @@ widgets:
   # === PROGRESO (se oculta cuando idle) ===
   - obj:
       id: home_progress_section
+      hidden: true  # hasta que llegue el estado desde HA
       x: 100
       y: 295
       width: 680

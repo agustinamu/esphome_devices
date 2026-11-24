@@ -78,7 +78,9 @@ sensor:
 text_sensor:
   - platform: homeassistant
     id: printer_status
-    entity_id: sensor.${bambu_prefix}_estado_actual
+    # Estado general (running/pause/prepare/finish/failed/idle/offline/...), no la
+    # etapa (estado_actual tiene ~80 valores y pausas que no empiezan por paused_).
+    entity_id: sensor.${bambu_prefix}_estado_de_la_impresion
     on_value:
       then:
         - script.execute: refresh_printer_status
@@ -92,7 +94,9 @@ text_sensor:
 
   - platform: homeassistant
     id: hms_errors
-    entity_id: sensor.${bambu_prefix}_errores_hms
+    # Texto del primer error HMS (atributo "1-Error" del binary_sensor).
+    entity_id: binary_sensor.${bambu_prefix}_errores_hms
+    attribute: "1-Error"
 
   - platform: homeassistant
     id: sdcard_state
@@ -109,6 +113,12 @@ text_sensor:
       then:
         - script.execute: refresh_skip_objects
 
+  # access_token de la imagen del plato (rota cada ~5 min): sirve para image_proxy.
+  - platform: homeassistant
+    id: plate_image_token
+    entity_id: image.seleccionar_imagen
+    attribute: access_token
+
   # IDs ya omitidos por la impresora (lista, llega como "[118, 137]").
   - platform: homeassistant
     id: skipped_objects_ids
@@ -121,7 +131,9 @@ text_sensor:
   # Inventario de Spoolman serializado "id:name:grams|..." (rest sensor en HA, proxy).
   - platform: homeassistant
     id: spoolman_inventory
-    entity_id: sensor.spoolman_inventory
+    # En atributo, no en estado: el estado de HA está limitado a 255 caracteres.
+    entity_id: sensor.spoolman_inventario
+    attribute: items
     on_value:
       then:
         - script.execute: render_filament_page
