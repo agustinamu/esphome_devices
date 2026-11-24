@@ -67,6 +67,9 @@ sensor:
   - platform: homeassistant
     id: printable_objects_count
     entity_id: sensor.${bambu_prefix}_objetos_imprimibles
+    on_value:
+      then:
+        - script.execute: refresh_printer_status
 
   - platform: uptime
     id: uptime_sensor
@@ -76,10 +79,16 @@ text_sensor:
   - platform: homeassistant
     id: printer_status
     entity_id: sensor.${bambu_prefix}_estado_actual
+    on_value:
+      then:
+        - script.execute: refresh_printer_status
 
   - platform: homeassistant
     id: current_file
     entity_id: sensor.${bambu_prefix}_nombre_de_la_tarea
+    on_value:
+      then:
+        - script.execute: refresh_printer_status
 
   - platform: homeassistant
     id: hms_errors
@@ -96,6 +105,15 @@ text_sensor:
     id: plate_bbox_data
     entity_id: sensor.analizador_de_plato
     attribute: bbox_data
+    on_value:
+      then:
+        - script.execute: refresh_skip_objects
+
+  # IDs ya omitidos por la impresora (lista, llega como "[118, 137]").
+  - platform: homeassistant
+    id: skipped_objects_ids
+    entity_id: sensor.${bambu_prefix}_objetos_omitidos
+    attribute: objects
     on_value:
       then:
         - script.execute: refresh_skip_objects
@@ -138,6 +156,9 @@ binary_sensor:
   - platform: homeassistant
     id: chamber_light
     entity_id: light.${bambu_prefix}_luz_de_la_carcasa
+    on_state:
+      then:
+        - script.execute: refresh_chamber_light
 
   - platform: homeassistant
     id: print_error

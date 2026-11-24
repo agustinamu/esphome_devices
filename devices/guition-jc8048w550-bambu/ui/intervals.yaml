@@ -60,26 +60,6 @@ interval:
 
   - interval: 2s
     then:
-      # Evaluar estado idle una vez por ciclo (usado en múltiples widgets)
-      # estado_actual usa estados en inglés: idle, offline, printing, paused_*, etc.
-      - lambda: |-
-          std::string status = id(printer_status).state;
-          id(printer_is_idle) = (status == "idle" || status == "offline" || status.empty());
-
-      # === HOME PAGE ===
-      - lvgl.label.update:
-          id: lbl_status
-          text: !lambda |-
-            if (id(printer_status).state.empty()) return "---";
-            return id(printer_status).state.c_str();
-
-      # Nombre del archivo
-      - lvgl.label.update:
-          id: lbl_filename
-          text: !lambda |-
-            if (id(current_file).state.empty()) return "Sin archivo";
-            return id(current_file).state.c_str();
-
       # Hora estimada de fin
       - lvgl.label.update:
           id: lbl_finish_time
@@ -94,44 +74,6 @@ interval:
             int finish_min = total_mins % 60;
             snprintf(buf, sizeof(buf), "%02d:%02d", finish_hour, finish_min);
             return buf;
-
-      # Mostrar Pause o Resume según estado
-      - lvgl.widget.update:
-          id: btn_pause
-          hidden: !lambda |-
-            if (id(printer_is_idle)) return true;
-            // Ocultar si cualquier estado paused_*
-            return id(printer_status).state.substr(0, 7) == "paused_";
-      - lvgl.widget.update:
-          id: btn_resume
-          hidden: !lambda |-
-            // Mostrar resume solo si cualquier estado paused_*
-            return id(printer_status).state.substr(0, 7) != "paused_";
-
-      # Mostrar STOP solo cuando imprimiendo o pausado
-      - lvgl.widget.update:
-          id: btn_stop
-          hidden: !lambda return id(printer_is_idle);
-
-      # Mostrar LIGHT cuando idle (reemplaza STOP)
-      - lvgl.widget.update:
-          id: btn_light_home
-          hidden: !lambda return !id(printer_is_idle);
-
-      # Actualizar estado visual del boton LIGHT
-      - lvgl.label.update:
-          id: icon_light_home
-          text: !lambda |-
-            if (id(chamber_light).state) return "\U000F0238";
-            return "\U000F0336";
-          text_color: !lambda |-
-            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
-            return lv_color_hex(0x888888);
-      - lvgl.label.update:
-          id: lbl_light_home
-          text_color: !lambda |-
-            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
-            return lv_color_hex(0x888888);
 
       - lvgl.label.update:
           id: lbl_progress
@@ -215,58 +157,6 @@ interval:
             static char buf[24];
             snprintf(buf, sizeof(buf), "%.0f°C / %.0f°C", id(bed_temp).state, id(bed_target).state);
             return buf;
-
-      # Light toggle feedback
-      - lvgl.label.update:
-          id: lbl_light_icon
-          text: !lambda |-
-            if (id(chamber_light).state) return "\U000F0238";
-            return "\U000F0336";
-          text_color: !lambda |-
-            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
-            return lv_color_hex(0x888888);
-      - lvgl.label.update:
-          id: lbl_light_text
-          text: !lambda |-
-            if (id(chamber_light).state) return "ON";
-            return "OFF";
-          text_color: !lambda |-
-            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
-            return lv_color_hex(0x888888);
-
-      # === HOME: Ocultar secciones cuando idle/offline ===
-      - lvgl.widget.update:
-          id: home_filename_row
-          hidden: !lambda return id(printer_is_idle);
-      - lvgl.widget.update:
-          id: home_fans_row
-          hidden: !lambda return id(printer_is_idle);
-      - lvgl.widget.update:
-          id: home_progress_section
-          hidden: !lambda return id(printer_is_idle);
-
-      # === SKIP OBJECTS ===
-      # Boton SKIP en home: visible solo imprimiendo con >1 objeto
-      - lvgl.widget.update:
-          id: btn_skip_objects
-          hidden: !lambda |-
-            if (id(printer_is_idle)) return true;
-            return id(printable_objects_count).state <= 1;
-
-      # Contador en skip page
-      - lvgl.label.update:
-          id: lbl_skip_count
-          text: !lambda |-
-            static char buf[16];
-            int n = (int)id(printable_objects_count).state;
-            if (n <= 0) return "";
-            snprintf(buf, sizeof(buf), "%d objects", n);
-            return buf;
-
-      # Mostrar/ocultar boton SKIP SELECTED segun seleccion
-      - lvgl.widget.update:
-          id: btn_do_skip
-          hidden: !lambda return id(skip_selection) == 0;
 
   # Info page: datos que cambian lento (WiFi, IP, uptime, status). Interval propio
   # lento (10s) para no recargar el interval principal con widgets poco visibles.

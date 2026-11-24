@@ -31,6 +31,10 @@ globals:
     initial_value: '0'
   - id: skip_ids_str
     type: std::string
+  # Bit i = objeto i de la lista ya omitido por la impresora (no seleccionable).
+  - id: skip_done
+    type: int
+    initial_value: '0'
   # Filament select (3.C Fase 2): página actual del picker e id del spool cargado
   - id: filament_page_idx
     type: int
@@ -210,6 +214,117 @@ script:
           state:
             checked: !lambda return id(chamber_fan_speed).state > 0;
 
+  # Estado de la impresora: visibilidad de botones y secciones. Reactivo
+  # (printer_status, current_file, printable_objects_count) en vez de cada 2 s.
+  - id: refresh_printer_status
+    mode: restart
+    then:
+      # Evaluar estado idle una vez por ciclo (usado en múltiples widgets)
+      # estado_actual usa estados en inglés: idle, offline, printing, paused_*, etc.
+      - lambda: |-
+          std::string status = id(printer_status).state;
+          id(printer_is_idle) = (status == "idle" || status == "offline" || status.empty());
+
+      # === HOME PAGE ===
+      - lvgl.label.update:
+          id: lbl_status
+          text: !lambda |-
+            if (id(printer_status).state.empty()) return "---";
+            return id(printer_status).state.c_str();
+
+      # Nombre del archivo
+      - lvgl.label.update:
+          id: lbl_filename
+          text: !lambda |-
+            if (id(current_file).state.empty()) return "Sin archivo";
+            return id(current_file).state.c_str();
+      # Mostrar Pause o Resume según estado
+      - lvgl.widget.update:
+          id: btn_pause
+          hidden: !lambda |-
+            if (id(printer_is_idle)) return true;
+            // Ocultar si cualquier estado paused_*
+            return id(printer_status).state.substr(0, 7) == "paused_";
+      - lvgl.widget.update:
+          id: btn_resume
+          hidden: !lambda |-
+            // Mostrar resume solo si cualquier estado paused_*
+            return id(printer_status).state.substr(0, 7) != "paused_";
+
+      # Mostrar STOP solo cuando imprimiendo o pausado
+      - lvgl.widget.update:
+          id: btn_stop
+          hidden: !lambda return id(printer_is_idle);
+
+      # Mostrar LIGHT cuando idle (reemplaza STOP)
+      - lvgl.widget.update:
+          id: btn_light_home
+          hidden: !lambda return !id(printer_is_idle);
+      # === HOME: Ocultar secciones cuando idle/offline ===
+      - lvgl.widget.update:
+          id: home_filename_row
+          hidden: !lambda return id(printer_is_idle);
+      - lvgl.widget.update:
+          id: home_fans_row
+          hidden: !lambda return id(printer_is_idle);
+      - lvgl.widget.update:
+          id: home_progress_section
+          hidden: !lambda return id(printer_is_idle);
+
+      # === SKIP OBJECTS ===
+      # Boton SKIP en home: visible solo imprimiendo con >1 objeto
+      - lvgl.widget.update:
+          id: btn_skip_objects
+          hidden: !lambda |-
+            if (id(printer_is_idle)) return true;
+            return id(printable_objects_count).state <= 1;
+
+      # Contador en skip page
+      - lvgl.label.update:
+          id: lbl_skip_count
+          text: !lambda |-
+            static char buf[16];
+            int n = (int)id(printable_objects_count).state;
+            if (n <= 0) return "";
+            snprintf(buf, sizeof(buf), "%d objects", n);
+            return buf;
+
+  # Luz de la carcasa: iconos de Home y Controls (reactivo a chamber_light).
+  - id: refresh_chamber_light
+    mode: restart
+    then:
+      # Actualizar estado visual del boton LIGHT
+      - lvgl.label.update:
+          id: icon_light_home
+          text: !lambda |-
+            if (id(chamber_light).state) return "\U000F0238";
+            return "\U000F0336";
+          text_color: !lambda |-
+            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0x888888);
+      - lvgl.label.update:
+          id: lbl_light_home
+          text_color: !lambda |-
+            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0x888888);
+      # Light toggle feedback
+      - lvgl.label.update:
+          id: lbl_light_icon
+          text: !lambda |-
+            if (id(chamber_light).state) return "\U000F0238";
+            return "\U000F0336";
+          text_color: !lambda |-
+            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0x888888);
+      - lvgl.label.update:
+          id: lbl_light_text
+          text: !lambda |-
+            if (id(chamber_light).state) return "ON";
+            return "OFF";
+          text_color: !lambda |-
+            if (id(chamber_light).state) return lv_color_hex(0x00AE42);
+            return lv_color_hex(0x888888);
+
   # Lista y overlays salen de la misma cadena (plate_analyzer), así el índice i
   # de fila, overlay y bit de skip_selection es siempre el mismo objeto.
   - id: refresh_skip_objects
@@ -237,6 +352,16 @@ script:
 
           // Formato: ID:name:x1,y1,x2,y2|...  (coords vacías si no hay bbox)
           const std::string &data = id(plate_bbox_data).state;
+          // IDs ya omitidos: HA envía la lista como texto, p. ej. "[118, 137]".
+          std::vector<int> done_ids;
+          {
+            const char *p = id(skipped_objects_ids).state.c_str();
+            while (*p) {
+              if (isdigit((unsigned char) *p)) { done_ids.push_back(strtol(p, (char **) &p, 10)); }
+              else p++;
+            }
+          }
+          int done = 0;
           int count = 0;
           size_t pos = 0;
           while (pos < data.size() && count < 16) {
@@ -249,6 +374,17 @@ script:
             std::string name = data.substr(c1 + 1, c2 - c1 - 1);
             lv_label_set_text(labels[count], name.c_str());
             lv_obj_clear_flag(rows[count], LV_OBJ_FLAG_HIDDEN);
+            int obj_id = atoi(data.c_str() + pos);
+            bool is_done = std::find(done_ids.begin(), done_ids.end(), obj_id) != done_ids.end();
+            lv_obj_set_style_text_color(labels[count], lv_color_hex(is_done ? 0x666666 : 0xFFFFFF), 0);
+            if (is_done) {
+              done |= (1 << count);
+              lv_obj_add_state(rows[count], LV_STATE_DISABLED);
+              lv_obj_add_state(overlays[count], LV_STATE_DISABLED);
+            } else {
+              lv_obj_clear_state(rows[count], LV_STATE_DISABLED);
+              lv_obj_clear_state(overlays[count], LV_STATE_DISABLED);
+            }
 
             int x1, y1, x2, y2;
             if (c2 + 1 < pipe &&
@@ -270,7 +406,8 @@ script:
             lv_obj_add_flag(rows[i], LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(overlays[i], LV_OBJ_FLAG_HIDDEN);
           }
-          // Objetos nuevos: la selección anterior ya no significa nada.
+          // Objetos nuevos u omitidos: la selección anterior ya no significa nada.
+          id(skip_done) = done;
           id(skip_selection) = 0;
       - script.execute: paint_skip_selection
 
@@ -293,6 +430,18 @@ script:
                                   id(btn_bbox_12), id(btn_bbox_13), id(btn_bbox_14), id(btn_bbox_15)};
           const lv_color_t green = lv_color_hex(0x00AE42);
           for (int i = 0; i < 16; i++) {
+            if (id(skip_done) & (1 << i)) {
+              // Ya omitido: gris, icono skip, recuadro tenue. LV_STATE_DISABLED evita clics.
+              lv_obj_set_style_border_color(rows[i], lv_color_hex(0x1E1E1E), 0);
+              lv_obj_set_style_bg_color(rows[i], lv_color_hex(0x1E1E1E), 0);
+              lv_label_set_text(checks[i], "\U000F04E2");
+              lv_obj_set_style_text_color(checks[i], lv_color_hex(0x666666), 0);
+              lv_obj_set_style_border_color(overlays[i], lv_color_hex(0x444444), 0);
+              lv_obj_set_style_border_width(overlays[i], 1, 0);
+              lv_obj_set_style_bg_opa(overlays[i], 160, 0);
+              lv_obj_set_style_bg_color(overlays[i], lv_color_hex(0x000000), 0);
+              continue;
+            }
             bool sel = id(skip_selection) & (1 << i);
             lv_obj_set_style_border_color(rows[i], sel ? green : lv_color_hex(0x2A2A2A), 0);
             lv_obj_set_style_bg_color(rows[i], sel ? lv_color_hex(0x1A3A1A) : lv_color_hex(0x2A2A2A), 0);

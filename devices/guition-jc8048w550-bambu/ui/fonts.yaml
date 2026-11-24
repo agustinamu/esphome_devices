@@ -42,6 +42,7 @@ font:
       - "\U000F0029"  # alert
       - "\U000F0131"  # checkbox-blank-outline
       - "\U000F0134"  # checkbox-marked
+      - "\U000F04E2"  # skip-next (objeto ya omitido)
 
   - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
     id: mdi_32
