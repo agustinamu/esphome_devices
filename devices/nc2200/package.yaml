@@ -8,7 +8,8 @@
 #   verde  (D+, pin 3, RX cargador) -> TX (GPIO1)
 #   rojo (VBUS) sin conectar: no da corriente para el ESP.
 #
-# Pregunta una ranura por segundo (0x91) y publica sus valores.
+# Pregunta una ranura por segundo (0x91) y publica sus valores; lee el programa de
+# cada ranura (0x93) y los ajustes generales (0x96), y arranca programas (0x94).
 
 esp8266:
   board: d1_mini
@@ -25,6 +26,47 @@ uart:
   tx_pin: GPIO1
   baud_rate: 115200
   rx_buffer_size: 256
+
+globals:
+  - id: prog_req # ranuras cuyo programa hay que leer (0x93), bit n = ranura n
+    type: uint8_t
+    initial_value: "0x0F"
+  - id: sys_req # leer ajustes generales (0x96)
+    type: bool
+    initial_value: "true"
+
+# Ajustes generales del cargador (0x96), solo lectura.
+sensor:
+  - platform: template
+    id: sys_dv
+    name: "ΔV de fin de carga"
+    unit_of_measurement: mV
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: sys_dcut
+    name: "Corte de descarga"
+    unit_of_measurement: V
+    device_class: voltage
+    entity_category: diagnostic
+    accuracy_decimals: 2
+    update_interval: never
+  - platform: template
+    id: sys_ccut
+    name: "Corte de carga"
+    unit_of_measurement: V
+    device_class: voltage
+    entity_category: diagnostic
+    accuracy_decimals: 2
+    update_interval: never
+  - platform: template
+    id: sys_trickle
+    name: "Corriente de mantenimiento"
+    unit_of_measurement: mA
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: never
 
 packages:
   r1: !include { file: slot.yaml, vars: { n: 0, slot: 1 } }
@@ -47,6 +89,10 @@ interval:
           sensor::Sensor *R[4] = {id(r0), id(r1), id(r2), id(r3)};
           sensor::Sensor *S[4] = {id(s0), id(s1), id(s2), id(s3)};
           text_sensor::TextSensor *ST[4] = {id(st0), id(st1), id(st2), id(st3)};
+          select::Select *M[4] = {id(m0), id(m1), id(m2), id(m3)};
+          number::Number *CC[4] = {id(cc0), id(cc1), id(cc2), id(cc3)};
+          number::Number *CD[4] = {id(cd0), id(cd1), id(cd2), id(cd3)};
+          number::Number *CAP[4] = {id(cap0), id(cap1), id(cap2), id(cap3)};
 
           // 1. Leer lo que haya llegado (la respuesta a la petición anterior).
           uint8_t b;
@@ -70,6 +116,36 @@ interval:
             }
             std::vector<uint8_t> f(buf.begin(), buf.begin() + n);
             buf.erase(buf.begin(), buf.begin() + n);
+
+            // Programa de una ranura: pos, modo, carga mA, descarga mA, capacidad mAh.
+            if (f[2] == 0x93 && n >= 12 && f[3] <= 3) {
+              static const char *PROG[] = {"carga", "descarga", "refresh", "break-in"};
+              uint8_t p = f[3], mode = f[4];
+              auto u16 = [&](int k) { return (uint16_t) ((f[k] << 8) | f[k + 1]); };
+              uint16_t cc = u16(5), cd = u16(7), cap = u16(9);
+              ESP_LOGI("nc2200", "Programa ranura %u: modo %u, carga %u mA, descarga %u mA, %u mAh",
+                       p + 1, mode, cc, cd, cap);
+              if (mode >= 1 && mode <= 4 && M[p]->current_option() != PROG[mode - 1])
+                M[p]->publish_state(PROG[mode - 1]);
+              // Fuera de rango (p. ej. 0 en un campo que el modo no usa): no se toca.
+              if (cc >= 200 && cc <= 2000 && CC[p]->state != cc) CC[p]->publish_state(cc);
+              if (cd >= 100 && cd <= 1000 && CD[p]->state != cd) CD[p]->publish_state(cd);
+              if (cap >= 500 && cap <= 3200 && CAP[p]->state != cap) CAP[p]->publish_state(cap);
+              continue;
+            }
+            // Ajustes generales: 04, ΔV mV, corte descarga V/100, corte carga V/100 (0 = off), goteo mA.
+            if (f[2] == 0x96 && n >= 9) {
+              id(sys_dv).publish_state(f[4]);
+              id(sys_dcut).publish_state(f[5] / 100.0f);
+              id(sys_ccut).publish_state(f[6] ? f[6] / 100.0f : NAN);
+              id(sys_trickle).publish_state(f[7]);
+              continue;
+            }
+            if (f[2] == 0x94 && n >= 6) {
+              if (f[4] == 1) ESP_LOGI("nc2200", "Ranura %u: programa aceptado, empieza", f[3] + 1);
+              else ESP_LOGW("nc2200", "Ranura %u: el cargador rechazó el programa (%u)", f[3] + 1, f[4]);
+              continue;
+            }
 
             if (f[2] != 0x91 || n < 19 || f[3] > 3) {
               std::string hex;
@@ -111,10 +187,25 @@ interval:
             if (millis() - last_seen[s] > 10000 && ST[s]->state != "sin respuesta")
               ST[s]->publish_state("sin respuesta");
 
-          // 4. Pedir la siguiente ranura.
-          uint8_t req[5] = {0x0F, 0x03, 0x91, next, (uint8_t) (0x91 + next)};
+          // 4. Pedir algo: una petición por segundo para no pisar respuestas.
+          //    Programas y ajustes al arrancar, tras "empezar" y cada minuto
+          //    (por si se cambian en el cargador); si no, el estado de la siguiente ranura.
+          static uint16_t tick = 0;
+          if (++tick % 60 == 0) { id(prog_req) = 0x0F; id(sys_req) = true; }
+          uint8_t cmd = 0x91, arg = next;
+          if (id(prog_req)) {
+            uint8_t p = 0;
+            while (!(id(prog_req) & (1 << p))) p++;
+            id(prog_req) &= ~(1 << p);
+            cmd = 0x93; arg = p;
+          } else if (id(sys_req)) {
+            id(sys_req) = false;
+            cmd = 0x96; arg = 0x04;
+          } else {
+            next = (next + 1) % 4;
+          }
+          uint8_t req[5] = {0x0F, 0x03, cmd, arg, (uint8_t) (cmd + arg)};
           id(nc).write_array(req, 5);
-          next = (next + 1) % 4;
 
 # Para explorar el protocolo: se escribe "cmd datos" en hex (p. ej. "FE 00") y se
 # manda con cabecera y suma. La respuesta sale en el log ("Respuesta cmd=…").

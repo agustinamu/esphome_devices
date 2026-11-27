@@ -4,7 +4,8 @@ Lee las 4 ranuras del cargador NiMH SkyRC NC2200 por el puerto USB-A donde va el
 Bluetooth (SK-600135), sin el dongle. Por ranura publica voltaje, corriente, capacidad,
 temperatura, resistencia interna, tiempo y estado.
 
-Estado: prueba de concepto con un Wemos D1 mini; solo lectura.
+Estado: prueba de concepto con un Wemos D1 mini. Lee las ranuras y los ajustes, y arranca
+programas por ranura. **No puede parar**: el cargador no tiene ese comando (la app tampoco).
 
 ## Conexión
 
@@ -54,10 +55,27 @@ Estado de una ranura (`0x91` + índice 0-3), respuesta real de la ranura 1 desca
 Big-endian. Estado: 0 en espera, 1-6 preparando, 7 cargando, 8 descargando, 9 enfriando,
 10 terminado. Modo: 1 carga, 2 descarga, 3 refresh, 4 break-in, 5 turbo.
 
+Comandos del NC2200, sacados de la app oficial SkyRC 2.94 (`com.skyrc.q200`, descompilada):
+
+| cmd | qué | datos | respuesta |
+|---|---|---|---|
+| `0x91` | estado de ranura | índice 0-3 | la de arriba |
+| `0x93` | leer programa | índice | índice, modo, carga mA, descarga mA, capacidad mAh (16 bits) |
+| `0x94` | escribir programa **y empezar** | índice, modo, carga, descarga, capacidad, relleno a 17 bytes | índice, 1 = OK |
+| `0x96` | leer ajustes | `04` | `04`, ΔV mV, corte descarga V/100, corte carga V/100 (0 = off), goteo mA |
+| `0x95` | escribir ajustes | `04`, mismos campos, relleno a 17 | 1 = OK |
+| `0x92` | turbo | `04` | 1 = OK |
+| `0x97` | reset de fábrica | `04` | sin probar |
+
+Modo: 1 carga, 2 descarga, 3 refresh, 4 break-in. La app pone a 0 los campos que el modo no
+usa. Rangos de la app: carga 200-2000 mA, descarga 100-1000 mA, capacidad 500-3200 mAh (de 100
+en 100). `0x94` reinicia la ranura aunque esté en marcha (probado). `0xFE` (parar en el MC5000)
+no hace nada en el NC2200.
+
+En Home Assistant, por ranura: programa, corrientes y capacidad (se leen del cargador) y el
+botón «empezar». El campo «Enviar trama» manda cualquier `cmd datos` en hex.
+
 ## Pendiente
 
 - Pasar a ESP32-C3 (UART libre del USB, logs por USB).
 - El D1 mini pierde la WiFi a veces al conectar RX/TX: sin diagnosticar.
-- Arrancar y parar ranuras: `0xFE` (parar en el MC5000) no hace nada en el NC2200, ni con
-  máscara ni con índice, y no contesta. Hay que sacar los comandos del APK de SkyCharger.
-- Los botones «Ranura N parar» mandan `0xFE`: no funcionan todavía.
