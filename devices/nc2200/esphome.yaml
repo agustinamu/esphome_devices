@@ -1,0 +1,28 @@
+# Copiar este archivo en ESPHome de Home Assistant
+# Archivo: nc2200.yaml
+
+esphome:
+  name: nc2200
+  friendly_name: Cargador NC2200
+
+packages:
+  - url: https://github.com/agustinamu/esphome_devices
+    ref: develop
+    files: [devices/nc2200/package.yaml]
+    refresh: 1d
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  min_auth_mode: WPA2
+  ap:
+    ssid: "NC2200 Fallback"
+    password: !secret fallback_password

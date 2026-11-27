@@ -1,0 +1,114 @@
+# SkyRC NC2200 - Wemos D1 mini (ESP8266) en el puerto del dongle Bluetooth
+#
+# El puerto USB-A del cargador es un UART 3,3 V a 115200 8N1 (no es USB).
+# Protocolo y detalles: README.md.
+#
+#   negro (GND, pin 4)              -> G
+#   blanco (D-, pin 2, TX cargador) -> RX (GPIO3)
+#   verde  (D+, pin 3, RX cargador) -> TX (GPIO1)
+#   rojo (VBUS) sin conectar: no da corriente para el ESP.
+#
+# Pregunta una ranura por segundo (0x91) y publica sus valores.
+
+esp8266:
+  board: d1_mini
+
+logger:
+  baud_rate: 0 # el UART0 es para el cargador; el log va por WiFi
+
+web_server:
+  port: 80
+
+uart:
+  id: nc
+  rx_pin: GPIO3
+  tx_pin: GPIO1
+  baud_rate: 115200
+  rx_buffer_size: 256
+
+packages:
+  r1: !include { file: slot.yaml, vars: { n: 0, slot: 1 } }
+  r2: !include { file: slot.yaml, vars: { n: 1, slot: 2 } }
+  r3: !include { file: slot.yaml, vars: { n: 2, slot: 3 } }
+  r4: !include { file: slot.yaml, vars: { n: 3, slot: 4 } }
+
+interval:
+  - interval: 1s
+    then:
+      - lambda: |-
+          static std::vector<uint8_t> buf;
+          static uint8_t next = 0;
+          static uint32_t last_seen[4] = {0, 0, 0, 0};
+
+          sensor::Sensor *V[4] = {id(v0), id(v1), id(v2), id(v3)};
+          sensor::Sensor *I[4] = {id(i0), id(i1), id(i2), id(i3)};
+          sensor::Sensor *C[4] = {id(c0), id(c1), id(c2), id(c3)};
+          sensor::Sensor *T[4] = {id(t0), id(t1), id(t2), id(t3)};
+          sensor::Sensor *R[4] = {id(r0), id(r1), id(r2), id(r3)};
+          sensor::Sensor *S[4] = {id(s0), id(s1), id(s2), id(s3)};
+          text_sensor::TextSensor *ST[4] = {id(st0), id(st1), id(st2), id(st3)};
+
+          // 1. Leer lo que haya llegado (la respuesta a la petición anterior).
+          uint8_t b;
+          while (id(nc).available() && id(nc).read_byte(&b)) buf.push_back(b);
+          if (buf.size() > 512) buf.clear();
+
+          // 2. Sacar tramas: 0F len cmd datos chk, chk = suma(cmd..datos).
+          while (true) {
+            auto start = std::find(buf.begin(), buf.end(), 0x0F);
+            buf.erase(buf.begin(), start);
+            if (buf.size() < 2) break;
+            size_t n = buf[1] + 2;
+            if (n < 4) { buf.erase(buf.begin()); continue; }
+            if (buf.size() < n) break;
+            uint8_t sum = 0;
+            for (size_t k = 2; k < n - 1; k++) sum += buf[k];
+            if (sum != buf[n - 1]) {  // 0F falso: saltarlo y resincronizar
+              ESP_LOGW("nc2200", "Checksum mal, descarto un byte");
+              buf.erase(buf.begin());
+              continue;
+            }
+            std::vector<uint8_t> f(buf.begin(), buf.begin() + n);
+            buf.erase(buf.begin(), buf.begin() + n);
+
+            if (f[2] != 0x91 || n < 19 || f[3] > 3) {
+              ESP_LOGD("nc2200", "Trama no esperada cmd=0x%02X len=%u", f[2], (unsigned) n);
+              continue;
+            }
+            uint8_t s = f[3];
+            auto u16 = [&](int k) { return (uint16_t) ((f[k] << 8) | f[k + 1]); };
+            uint16_t ma = u16(4), mv = u16(6), temp = u16(8), mah = u16(10);
+            uint16_t secs = u16(12), mohm = u16(14);
+            uint8_t status = f[16], mode = f[17], err = f[18];
+            last_seen[s] = millis();
+
+            bool running = status >= 7;
+            bool cell = mv >= 5;
+            std::string txt;
+            if (err == 1) txt = "error";
+            else if (running) {
+              static const char *ST_NAME[] = {"cargando", "descargando", "enfriando", "terminado"};
+              static const char *MODE_NAME[] = {"?", "carga", "descarga", "refresh", "break-in", "turbo"};
+              txt = status <= 10 ? ST_NAME[status - 7] : "estado " + to_string(status);
+              txt += std::string(" (") + (mode <= 5 ? MODE_NAME[mode] : "?") + ")";
+            } else if (!cell) txt = "vacía";
+            else txt = status == 0 ? "en espera" : "preparando";
+
+            V[s]->publish_state(cell ? mv / 1000.0f : 0.0f);
+            I[s]->publish_state(running ? ma / 1000.0f : 0.0f);
+            C[s]->publish_state(running ? mah : NAN);
+            T[s]->publish_state(running && temp ? temp : NAN);
+            R[s]->publish_state(running && mohm ? mohm : NAN);
+            S[s]->publish_state(running ? secs : NAN);
+            if (ST[s]->state != txt) ST[s]->publish_state(txt);
+          }
+
+          // 3. Ranuras que llevan 10 s sin contestar.
+          for (int s = 0; s < 4; s++)
+            if (millis() - last_seen[s] > 10000 && ST[s]->state != "sin respuesta")
+              ST[s]->publish_state("sin respuesta");
+
+          // 4. Pedir la siguiente ranura.
+          uint8_t req[5] = {0x0F, 0x03, 0x91, next, (uint8_t) (0x91 + next)};
+          id(nc).write_array(req, 5);
+          next = (next + 1) % 4;

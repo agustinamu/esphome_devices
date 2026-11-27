@@ -9,6 +9,7 @@ Configuraciones ESPHome para dispositivos del hogar, usables como remote package
 | [humidificador](devices/humidificador/) | ESP-01 (ESP8266) | Control por pulsos GPIO |
 | [guition-jc8048w550](devices/guition-jc8048w550/) | ESP32-S3 + Display 5" | Ejemplo básico con LVGL |
 | [guition-jc8048w550-bambu](devices/guition-jc8048w550-bambu/) | ESP32-S3 + Display 5" | Dashboard completo para Bambu Lab P1S/X1C |
+| [nc2200](devices/nc2200/) | Wemos D1 mini (ESP8266) | Cargador SkyRC NC2200 por el puerto del dongle Bluetooth |
 
 ## Guía de Inicio Rápido
 

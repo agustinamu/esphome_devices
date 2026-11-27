@@ -1,0 +1,56 @@
+# Sensores de una ranura del NC2200. Se incluye 4 veces desde package.yaml
+# con vars: n (índice del protocolo, 0-3) y slot (número en el cargador, 1-4).
+
+sensor:
+  - platform: template
+    id: v${n}
+    name: "Ranura ${slot} voltaje"
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+    accuracy_decimals: 3
+    update_interval: never
+  - platform: template
+    id: i${n}
+    name: "Ranura ${slot} corriente"
+    unit_of_measurement: A
+    device_class: current
+    state_class: measurement
+    accuracy_decimals: 3
+    update_interval: never
+  - platform: template
+    id: c${n}
+    name: "Ranura ${slot} capacidad"
+    unit_of_measurement: mAh
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: t${n}
+    name: "Ranura ${slot} temperatura"
+    unit_of_measurement: °C
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: r${n}
+    name: "Ranura ${slot} resistencia"
+    unit_of_measurement: mΩ
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    id: s${n}
+    name: "Ranura ${slot} tiempo"
+    unit_of_measurement: s
+    device_class: duration
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: never
+
+text_sensor:
+  - platform: template
+    id: st${n}
+    name: "Ranura ${slot} estado"
+    update_interval: never
