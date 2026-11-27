@@ -54,3 +54,17 @@ text_sensor:
     id: st${n}
     name: "Ranura ${slot} estado"
     update_interval: never
+
+# Parar: 0xFE + ranura como máscara de bits (1, 2, 4, 8), como el MC5000 en
+# srThibaultP/ha-skyrc-charger. Sin probar en el NC2200 salvo la ranura 1.
+button:
+  - platform: template
+    name: "Ranura ${slot} parar"
+    icon: mdi:stop
+    on_press:
+      - uart.write:
+          id: nc
+          data: !lambda |-
+            uint8_t m = 1 << ${n};
+            ESP_LOGI("nc2200", "Parar ranura ${slot} (máscara 0x%02X)", m);
+            return std::vector<uint8_t>{0x0F, 0x03, 0xFE, m, (uint8_t) (0xFE + m)};

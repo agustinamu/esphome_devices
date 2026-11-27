@@ -72,7 +72,10 @@ interval:
             buf.erase(buf.begin(), buf.begin() + n);
 
             if (f[2] != 0x91 || n < 19 || f[3] > 3) {
-              ESP_LOGD("nc2200", "Trama no esperada cmd=0x%02X len=%u", f[2], (unsigned) n);
+              std::string hex;
+              char h[4];
+              for (auto x : f) { snprintf(h, sizeof(h), "%02X ", x); hex += h; }
+              ESP_LOGI("nc2200", "Respuesta cmd=0x%02X: %s", f[2], hex.c_str());
               continue;
             }
             uint8_t s = f[3];
