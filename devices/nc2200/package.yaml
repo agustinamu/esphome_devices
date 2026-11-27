@@ -115,3 +115,34 @@ interval:
           uint8_t req[5] = {0x0F, 0x03, 0x91, next, (uint8_t) (0x91 + next)};
           id(nc).write_array(req, 5);
           next = (next + 1) % 4;
+
+# Para explorar el protocolo: se escribe "cmd datos" en hex (p. ej. "FE 00") y se
+# manda con cabecera y suma. La respuesta sale en el log ("Respuesta cmd=…").
+text:
+  - platform: template
+    name: "Enviar trama"
+    icon: mdi:console
+    mode: text
+    optimistic: true
+    entity_category: config
+    set_action:
+      - uart.write:
+          id: nc
+          data: !lambda |-
+            std::vector<uint8_t> body;
+            for (size_t k = 0; k < x.size();) {
+              if (!isxdigit(x[k])) { k++; continue; }
+              body.push_back(strtoul(x.substr(k, 2).c_str(), nullptr, 16));
+              k += 2;
+            }
+            if (body.empty()) return std::vector<uint8_t>{};
+            uint8_t sum = 0;
+            for (auto b : body) sum += b;
+            std::vector<uint8_t> f{0x0F, (uint8_t) (body.size() + 1)};
+            f.insert(f.end(), body.begin(), body.end());
+            f.push_back(sum);
+            std::string hex;
+            char h[4];
+            for (auto b : f) { snprintf(h, sizeof(h), "%02X ", b); hex += h; }
+            ESP_LOGI("nc2200", "Envío: %s", hex.c_str());
+            return f;
