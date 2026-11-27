@@ -58,4 +58,6 @@ Big-endian. Estado: 0 en espera, 1-6 preparando, 7 cargando, 8 descargando, 9 en
 
 - Pasar a ESP32-C3 (UART libre del USB, logs por USB).
 - El D1 mini pierde la WiFi a veces al conectar RX/TX: sin diagnosticar.
-- Arrancar y parar ranuras (`0xFE` para parar, según la librería; sin probar).
+- Arrancar y parar ranuras: `0xFE` (parar en el MC5000) no hace nada en el NC2200, ni con
+  máscara ni con índice, y no contesta. Hay que sacar los comandos del APK de SkyCharger.
+- Los botones «Ranura N parar» mandan `0xFE`: no funcionan todavía.
