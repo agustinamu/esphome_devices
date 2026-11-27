@@ -4,8 +4,8 @@ Lee las 4 ranuras del cargador NiMH SkyRC NC2200 por el puerto USB-A donde va el
 Bluetooth (SK-600135), sin el dongle. Por ranura publica voltaje, corriente, capacidad,
 temperatura, resistencia interna, tiempo y estado.
 
-Estado: prueba de concepto con un Wemos D1 mini. Lee las ranuras y los ajustes, y arranca
-programas por ranura. **No puede parar**: el cargador no tiene ese comando (la app tampoco).
+Estado: prueba de concepto con un Wemos D1 mini. Lee las ranuras y los ajustes, y cambia el
+programa de cada ranura. **No puede parar**: el cargador no tiene ese comando (la app tampoco).
 
 ## Conexión
 
@@ -72,8 +72,9 @@ usa. Rangos de la app: carga 200-2000 mA, descarga 100-1000 mA, capacidad 500-32
 en 100). `0x94` reinicia la ranura aunque esté en marcha (probado). `0xFE` (parar en el MC5000)
 no hace nada en el NC2200.
 
-En Home Assistant, por ranura: programa, corrientes y capacidad (se leen del cargador) y el
-botón «empezar». El campo «Enviar trama» manda cualquier `cmd datos` en hex.
+En Home Assistant, por ranura: programa, corrientes y capacidad, leídos del cargador. Un
+cambio se manda al momento (y reinicia la ranura) solo si afecta al modo elegido; el resto se
+guarda para cuando se cambie de modo. No hay botón de reiniciar a secas. El campo «Enviar trama» manda cualquier `cmd datos` en hex.
 
 ## Pendiente
 

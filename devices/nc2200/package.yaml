@@ -127,10 +127,18 @@ interval:
                        p + 1, mode, cc, cd, cap);
               if (mode >= 1 && mode <= 4 && M[p]->current_option() != PROG[mode - 1])
                 M[p]->publish_state(PROG[mode - 1]);
-              // Fuera de rango (p. ej. 0 en un campo que el modo no usa): no se toca.
-              if (cc >= 200 && cc <= 2000 && CC[p]->state != cc) CC[p]->publish_state(cc);
-              if (cd >= 100 && cd <= 1000 && CD[p]->state != cd) CD[p]->publish_state(cd);
-              if (cap >= 500 && cap <= 3200 && CAP[p]->state != cap) CAP[p]->publish_state(cap);
+              // Solo los campos que usa el modo: los demás se guardan en HA para
+              // cuando se cambie de modo. La primera lectura tras arrancar los toma todos.
+              static bool seen[4] = {false, false, false, false};
+              bool all = !seen[p];
+              seen[p] = true;
+              bool uc = mode == 1 || mode == 3, ud = mode == 2 || mode == 3, uk = mode == 4;
+              if (cc >= 200 && cc <= 2000 && (uc || all) && CC[p]->state != cc)
+                CC[p]->publish_state(cc);
+              if (cd >= 100 && cd <= 1000 && (ud || all) && CD[p]->state != cd)
+                CD[p]->publish_state(cd);
+              if (cap >= 500 && cap <= 3200 && (uk || all) && CAP[p]->state != cap)
+                CAP[p]->publish_state(cap);
               continue;
             }
             // Ajustes generales: 04, ΔV mV, corte descarga V/100, corte carga V/100 (0 = off), goteo mA.

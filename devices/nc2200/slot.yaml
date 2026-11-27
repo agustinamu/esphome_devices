@@ -55,8 +55,11 @@ text_sensor:
     name: "Ranura ${slot} estado"
     update_interval: never
 
-# Programa de la ranura (lo que hará al empezar). Se lee del cargador con 0x93
-# y se escribe con 0x94 al pulsar "empezar". Rangos: los de la app SkyRC.
+# Programa de la ranura. Se lee del cargador con 0x93 y se escribe con 0x94 al
+# cambiarlo desde HA. Ojo: 0x94 reinicia la ranura con el programa nuevo, así que
+# solo se manda si el cambio afecta al modo elegido (un cambio de modo, o la
+# corriente o capacidad que ese modo usa). No hay "parar" ni "reiniciar" a secas.
+# Rangos: los de la app SkyRC.
 select:
   - platform: template
     id: m${n}
@@ -64,6 +67,12 @@ select:
     icon: mdi:battery-sync
     options: ["carga", "descarga", "refresh", "break-in"]
     optimistic: true
+    set_action:
+      - lambda: |-
+          auto old = id(m${n}).active_index();
+          auto idx = id(m${n}).index_of(x);
+          if (!idx.has_value() || old == idx) return;
+          id(prog${n}).execute(*idx + 1, id(cc${n}).state, id(cd${n}).state, id(cap${n}).state);
 
 number:
   - platform: template
@@ -76,6 +85,11 @@ number:
     step: 100
     mode: box
     optimistic: true
+    set_action:
+      - lambda: |-
+          uint8_t mode = id(m${n}).active_index().value_or(9) + 1;
+          if (x == id(cc${n}).state || !(mode == 1 || mode == 3)) return;
+          id(prog${n}).execute(mode, x, id(cd${n}).state, id(cap${n}).state);
   - platform: template
     id: cd${n}
     name: "Ranura ${slot} corriente de descarga"
@@ -86,6 +100,11 @@ number:
     step: 100
     mode: box
     optimistic: true
+    set_action:
+      - lambda: |-
+          uint8_t mode = id(m${n}).active_index().value_or(9) + 1;
+          if (x == id(cd${n}).state || !(mode == 2 || mode == 3)) return;
+          id(prog${n}).execute(mode, id(cc${n}).state, x, id(cap${n}).state);
   - platform: template
     id: cap${n}
     name: "Ranura ${slot} capacidad break-in"
@@ -96,41 +115,40 @@ number:
     step: 100
     mode: box
     optimistic: true
+    set_action:
+      - lambda: |-
+          uint8_t mode = id(m${n}).active_index().value_or(9) + 1;
+          if (x == id(cap${n}).state || mode != 4) return;
+          id(prog${n}).execute(mode, id(cc${n}).state, id(cd${n}).state, x);
 
-# Empezar: escribe el programa (0x94). El cargador reinicia la ranura con él,
-# aunque esté en marcha. No hay comando de parar: la app tampoco lo tiene.
-button:
-  - platform: template
-    name: "Ranura ${slot} empezar"
-    icon: mdi:play
-    on_press:
+script:
+  - id: prog${n}
+    mode: queued
+    parameters:
+      mode: int
+      cc: float
+      cd: float
+      cap: float
+    then:
       - uart.write:
           id: nc
           data: !lambda |-
-            auto idx = id(m${n}).active_index();
-            float vcc = id(cc${n}).state, vcd = id(cd${n}).state, vcap = id(cap${n}).state;
-            if (!idx.has_value()) {
-              ESP_LOGW("nc2200", "Ranura ${slot}: programa aún sin leer del cargador");
-              return std::vector<uint8_t>{};
-            }
-            uint8_t mode = *idx + 1;  // 1 carga, 2 descarga, 3 refresh, 4 break-in
             bool need_cc = mode == 1 || mode == 3, need_cd = mode == 2 || mode == 3;
-            if ((need_cc && isnan(vcc)) || (need_cd && isnan(vcd)) || (mode == 4 && isnan(vcap))) {
-              ESP_LOGW("nc2200", "Ranura ${slot}: falta un valor del programa");
+            if ((need_cc && isnan(cc)) || (need_cd && isnan(cd)) || (mode == 4 && isnan(cap))) {
+              ESP_LOGW("nc2200", "Ranura ${slot}: falta un valor del programa, no se manda");
               return std::vector<uint8_t>{};
             }
-            uint16_t cc = need_cc ? vcc : 0;
-            uint16_t cd = need_cd ? vcd : 0;
-            uint16_t cap = mode == 4 ? vcap : 0;
-            std::vector<uint8_t> f{0x0F, 0x13, 0x94, ${n}, mode,
-                                   (uint8_t) (cc >> 8), (uint8_t) cc,
-                                   (uint8_t) (cd >> 8), (uint8_t) cd,
-                                   (uint8_t) (cap >> 8), (uint8_t) cap};
+            // Como la app: a 0 lo que el modo no usa.
+            uint16_t c = need_cc ? cc : 0, d = need_cd ? cd : 0, k = mode == 4 ? cap : 0;
+            std::vector<uint8_t> f{0x0F, 0x13, 0x94, ${n}, (uint8_t) mode,
+                                   (uint8_t) (c >> 8), (uint8_t) c,
+                                   (uint8_t) (d >> 8), (uint8_t) d,
+                                   (uint8_t) (k >> 8), (uint8_t) k};
             f.resize(3 + 17, 0);
             uint8_t sum = 0;
-            for (size_t k = 2; k < f.size(); k++) sum += f[k];
+            for (size_t j = 2; j < f.size(); j++) sum += f[j];
             f.push_back(sum);
-            ESP_LOGI("nc2200", "Empezar ranura ${slot}: modo %u, carga %u mA, descarga %u mA, %u mAh",
-                     mode, cc, cd, cap);
+            ESP_LOGI("nc2200", "Programa ranura ${slot}: modo %d, carga %u mA, descarga %u mA, %u mAh",
+                     mode, c, d, k);
             id(prog_req) |= 1 << ${n};
             return f;
