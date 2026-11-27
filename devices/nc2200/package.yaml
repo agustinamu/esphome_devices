@@ -27,6 +27,46 @@ uart:
   baud_rate: 115200
   rx_buffer_size: 256
 
+# Acción para HA (esphome.nc2200_programar): escribe el programa completo de una
+# ranura de una vez (un solo reinicio aunque cambien modo y corrientes).
+# modo: carga | descarga | refresh | break-in. Lo usa la tarjeta nc2200-card.
+api:
+  actions:
+    - action: programar
+      variables:
+        ranura: int
+        modo: string
+        carga: int
+        descarga: int
+        capacidad: int
+      then:
+        - lambda: |-
+            static const char *PROG[] = {"carga", "descarga", "refresh", "break-in"};
+            int m = 0;
+            while (m < 4 && modo != PROG[m]) m++;
+            if (ranura < 1 || ranura > 4 || m == 4) {
+              ESP_LOGW("nc2200", "programar: ranura %d o modo '%s' no válidos", ranura, modo.c_str());
+              return;
+            }
+            int p = ranura - 1;
+            select::Select *M[4] = {id(m0), id(m1), id(m2), id(m3)};
+            number::Number *CC[4] = {id(cc0), id(cc1), id(cc2), id(cc3)};
+            number::Number *CD[4] = {id(cd0), id(cd1), id(cd2), id(cd3)};
+            number::Number *CAP[4] = {id(cap0), id(cap1), id(cap2), id(cap3)};
+            float c = carga >= 200 && carga <= 2000 ? carga : CC[p]->state;
+            float d = descarga >= 100 && descarga <= 1000 ? descarga : CD[p]->state;
+            float k = capacidad >= 500 && capacidad <= 3200 ? capacidad : CAP[p]->state;
+            M[p]->publish_state(PROG[m]);
+            if (!isnan(c)) CC[p]->publish_state(c);
+            if (!isnan(d)) CD[p]->publish_state(d);
+            if (!isnan(k)) CAP[p]->publish_state(k);
+            switch (p) {
+              case 0: id(prog0).execute(m + 1, c, d, k); break;
+              case 1: id(prog1).execute(m + 1, c, d, k); break;
+              case 2: id(prog2).execute(m + 1, c, d, k); break;
+              default: id(prog3).execute(m + 1, c, d, k); break;
+            }
+
 globals:
   - id: prog_req # ranuras cuyo programa hay que leer (0x93), bit n = ranura n
     type: uint8_t
